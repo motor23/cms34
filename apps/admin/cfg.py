@@ -1,0 +1,103 @@
+# -*- coding: utf-8 -*-
+from os import path
+import sys
+import memcache
+from collections import OrderedDict
+
+from ..common.cfg import Cfg
+import iktomi.templates, iktomi.cms
+
+
+class AdminCfg(Cfg):
+
+    @property
+    def SITE_DIR(self):
+        return path.join(self.ROOT, 'admin')
+
+    IKTOMI_TMPLATE_DIR = path.dirname(path.abspath(iktomi.templates.__file__))
+    IKTOMI_CMS_DIR = path.dirname(path.abspath(iktomi.cms.__file__))
+    CMS34_DIR = path.dirname(path.abspath(__file__))
+
+    @property
+    def TEMPLATES(self):
+        return [
+            path.join(self.SITE_DIR, 'templates'),
+            path.join(self.CMS34_DIR, 'templates'),
+            path.join(self.IKTOMI_CMS_DIR, 'templates'),
+            path.join(self.IKTOMI_TMPLATE_DIR, 'jinja2', 'templates'),
+        ]
+
+    @property
+    def STATIC_DIR(self):
+        return path.join(self.SITE_DIR, 'static')
+
+    STATIC_URL = '/static/'
+
+    @property
+    def CMS_STATIC_DIR(self):
+        return path.join(self.IKTOMI_CMS_DIR, 'static')
+
+    CMS_STATIC_URL = '/cms-static/'
+
+
+    @property
+    def ADMIN_FORM_TMP(self):
+        return path.join(self.TMP_DIR, 'admin')
+    PRIVATE_FORM_TMP = ADMIN_FORM_TMP
+    SHARED_FORM_TMP = ADMIN_FORM_TMP
+
+    @property
+    def PRIVATE_MEDIA_DIR(self):
+        return path.join(self.MEDIA_DIR, 'private')
+
+    ADMIN_MEDIA_URL = '/media/'
+    SHARED_MEDIA_URL = '/shared/'
+    PRIVATE_MEDIA_URL = '/private/'
+    ADMIN_FORM_TMP_URL = '/form-temp/'
+
+    MODEL_LOCK_TIMEOUT = 5*60
+    MODEL_LOCK_RENEW = 60
+
+    @property
+    def FLUP_ARGS(self):
+        return dict(
+            fastcgi_params = self.FASTCGI_PARAMS,
+            umask = 0,
+            bind = path.join(self.RUN_DIR, 'admin.sock'),
+            pidfile = path.join(self.RUN_DIR, 'admin.pid'),
+            logfile = path.join(self.LOG_DIR, 'admin.log'),
+        )
+
+    @property
+    def MANIFESTS(self):
+        return OrderedDict([
+            ("cms", {
+                "path": self.CMS_STATIC_DIR,
+                "url": self.CMS_STATIC_URL,
+                "css": 'css/Manifest',
+                "js": 'js/Manifest'
+            }),
+            ("", {
+                "path": self.STATIC_DIR,
+                "url": self.STATIC_URL,
+                "css": 'css/Manifest',
+                "js": 'js/Manifest'
+            }),
+        ])
+
+    MEMCACHE = ['127.0.0.1:11211']
+
+    DATABASES = {
+        'admin': 'mysql://root@localhost/admin?charset=utf8',
+        'front': 'mysql://root@localhost/front?charset=utf8',
+        'shared': 'mysql://root@localhost/shared?charset=utf8',
+        'flood': 'mysql://root@localhost/flood?charset=utf8',
+    }
+
+    DATABASE_PARAMS = {
+        'pool_size': 10,
+        'max_overflow': 50,
+        'pool_recycle': 3600,
+    }
+
+
