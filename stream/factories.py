@@ -5,7 +5,6 @@ from iktomi.cms.stream import FilterForm
 from iktomi.cms.publishing.i18n_stream import PublishStream
 from iktomi.cms.forms import ModelForm
 
-
 def dict_to_register(streams_dict):
     def register(name, stream):
         streams_dict[name] = stream
@@ -43,11 +42,11 @@ class FormFactoryBase(object):
     def __call__(self, env, *args, **kwargs):
         return self.get_form(env, *args, **kwargs)(env, *args, **kwargs)
 
-    def load_initial(self, env, *args, **kwargs):
-        return self.get_form(env, *args, **kwargs)\
-                   .load_initial(env, *args, **kwargs)
+    def load_initial(self, env, item, initial, *args, **kwargs):
+        return self.get_form(env, initial, item, *args, **kwargs)\
+                   .load_initial(env, item, initial, *args, **kwargs)
 
-    def get_form(self, env, item, *args, **kwargs):
+    def get_form(self, env, initial, item, *args, **kwargs):
         raise NotImplementedError
 
 
@@ -113,18 +112,15 @@ class FormFactoryDispatcher(FormFactoryBase):
     field_name = None
     form_factory = None
 
-    def __init__(self, fields, **kwargs):
-        FormFactoryBase.__init__(self, fields, **kwargs)
-        assert self.form_factory is not None
-        assert self.field_name is not None
-        assert isinstance(self.fields, dict)
+    def __init__(self, fields=None, stream_factory=None):
+        assert isinstance(fields, dict)
+        FormFactoryBase.__init__(self, fields, stream_factory)
 
-    def get_form(self, env, item, *args, **kwargs):
+    def get_form(self, env, initial, item, *args, **kwargs):
         value = getattr(item, self.field_name)
-        _kwargs = {}
-        _kwargs.update(kwargs)
-        _kwargs['stream_factory'] = self.stream_factory
-        return self.form_factory(self.fields[value], **_kwargs)
+        return self.form_factory(self.fields[value],
+                                 stream_factory=self.stream_factory,)\
+                   .get_form(env, initial, item, *args, **kwargs)
 
 
 class TypedItemFormFactory(FormFactoryDispatcher):
@@ -206,56 +202,4 @@ class StreamFactory(object):
     @property
     def main_factory(self):
         return self
-
-
-class SF_Plugin(object):
-
-    def __init__(self, factory=None, **kwargs):
-        self.factory = factory
-        self.__dict__.update(kwargs)
-
-    def __call__(self, factory):
-        return self.__class___(factory)
-
-    def create_filter_form(self, factory, fields):
-        return factory, fields
-
-    def create_item_form(self, factory, fields):
-        return factory, fields
-
-    def create_list_fields(self, factory, fields):
-        return factory, fields
-
-    def create_config(self, factory, cfg):
-        pass
-
-
-class SF_FieldDispatcherPlugin(SF_Plugin):
-    field = None
-
-
-class SF_TreePlugin(SF_Plugin):
-
-    def create_config(self, factory, cfg):
-        cfg.modify_items = self.modify_items
-
-    def modify_items(self, items):
-        tree = self._get_child_items(None, items)
-        for item in items:
-            if item not in tree:
-                item.tree_level = 0
-                tree.append(item)
-        return tree
-
-    def _get_child_items(self, parent, items):
-        # build tree
-        result = []
-        root_items = filter(lambda item: item.parent==parent, items)
-        for root_item in list(root_items):
-            result.append(root_item)
-            child_items = self._get_child_items(root_item, items)
-            root_item.has_childs = bool(child_items)
-            result += child_items
-        return result
-
 

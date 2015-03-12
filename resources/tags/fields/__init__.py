@@ -1,8 +1,12 @@
 # -*- coding: utf8 -*-
+from iktomi.forms import convs
 
 from ....mixed.fields import (
     XF_Id,
     XF_StreamSelect,
+)
+from ....stream.item_fields import (
+    IF_StreamSelect,
 )
 from .model import (
     MF_RegionId,
@@ -50,6 +54,25 @@ class XF_RegionSelect(XF_StreamSelect):
                 self.name,
                 remote_cls_name=self.model,
             )
+
+    def _item_field(self, models, factory=None):
+        return IF_StreamSelect(
+            self.name,
+            label=self.label,
+            model=self.model,
+            stream_name=self.stream_name,
+            multiple=self.multiple,
+            allow_create=self.allow_create,
+            allow_select=self.allow_select,
+            allow_delete=self.allow_delete,
+            inshift=self.inshift,
+            condition=self.condition,
+            default_filters=self.default_filters,
+            ordered=self.ordered,
+            rel=self.rel,
+            conv=convs.Char()
+        )
+
 
 
 class XF_Region(XF_RegionSelect):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from ...stream import (
     StreamFactory,
-    SF_TreePlugin,
+    SFP_Tree,
 )
 from ...mixed import (
     XF_Block,
@@ -41,7 +41,7 @@ class MenuStreamFactory(StreamFactory):
     model = 'Menu'
     title = u'Меню'
     initial_sort = 'order'
-    plugins = [SF_TreePlugin]
+    plugins = [SFP_Tree]
 
     item_fields = (
         xb_object,

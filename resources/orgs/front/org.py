@@ -11,8 +11,6 @@ title = u'Состав cовета'
 
 class OrgSection(ModelFactory):
     title = title
-    table = None
-    identity = name
     item_fields = [MF_M2ORelation('org', remote_cls_name='Org'),]
 
 

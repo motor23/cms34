@@ -63,7 +63,3 @@ handler = Context.handler()
 
 class EventsListSection(ModelFactory):
     title = title
-    table = None
-    identity = name
-
-

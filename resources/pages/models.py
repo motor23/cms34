@@ -21,5 +21,4 @@ class Page(ModelFactory):
 
 class PagesSection(ModelFactory):
     title = u'Страницы'
-    table = None
 

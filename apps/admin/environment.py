@@ -26,7 +26,7 @@ class BoundTemplate(Environment.BoundTemplate):
             user = getattr(self.env, 'user', None),
             packed_js_tag = partial(packer.js_tag, self.env),
             packed_css_tag = partial(packer.css_tag, self.env),
-            STATIC_URL = self.env.cfg.STATIC_URL,
+            CMS34_STATIC_URL = self.env.cfg.CMS34_STATIC_URL,
             CMS_STATIC_URL = self.env.cfg.CMS_STATIC_URL,
         ))
         return d
@@ -48,13 +48,13 @@ class Context(Environment.Context):
 class AdminEnvironment(Environment):
     Context = Context
     BoundTemplate = BoundTemplate
+    auth_model = models.admin.AdminUser
 
     def __init__(self, app, **kwargs):
         Environment.__init__(self, app, **kwargs)
         self.streams = app.streams
         self.dashboard = app.dashboard
         self.top_menu = app.top_menu
-
 
     @cached_property
     def url_for_static(self):

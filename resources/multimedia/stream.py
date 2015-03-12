@@ -2,6 +2,8 @@
 from ...stream import (
     StreamFactory,
     TypedItemFormFactory,
+    SFP_FileUpload,
+    SFP_ImageUpload,
 )
 from ...mixed import (
     XF_Block,
@@ -42,12 +44,14 @@ class XB_Main(XF_Block):
 
 xb_main = XB_Main()
 
+
 class MediaStreamFactory(StreamFactory):
     stream_name = 'multimedia'
     model = 'Media'
     title = u'Медиа'
     limit = 40
     item_form_factory = TypedItemFormFactory
+    plugins = [SFP_FileUpload, SFP_ImageUpload]
 
     list_fields = [
         xb_object,

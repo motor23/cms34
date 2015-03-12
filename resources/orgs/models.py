@@ -24,4 +24,3 @@ class Org(ModelFactory):
 
 class OrgsListSection(ModelFactory):
     title = u'Список организаций'
-    table = None

@@ -179,7 +179,7 @@ class MF_Text(MF_Base):
 
 class MF_Enum(MF_Base):
     choices = None
-    nullable = False
+    nullable = True
 
     def get_dict(self, models, factory=None):
         if self.choices is None:
@@ -409,7 +409,7 @@ class MF_File(MF_Base):
 
     def get_dict(self, models, factory=None):
         base_path = self.get_base_path(factory)
-        file_name = Column(VarBinary(250), nullable=False)
+        file_name = Column(VarBinary(250))
         file = ReplicatedFileProperty(
             file_name,
             persistent_cls=self._File,
@@ -434,7 +434,7 @@ class MF_Img(MF_Base):
 
     def get_dict(self, models, factory=None):
         base_path = self.get_base_path(factory)
-        img_name = Column(VarBinary(250), nullable=False)
+        img_name = Column(VarBinary(250))
         img = ReplicatedImageProperty(img_name,
             image_sizes=self.image_sizes,
             resize=self.resize,

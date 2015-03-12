@@ -23,5 +23,4 @@ class Event(ModelFactory):
 
 class EventsListSection(ModelFactory):
     title = u'Событие'
-    table = None
 

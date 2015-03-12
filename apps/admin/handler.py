@@ -12,15 +12,15 @@ import models
 from . import views as h
 
 
-def create_handler(app, additional_cases=[]):
+def create_handler(app, add_handler=web.cases(), add_auth_handler=web.cases()):
 
     h_auth = AdminAuth(models.admin.AdminUser, storage=app.cache)
 
     return flash_message_handler | web.cases(
-        static_files(app.cfg.STATIC_DIR, app.cfg.STATIC_URL),
+        static_files(app.cfg.CMS34_STATIC_DIR, app.cfg.CMS34_STATIC_URL),
         static_files(app.cfg.CMS_STATIC_DIR, app.cfg.CMS_STATIC_URL),
         static_files(app.cfg.PRIVATE_MEDIA_DIR, app.cfg.PRIVATE_MEDIA_URL),
-        static_files(app.cfg.ADMIN_FORM_TMP, app.cfg.ADMIN_FORM_TMP_URL),
+        static_files(app.cfg.ADMIN_FORM_TMP_DIR, app.cfg.ADMIN_FORM_TMP_URL),
         static_files(app.cfg.SHARED_MEDIA_DIR, app.cfg.SHARED_MEDIA_URL),
         static_files(app.cfg.ADMIN_MEDIA_DIR, app.cfg.ADMIN_MEDIA_URL),
 
@@ -43,12 +43,10 @@ def create_handler(app, additional_cases=[]):
                      h.force_lock),
                 Rule('/_release_lock/<string:item_id>/<string:edit_session>',
                      h.release_lock),
-
-                web.match('/_tmp_file', 'load_tmp_file') | h.load_tmp_file,
-                web.match('/_tmp_img', 'load_tmp_image') | h.load_tmp_image,
             ),
             app.streams.to_app(),
-            *additional_cases
+            add_auth_handler,
         ),
+        add_handler,
         HTTPNotFound,  # XXX does not work without this
     )

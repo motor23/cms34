@@ -69,9 +69,9 @@ class Application(BaseApplication):
     @cached_property
     def file_manager(self):
         return FileManager(
-            transient_root=self.cfg.ADMIN_FORM_TMP,
+            transient_root=self.cfg.ADMIN_FORM_TMP_DIR,
             persistent_root=self.cfg.ADMIN_MEDIA_DIR,
-            transient_url=self.cfg.ADMIN_FORM_TMP,
+            transient_url=self.cfg.ADMIN_FORM_TMP_URL,
             persistent_url=self.cfg.ADMIN_MEDIA_URL,
             public_root=self.cfg.FRONT_MEDIA_DIR,
         )
@@ -79,7 +79,7 @@ class Application(BaseApplication):
     @cached_property
     def shared_file_manager(self):
         return FileManager(
-            transient_root=self.cfg.SHARED_FORM_TMP,
+            transient_root=self.cfg.SHARED_FORM_TMP_DIR,
             persistent_root=self.cfg.SHARED_MEDIA_DIR,
             persistent_url=self.cfg.SHARED_MEDIA_URL,
         )
@@ -87,7 +87,7 @@ class Application(BaseApplication):
     @cached_property
     def private_file_manager(self):
         return FileManager(
-            transient_root=self.cfg.PRIVTE_FORM_TMP,
+            transient_root=self.cfg.PRIVTE_FORM_TMP_DIR,
             transient_url=None,
             persistent_root=self.cfg.PRIVTE_MEDIA_DIR,
             persistent_url=self.cfg.PRIVTE_MEDIA_URL,

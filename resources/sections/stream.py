@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from ...stream import (
     StreamFactory,
-    SF_TreePlugin,
+    SFP_Tree,
+    TypedItemFormFactory,
 )
 from ...mixed import (
     XF_String,
@@ -56,19 +57,18 @@ class SectionsStreamFactory(StreamFactory):
     model = 'Section'
     title = u'Разделы'
     initial_sort = 'order'
-    plugins = [SF_TreePlugin]
+    plugins = [SFP_Tree]
+    item_form_factory = TypedItemFormFactory
 
-    item_fields = (
+    common_fields = [
         xb_object,
         xb_main,
-    )
-    list_fields = (
-        xb_main,
-    )
-    sort_fields = (
+    ]
+    list_fields = common_fields
+    sort_fields = [
         #section_block,
-    )
-    filter_fields = (
-        xb_main,
-    )
-
+    ]
+    filter_fields = common_fields
+    item_fields = {
+        '404': common_fields,
+    }

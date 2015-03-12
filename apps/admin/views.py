@@ -6,13 +6,8 @@ from iktomi.cms.stream_handlers import insure_is_xhr
 from iktomi.cms.views import (update_lock, PostNote,
                               force_lock, release_lock)
 
-__all__ = ['index', 'tinymce_compressor', 
-           'load_tmp_file', 'update_lock', 'force_lock',
-           'release_lock', 'load_tmp_image']
-
-
-load_tmp_file = FileUploadHandler()  # XXX both views are identical?
-load_tmp_image = FileUploadHandler()
+__all__ = ['index', 'tinymce_compressor', 'update_lock', 'force_lock',
+           'release_lock']
 
 packer = StaticPacker()
 

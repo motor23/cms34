@@ -41,5 +41,7 @@ class Person(ModelFactory):
 
 class PersonsListSection(ModelFactory):
     title = u'Список персон'
-    table = None
+
+class PersonSection(ModelFactory):
+    title = u'Персона'
 

@@ -10,7 +10,5 @@ title = u'Список персон'
 
 class Section(Factory):
     title = title
-    table = None
-    identity = name
 
 

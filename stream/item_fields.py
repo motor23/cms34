@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 from collections import OrderedDict
 
+from iktomi.utils import cached_property
 from iktomi.forms import Field
 from iktomi.cms.forms import convs, widgets, fields
 

@@ -21,17 +21,10 @@ class AdminCfg(Cfg):
     @property
     def TEMPLATES(self):
         return [
-            path.join(self.SITE_DIR, 'templates'),
             path.join(self.CMS34_DIR, 'templates'),
             path.join(self.IKTOMI_CMS_DIR, 'templates'),
             path.join(self.IKTOMI_TMPLATE_DIR, 'jinja2', 'templates'),
         ]
-
-    @property
-    def STATIC_DIR(self):
-        return path.join(self.SITE_DIR, 'static')
-
-    STATIC_URL = '/static/'
 
     @property
     def CMS_STATIC_DIR(self):
@@ -39,12 +32,17 @@ class AdminCfg(Cfg):
 
     CMS_STATIC_URL = '/cms-static/'
 
+    @property
+    def CMS34_STATIC_DIR(self):
+        return path.join(self.CMS34_DIR, 'static')
+
+    CMS34_STATIC_URL = '/cms34-static/'
 
     @property
-    def ADMIN_FORM_TMP(self):
+    def ADMIN_FORM_TMP_DIR(self):
         return path.join(self.TMP_DIR, 'admin')
-    PRIVATE_FORM_TMP = ADMIN_FORM_TMP
-    SHARED_FORM_TMP = ADMIN_FORM_TMP
+    PRIVATE_FORM_TMP_DIR = ADMIN_FORM_TMP_DIR
+    SHARED_FORM_TMP_DIR = ADMIN_FORM_TMP_DIR
 
     @property
     def PRIVATE_MEDIA_DIR(self):
@@ -77,9 +75,9 @@ class AdminCfg(Cfg):
                 "css": 'css/Manifest',
                 "js": 'js/Manifest'
             }),
-            ("", {
-                "path": self.STATIC_DIR,
-                "url": self.STATIC_URL,
+            ("cms34", {
+                "path": self.CMS34_STATIC_DIR,
+                "url": self.CMS34_STATIC_URL,
                 "css": 'css/Manifest',
                 "js": 'js/Manifest'
             }),
