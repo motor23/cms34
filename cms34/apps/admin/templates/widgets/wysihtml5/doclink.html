@@ -1,0 +1,23 @@
+<a data-wysihtml5-command="objectLink" class="btn" id="doclink_button"
+data-stream="{{ env.stream.url_for(env) }}">Вставить объект</a>
+<div class="wysihtml5-dialog-place">
+  <div class="wysihtml5-dialog wysihtml5-menu"  data-wysihtml5-dialog="ObjectLink"
+       id="{{ widget.id }}-table" style="display: none; min-width:150px">
+    <a data-wysihtml5-command="doclink"
+       data-wysihtml5-command-value="select">Блок ссылок</a>
+    <a data-wysihtml5-command="fileslink"
+       data-wysihtml5-command-value="select">Блок файлов</a> 
+    <a data-wysihtml5-command="medialink"
+       data-wysihtml5-command-value="select">Мультимедиа</a>
+
+    {#
+    <a data-wysihtml5-command="photolink"
+       data-wysihtml5-command-value="select">Фотография</a>
+    <a data-wysihtml5-command="videolink"
+       data-wysihtml5-command-value="select">Видео</a>
+    <a data-wysihtml5-command="audiolink"
+       data-wysihtml5-command-value="select">Аудио</a>
+
+    #}
+  </div>
+</div>

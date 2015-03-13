@@ -22,5 +22,5 @@ class Event(ModelFactory):
     ]
 
 class EventsListSection(ModelFactory):
-    title = u'Событие'
+    title = u'Список событий'
 

@@ -1,10 +1,10 @@
 # -*- coding:utf8 -*-
 from iktomi.utils import cached_property
 from iktomi.cms.menu import (Menu, DashStream)
+from iktomi.unstable.db.files import FileManager
 
 from ..common.app import Application as BaseApplication
 from ..common.sessionmakers import binded_filesessionmaker
-from ..common.files import FileManager
 
 
 class Application(BaseApplication):
@@ -59,21 +59,31 @@ class Application(BaseApplication):
     def db_maker(self):
         import models
         return binded_filesessionmaker(self.cfg.DATABASES,
-                                   engine_params=self.cfg.DATABASE_PARAMS,
-                                   default_file_manager=self.file_manager,
-                                   file_managers={
-                                       models.shared.metadata: self.shared_file_manager,
-                                   })
+                        engine_params=self.cfg.DATABASE_PARAMS,
+                        default_file_manager=self.admin_file_manager,
+                        file_managers={
+                            models.admin.metadata: self.admin_file_manager,
+                            models.front.metadata: self.front_file_manager,
+                            models.shared.metadata: self.shared_file_manager,
+                        })
 
 
     @cached_property
-    def file_manager(self):
+    def admin_file_manager(self):
         return FileManager(
             transient_root=self.cfg.ADMIN_FORM_TMP_DIR,
             persistent_root=self.cfg.ADMIN_MEDIA_DIR,
             transient_url=self.cfg.ADMIN_FORM_TMP_URL,
             persistent_url=self.cfg.ADMIN_MEDIA_URL,
-            public_root=self.cfg.FRONT_MEDIA_DIR,
+        )
+
+    @cached_property
+    def front_file_manager(self):
+        return FileManager(
+            transient_root=None,
+            persistent_root=self.cfg.FRONT_MEDIA_DIR,
+            transient_url=None,
+            persistent_url=self.cfg.ADMIN_MEDIA_URL,
         )
 
     @cached_property
@@ -81,6 +91,7 @@ class Application(BaseApplication):
         return FileManager(
             transient_root=self.cfg.SHARED_FORM_TMP_DIR,
             persistent_root=self.cfg.SHARED_MEDIA_DIR,
+            transient_url=None,
             persistent_url=self.cfg.SHARED_MEDIA_URL,
         )
 

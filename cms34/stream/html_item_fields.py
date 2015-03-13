@@ -168,8 +168,8 @@ class IF_ExpHtml(IF_Html):
         ('history', ['undo', 'redo']),
         ('html', ['html']),
     ]
-    stylesheets = ('/static/css/wysihtml5-content.css',
-                   '/static/css/wysihtml5-blocks.css',)
+    stylesheets = ('/cms34-static/css/wysihtml5-content.css',
+                   '/cms34-static/css/wysihtml5-blocks.css',)
 
     def create_conv(self, models, factory=None):
         return ExpandableHtmlConv(

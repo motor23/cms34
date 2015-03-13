@@ -16,21 +16,21 @@ from ...mixed import (
 class XB_Main(XF_Block):
     name = 'menu_block'
     label = u'Меню'
-    list_fields = (
+    list_fields = [
         xf_tree_title,
         xf_order,
         #StdText(name='tree_path', label=u'url'),
-    )
-    sort_fields = (
+    ]
+    sort_fields = [
         xf_order,
-    )
-    filter_fields = (
-    )
-    item_fields = (
+    ]
+    filter_fields = [
+    ]
+    item_fields = [
         xf_order,
         xf_parent,
         xf_tree_title,
-    )
+    ]
 
 
 xb_main = XB_Main()
@@ -43,14 +43,14 @@ class MenuStreamFactory(StreamFactory):
     initial_sort = 'order'
     plugins = [SFP_Tree]
 
-    item_fields = (
+    item_fields = [
         xb_object,
         xb_main,
-    )
-    list_fields = (
+    ]
+    list_fields = [
         xb_object,
         xb_main,
-    )
-    sort_fields = ()
-    filter_fields = ()
+    ]
+    sort_fields = []
+    filter_fields = []
 

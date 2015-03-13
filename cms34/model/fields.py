@@ -22,8 +22,8 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from iktomi.utils import cached_property
 from iktomi.unstable.db.files import PersistentFile
 from iktomi.cms.publishing.files import (
-    ReplicatedImageProperty,
-    ReplicatedFileProperty,
+    PublicatedImageProperty,
+    PublicatedFileProperty,
 )
 from ..utils import prop_getter
 
@@ -410,7 +410,7 @@ class MF_File(MF_Base):
     def get_dict(self, models, factory=None):
         base_path = self.get_base_path(factory)
         file_name = Column(VarBinary(250))
-        file = ReplicatedFileProperty(
+        file = PublicatedFileProperty(
             file_name,
             persistent_cls=self._File,
             name_template=('%s/%s/{random}' % (base_path, self.name)),
@@ -435,7 +435,7 @@ class MF_Img(MF_Base):
     def get_dict(self, models, factory=None):
         base_path = self.get_base_path(factory)
         img_name = Column(VarBinary(250))
-        img = ReplicatedImageProperty(img_name,
+        img = PublicatedImageProperty(img_name,
             image_sizes=self.image_sizes,
             resize=self.resize,
             fill_from=self.fill_from,
