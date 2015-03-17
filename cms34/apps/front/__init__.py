@@ -1,28 +1,13 @@
 # -*- coding:utf8 -*-
 from iktomi.utils import cached_property
-from iktomi.cms.menu import (Menu, DashStream)
-from iktomi.unstable.db.files import FileManager
+from iktomi.unstable.db.files import FileManager, ReadonlyFileManager
+from iktomi.unstable.db.sqla.public_query import PublicQuery
 
 from ..common.app import Application as BaseApplication
 from ..common.sessionmakers import binded_filesessionmaker
 
 
 class Application(BaseApplication):
-
-    @cached_property
-    def streams(env):
-        from .streams import streams
-        return streams
-
-    @cached_property
-    def dashboard(env):
-        from .menuconf import dashboard
-        return dashboard
-
-    @cached_property
-    def top_menu(env):
-        from .menuconf import top_menu
-        return top_menu
 
     @cached_property
     def handler(self):
@@ -34,8 +19,7 @@ class Application(BaseApplication):
         from .environment import Environment
         return Environment
 
-
-    def command_admin(self):
+    def command_front(self):
         from iktomi.cli.app import App
         shell_namespace = {
             'app': self,
@@ -43,7 +27,7 @@ class Application(BaseApplication):
         }
         return App(self, shell_namespace=shell_namespace)
 
-    def command_admin_fcgi(self):
+    def command_front_fcgi(self):
         from iktomi.cli.fcgi import Flup
         return Flup(self, **self.cfg.FLUP_ARGS)
 
@@ -60,30 +44,18 @@ class Application(BaseApplication):
         import models
         return binded_filesessionmaker(self.cfg.DATABASES,
                         engine_params=self.cfg.DATABASE_PARAMS,
-                        default_file_manager=self.admin_file_manager,
+                        session_params={'query_cls': PublicQuery},
+                        default_file_manager=self.front_file_manager,
                         file_managers={
-                            models.admin.metadata: self.admin_file_manager,
                             models.front.metadata: self.front_file_manager,
                             models.shared.metadata: self.shared_file_manager,
                         })
 
-
-    @cached_property
-    def admin_file_manager(self):
-        return FileManager(
-            transient_root=self.cfg.ADMIN_FORM_TMP_DIR,
-            persistent_root=self.cfg.ADMIN_MEDIA_DIR,
-            transient_url=self.cfg.ADMIN_FORM_TMP_URL,
-            persistent_url=self.cfg.ADMIN_MEDIA_URL,
-        )
-
     @cached_property
     def front_file_manager(self):
-        return FileManager(
-            transient_root=None,
+        return ReadonlyFileManager(
             persistent_root=self.cfg.FRONT_MEDIA_DIR,
-            transient_url=None,
-            persistent_url=self.cfg.ADMIN_MEDIA_URL,
+            persistent_url=self.cfg.FRONT_MEDIA_URL,
         )
 
     @cached_property
@@ -92,14 +64,6 @@ class Application(BaseApplication):
             transient_root=self.cfg.SHARED_FORM_TMP_DIR,
             persistent_root=self.cfg.SHARED_MEDIA_DIR,
             transient_url=None,
-            persistent_url=self.cfg.SHARED_MEDIA_URL,
+            persistent_url=None,
         )
 
-    @cached_property
-    def private_file_manager(self):
-        return FileManager(
-            transient_root=self.cfg.PRIVTE_FORM_TMP_DIR,
-            transient_url=None,
-            persistent_root=self.cfg.PRIVTE_MEDIA_DIR,
-            persistent_url=self.cfg.PRIVTE_MEDIA_URL,
-        )

@@ -6,8 +6,7 @@ from webob.exc import HTTPException, HTTPInternalServerError, \
                       HTTPNotFound
 from webob import Request
 import memcache
-from iktomi.templates import Template
-from iktomi.templates.jinja2 import TemplateEngine
+from .templates import AppTemplateEngine
 from iktomi.utils import cached_property
 from iktomi.utils.storage import VersionedStorage
 from iktomi.web import (
@@ -114,9 +113,6 @@ class Application(BaseApplication):
         return memcache.Client(self.cfg.MEMCACHE)
 
 
-    @cached_property
-    def template_loader(self):
-        jinja_loader = TemplateEngine(self.cfg.TEMPLATES)
-        return Template(engines={'html': jinja_loader},
-                        *self.cfg.TEMPLATES)
+    def template_engine(self):
+        return AppTemplateEngine(self.cfg.TEMPLATES)
 

@@ -1,9 +1,9 @@
 # -*- coding:utf8 -*-
-import json
+import os, json
 
 from webob.exc import HTTPSeeOther
 from jinja2 import Markup
-from iktomi.templates import BoundTemplate as BaseBoundTemplate
+from iktomi.templates import BoundTemplate
 from iktomi import web
 from iktomi.utils import cached_property, quote_js
 from iktomi.utils.storage import (
@@ -14,27 +14,6 @@ from iktomi.utils.storage import (
 
 from iktomi.web.route_state import RouteState
 import models
-
-
-class BoundTemplate(BaseBoundTemplate):
-
-    constant_template_vars = {
-        'quote_js': quote_js,
-    }
-
-    def get_template_vars(self):
-        d = dict(
-            self.constant_template_vars,
-            env = self.env,
-            url_for = self.env.url_for,
-            url_for_static = self.env.url_for_static,
-            context = self.env.context,
-        )
-        return d
-
-    def render(self, template_name, __data=None, **kw):
-        r = BaseBoundTemplate.render(self, template_name, __data, **kw)
-        return Markup(r)
 
 
 class Context(object):
@@ -61,10 +40,16 @@ class BaseEnvironment(web.AppEnvironment):
     def finalize(self):
         pass
 
+    @cached_property
+    def url_for(self):
+        return self.root.build_url
+
+    def url_for_static(self, path):
+        return self.cfg.STATIC_URL + path
+
 
 class Environment(BaseEnvironment):
     models = models
-    BoundTemplate = BoundTemplate
     Context = Context
 
     def __init__(self, app, **kwargs):
@@ -85,14 +70,24 @@ class Environment(BaseEnvironment):
 
     @storage_cached_property
     def template(storage):
+        template = storage.app.template_engine()
         try:
-            return storage.BoundTemplate(storage, storage.app.template_loader)
-        except Exception, err:
-            raise Exception(err)
+            template.env.globals.update(storage.get_template_globals(storage))
+        except Exception, exc:
+            raise Exception(exc)
+        return template
+
+    def get_template_globals(self, env):
+        return dict(
+            env = env,
+            url_for = env.url_for,
+            url_for_static = env.url_for_static,
+            context = env.context,
+        )
 
     @storage_property
     def render_to_string(storage):
-        return storage.template.render
+        return storage.template.render_to_string
 
     @storage_property
     def render_to_response(storage):

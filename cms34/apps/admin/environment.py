@@ -4,7 +4,6 @@
 from functools import partial
 
 from iktomi.cms.views import AdminAuth
-from iktomi import web
 from iktomi.utils.storage import (storage_cached_property,
                                   storage_method,
                                   storage_property)
@@ -13,26 +12,12 @@ from iktomi.cms.item_lock import ItemLock
 
 import models
 
-from ..common.environment import Environment
+from ..common.environment import Environment as EnvironmentBase
 
 from .views import packer
 
 
-class BoundTemplate(Environment.BoundTemplate):
-
-    def get_template_vars(self):
-        d = Environment.BoundTemplate.get_template_vars(self)
-        d.update(dict(
-            user = getattr(self.env, 'user', None),
-            packed_js_tag = partial(packer.js_tag, self.env),
-            packed_css_tag = partial(packer.css_tag, self.env),
-            CMS34_STATIC_URL = self.env.cfg.CMS34_STATIC_URL,
-            CMS_STATIC_URL = self.env.cfg.CMS_STATIC_URL,
-        ))
-        return d
-
-
-class Context(Environment.Context):
+class Context(EnvironmentBase.Context):
 
     import json
 
@@ -45,20 +30,15 @@ class Context(Environment.Context):
         return self.env.db.query(AdminUser).filter_by(active=True).all()
 
 
-class AdminEnvironment(Environment):
+class Environment(EnvironmentBase):
     Context = Context
-    BoundTemplate = BoundTemplate
     auth_model = models.admin.AdminUser
 
     def __init__(self, app, **kwargs):
-        Environment.__init__(self, app, **kwargs)
+        EnvironmentBase.__init__(self, app, **kwargs)
         self.streams = app.streams
         self.dashboard = app.dashboard
         self.top_menu = app.top_menu
-
-    @cached_property
-    def url_for_static(self):
-        return web.filters.static_files('admin/static').construct_reverse()
 
     @storage_cached_property
     def item_lock(storage):
@@ -68,4 +48,14 @@ class AdminEnvironment(Environment):
     def get_edit_url(storage, x):
         return streams.get_edit_url(storage, x)
 
- 
+    def get_template_globals(self, env):
+        vars = EnvironmentBase.get_template_globals(self, env)
+        vars.update(dict(
+            user = getattr(env, 'user', None),
+            packed_js_tag = partial(packer.js_tag, env),
+            packed_css_tag = partial(packer.css_tag, env),
+            CMS34_STATIC_URL = env.cfg.CMS34_STATIC_URL,
+            CMS_STATIC_URL = env.cfg.CMS_STATIC_URL,
+        ))
+        return vars
+

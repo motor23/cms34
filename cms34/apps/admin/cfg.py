@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 from os import path
 import sys
-import memcache
 from collections import OrderedDict
 
-from ..common.cfg import Cfg
 import iktomi.templates, iktomi.cms
+import memcache
+
+from ..common.cfg import Cfg as CfgBase
 
 
-class AdminCfg(Cfg):
+class Cfg(CfgBase):
 
     @property
     def SITE_DIR(self):
@@ -37,6 +38,7 @@ class AdminCfg(Cfg):
         return path.join(self.CMS34_DIR, 'static')
 
     CMS34_STATIC_URL = '/cms34-static/'
+    STATIC_URL = '/static/'
 
     @property
     def ADMIN_FORM_TMP_DIR(self):

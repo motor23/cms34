@@ -20,9 +20,9 @@ class BaseCfg(object):
             return
         execfile(filepath, dict(cfg=self))
         l = locals()
-        locals.pop('self')
-        locals.pop('filepath')
-        self.update_cfg(locals())
+        l.pop('self')
+        l.pop('filepath')
+        self.update_cfg(l)
 
 
 class Cfg(BaseCfg):
