@@ -1,15 +1,21 @@
-<div class="tree_expand init-block" style="float:left; width:40px"
+<table class="list_fields_container">
+<tr><td class="td_width_25">
+<div class="tree_expand init-block" xstyle="width:40px"
      data-block-name="tree_expand"
      data-id="{{ item.id }}"
      data-parent="{{ item.parent_id or '' }}"
      data-childs="{{ item.has_childs and 1 or '' }}"
      data-level="{{ item.tree_level }}"
->
-    <button style="display:none" class="tree_expand_open_button">+</button>
-    <button style="display:none" class="tree_expand_close_button">-</button>
-    &nbsp;
+>   
+    <img class="tree_expand_open_button" src="/cms34-static/img/tree/plus.png">
+    <img class="tree_expand_close_button" src="/cms34-static/img/tree/minus.png">
 </div>
+</td><td class="td_width_25">
+<img src="/cms34-static/img/sections/{{ item.type }}.png"/>
+</td><td>
 <a data-id="{{ item.id }}"
     {%- if read_allowed %} href="{{ url }}"{% endif %}>
 {{ field_val }}
 </a>
+</td></tr>
+</table>

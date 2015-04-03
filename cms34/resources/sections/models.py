@@ -8,11 +8,10 @@ from ...mixed.fields import (
     xf_parent,
 )
 
-class EmptySection(ModelFactory):
-    title = u'Папка'
 
-class Section(ModelFactory):
+class MFY_Section(ModelFactory):
     title = u'Раздел'
+    name = 'Section'
     plugins = [SingleTableTypesPlugin]
 
     fields = [
@@ -22,5 +21,17 @@ class Section(ModelFactory):
         xf_title,
         xf_order,
     ]
-    types = [('404', EmptySection),]
+    types = []
+    resources = []
+
+    def __init__(self, *args, **kwargs):
+        self.types += [(r.name, r.section_model) for r in self.resources]
+        ModelFactory.__init__(self, *args, **kwargs)
+
+
+class MFY_DirSection(ModelFactory):
+    title = u'Папка'
+    model = 'DirSection'
+
+    fields = [xf_id]
 

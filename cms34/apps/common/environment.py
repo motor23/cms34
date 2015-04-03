@@ -40,8 +40,9 @@ class BaseEnvironment(web.AppEnvironment):
     def finalize(self):
         pass
 
-    @cached_property
+    @storage_cached_property
     def url_for(self):
+        raise Exception()
         return self.root.build_url
 
     def url_for_static(self, path):
@@ -70,19 +71,21 @@ class Environment(BaseEnvironment):
 
     @storage_cached_property
     def template(storage):
+        import traceback
         template = storage.app.template_engine()
         try:
             template.env.globals.update(storage.get_template_globals(storage))
         except Exception, exc:
+            traceback.print_exc(100)
             raise Exception(exc)
         return template
 
     def get_template_globals(self, env):
         return dict(
             env = env,
-            url_for = env.url_for,
-            url_for_static = env.url_for_static,
-            context = env.context,
+            url_for = self.url_for,
+            url_for_static = self.url_for_static,
+            context = self.context,
         )
 
     @storage_property

@@ -14,7 +14,7 @@ from ...mixed.fields import (
 class XB_Main(XF_Block):
     name = 'page_block'
     label = u'Страница'
-    index_fields = [
+    list_fields = [
         xf_title,
         xf_slug,
     ]
@@ -45,6 +45,6 @@ class PagesStreamFactory(StreamFactory):
         xb_object,
         xb_main,
     ]
-    index_fields = sort_fields = filter_fields = item_fields = blocks
+    list_fields = sort_fields = filter_fields = item_fields = blocks
 
 

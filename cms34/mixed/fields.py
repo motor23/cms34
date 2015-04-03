@@ -25,6 +25,8 @@ from ..stream import (
    LF_Img,
    LF_Relation,
    LF_DateTime,
+   LF_Container,
+   LF_EnumImg,
    FF_TextSearch,
    FF_Id,
    FF_Select,
@@ -45,6 +47,7 @@ from ..stream import (
    IF_Html,
    IF_ExpHtml,
    IF_List,
+   lf_tree_expand,
 )
 
 
@@ -61,6 +64,7 @@ __all__ = (
     'XF_Id',
     'XF_Select',
     'XF_Type',
+    'XF_TypeImg',
     'XF_StreamSelect',
     'XF_Parent',
     'XF_List',
@@ -73,6 +77,7 @@ __all__ = (
     'XF_Html',
     'XF_ExpHtml',
     'XF_Body',
+    'XF_TreeTitle',
     'xf_slug',
     'xf_title',
     'xf_tree_title',
@@ -209,6 +214,8 @@ class XF_String(XF_Simple):
 
 
 class XF_Slug(XF_String):
+    required = True
+    min_length = 2
     regex = r'^[A-Za-z][A-Za-z0-9_-]+$'
 
 
@@ -238,11 +245,21 @@ class XF_Title(XF_Text):
 
 class XF_TreeTitle(XF_Title):
 
+    list_fields = []
+
     def _list_field(self):
-        return LF_String(self.name,
-                        label=self.label,
-                        link_to_item=False,
-                        template = 'tree_expand_list_field.html')
+        return LF_Container('%s_container' % self.name,
+                    label = self.label,
+                    fields = self.container_list_fields(),
+        )
+
+    def container_list_fields(self):
+        return [
+            lf_tree_expand,
+            LF_String(self.name,
+                label=self.label,
+            ),
+        ]
 
 
 class XF_Lead(XF_Text):
@@ -347,6 +364,17 @@ class XF_Type(XF_Select):
         else:
             field = self._filter_field(models, factory)
             defaults_dict[self.name] = field.get_choices(models, factory)[0][0]
+
+
+class XF_TypeImg(XF_Type):
+
+    img_url_teplate = LF_EnumImg.img_url_template
+
+    def _list_field(self):
+        return LF_EnumImg(self.name,
+                    label=self.label,
+                    img_url_template=self.img_url_template,
+        )
 
 
 class XF_StreamSelect(XF_Simple):

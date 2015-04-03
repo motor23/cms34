@@ -1,0 +1,17 @@
+.tree_expand{
+    width:25px;
+}
+.tree_expand_open_button, .tree_expand_close_button{
+    cursor: pointer;
+    display: none;
+    width: 25px;
+}
+table.list_fields_container tr td{
+    padding:0px 5px;   
+}
+table.items table.list_fields_container div.opened .tree_expand_close_button{
+    display:block;
+}
+table.items table.list_fields_container div.closed .tree_expand_open_button{
+    display:block;
+}

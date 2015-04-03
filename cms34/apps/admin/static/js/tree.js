@@ -1,5 +1,8 @@
 Blocks.register('tree_expand', function(container){
-    var table = container.getParent('table')
+    var table = container.getParent('table.items')
+    if(!table){
+        return;
+    }
     var tree = table.retrieve('tree', []);
 
     function TreeElement(tree, el){
@@ -11,12 +14,12 @@ Blocks.register('tree_expand', function(container){
         this.id = el.get('data-id');
         this.parent_id = el.get('data-parent');
         this.td = el.getParent('td');
-        this.tr = this.td.getParent('tr');
+        this.tr = this.td.getParent('tr.item');
         this.childs = []
         this.parent_item = null;
         this.hidden = false;
         this.closed = false;
-        this.td.setStyle('padding-left', (this.level-1) * 20 + 10);
+        this.td.setStyle('padding-left', (this.level-1) * 40 + 10);
         this.tree.each(function(item){
             if(item.id==this.parent_id){
                 item.childs.push(this);
@@ -40,8 +43,8 @@ Blocks.register('tree_expand', function(container){
                 return;
             this.childs.each(function(item){item.show()});
             localStorage.setItem('tree-open-'+this.id, '1');
-            this.open_button.setStyle('display', 'none');
-            this.close_button.setStyle('display', 'inline-block');
+            el.removeClass('closed');
+            el.addClass('opened');
         }
         this.close = function(){
             this.closed = true;
@@ -49,8 +52,8 @@ Blocks.register('tree_expand', function(container){
                 return;
             this.childs.each(function(item){item.hide()});
             localStorage.setItem('tree-open-'+this.id, '');
-            this.open_button.setStyle('display', 'inline-block');
-            this.close_button.setStyle('display', 'none');
+            el.removeClass('opened');
+            el.addClass('closed');
         }
         this.open_button.addEvent('click', this.open.bind(this));
         this.close_button.addEvent('click', this.close.bind(this));

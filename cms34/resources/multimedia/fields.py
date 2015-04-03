@@ -2,6 +2,7 @@
 from ...mixed.fields import (
     XF_StreamSelect,
     XF_Select,
+    XF_TypeImg
 )
 
 class XF_Media(XF_StreamSelect):
@@ -49,10 +50,15 @@ class XF_Aspect(XF_Select):
                ('16_9', u'16:9'),)
 
 
+class XF_MediaTypeImg(XF_TypeImg):
+    img_url_template = '/cms34-static/img/multimedia/%(value)s.png'
+
+
 xf_media = XF_Media()
 xf_photo = XF_Photo()
 xf_video = XF_Video()
 xf_photoset = XF_PhotoSet()
 xf_medias = XF_Medias()
 xf_aspect = XF_Aspect()
+xf_media_type_img = XF_MediaTypeImg()
 

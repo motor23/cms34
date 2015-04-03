@@ -18,10 +18,8 @@ class BaseCfg(object):
     def update_from_py(self, filepath, silent=True):
         if silent and not os.path.isfile(filepath):
             return
-        execfile(filepath, dict(cfg=self))
-        l = locals()
-        l.pop('self')
-        l.pop('filepath')
+        l = {}
+        execfile(filepath, dict(cfg=self), l)
         self.update_cfg(l)
 
 
@@ -114,4 +112,23 @@ logging.config.dictConfig({
 })
 
 
+FASTCGI_PREFORKED_DEFAULTS = dict(
+    preforked=True,
+    multiplexed=False,
+    minSpare=1,
+    maxSpare=5,
+    maxChildren=50,
+    maxRequests=0,
+)
+
+# Do not change defaults, overwrite params in FASTCGI_PARAMS instead
+FASTCGI_THREADED_DEFAULTS = dict(
+    preforked=False,
+    multithreaded=True,
+    multiprocess=False,
+    multiplexed=False,
+    minSpare=1,
+    maxSpare=5,
+    maxThreads=sys.maxint,
+)
 

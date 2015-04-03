@@ -3,6 +3,7 @@ from iktomi.web import WebHandler, cases as cases
 
 
 class HView(WebHandler):
+
     def __init__(self, view_cls, **kwargs):
         assert view_cls.name is not None, 'You must set context name'
         self.view_cls = view_cls
@@ -14,11 +15,8 @@ class HView(WebHandler):
         env.view_contexts = contexts
 
         view = self.view_cls(env, data, **self.kwargs)
-        views = getattr(env, 'views', {})
-        views = OrderedDict(views)
-        if views.has_key(view.name):
-            raise Exception('View with name=%s already exists' % view.name)
-        views[view.name] = view
+        views = getattr(env, 'views', [])
+        views.append(view)
         env.views = views
         env.view = view
         return self.next_handler(env, data)
@@ -54,6 +52,7 @@ class Context(object):
 class BaseView(object):
 
     name = None
+    plugins = []
 
     def __init__(self, env, data):
         self.env = env
@@ -80,32 +79,25 @@ class BaseView(object):
         return self._url_for_index(self.root)
 
     def url_for_obj(self, obj):
-        return self._url_for_index(self.root, obj)
+        return self._url_for_obj(self.root, obj)
 
     @classmethod
     def _url_for_index(cls, root):
         raise NotImplementedError()
 
     @classmethod
-    def _url_for_obj(cls, root):
+    def _url_for_obj(cls, root, obj):
         raise NotImplementedError()
 
 
 class ViewHandler(WebHandler):
 
-    def __init__(self, method, view_name=None):
+    def __init__(self, method):
         self.method = method
-        self.view_name = view_name
 
     def __call__(self, env, data):
-        assert self.view_name
-        return self.method(env.views[self.view_name], env, data)
-
-    def __get__(self, instance, cls):
-        if instance is None:
-            return self.__class__(self.method, cls.name)
-        else:
-            return self.method.__get__(instance, cls)
+        result = self.method(env.view, env, data)
+        return result or self.next_handler(env, data)
 
 
 def view_handler(method):

@@ -41,7 +41,8 @@ class TemplateEngine(object):
         name = self.resolve(name)
         return jinja2.Markup(self.env.get_template(name).render(**vars))
 
-    def render_to_string(self, name, vars):
+    def render_to_string(self, name, vars={}, **kwargs):
+        vars = dict(vars, **kwargs) #XXX
         return self.render(name, **vars)
 
     def render_to_response(self, name, vars, content_type='text/html'):

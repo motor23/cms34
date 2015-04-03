@@ -12,15 +12,20 @@ from ...mixed import (
 from .fields import xf_members
 
 
-class Org(ModelFactory):
+class MFY_Org(ModelFactory):
     title = u'Организация'
+    model = 'Org'
 
-    fields = (
+    fields = [
         xf_id,
         xf_title,
         xf_body,
         xf_members,
-    )
+    ]
 
-class OrgsListSection(ModelFactory):
+
+class MFY_OrgsListSection(ModelFactory):
     title = u'Список организаций'
+    model = 'OrgsListSection'
+
+    fields = [xf_id]

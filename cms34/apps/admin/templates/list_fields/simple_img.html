@@ -1,0 +1,7 @@
+{% if field.link_to_item %}
+<a href="{{ url }}" title="{{ field_val['title'] }}">
+{% endif %}
+<img src="{{ field_val['url'] }}" alt="{{ field_val['title'] }}" width="{{ field.width }}"/>
+{% if field.link_to_item %}
+</a>
+{% endif %}

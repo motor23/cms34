@@ -17,31 +17,31 @@ from .fields import (
 )
 
 class Person(ModelFactory):
-    base_path = 'persons'
+    title = u'Персона'
+    base_path = 'person'
 
-    fields = (
+    fields = [
         xf_id,
         xf_first_name,
         xf_last_name,
         xf_patronymic,
         xf_post,
         MF_Img('img_orig'),
-    )
+    ]
 
-    @hybrid_factory_method.factory
-    @cached_property
-    def title(self):
-        return u'Персона'
+#    @hybrid_factory_method.factory
+#    @cached_property
+#    def title(self):
+#        return u'Персона'
 
-    @title.model
-    @property
-    def title(self):
-        return u' '.join([self.last_name, self.first_name, self.patronymic])
+#    @title.model
+#    @property
+#    def title(self):
+#        return u' '.join([self.last_name, self.first_name, self.patronymic])
 
 
 class PersonsListSection(ModelFactory):
     title = u'Список персон'
 
-class PersonSection(ModelFactory):
-    title = u'Персона'
+    fields = [xf_id]
 

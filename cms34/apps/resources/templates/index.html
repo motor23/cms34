@@ -1,0 +1,7 @@
+<p>CMS34: Hello word</p>
+<p>App: Front application with resources:</p>
+<ul>
+{% for res in env.app.resources.resources %}
+    <li>{{ res.name }}: {{ res.title }}</li>
+{% endfor %}
+</ul>

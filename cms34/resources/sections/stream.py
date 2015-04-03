@@ -9,13 +9,12 @@ from ...mixed import (
     XF_Block,
     xf_id,
     xf_slug,
-    xf_tree_title,
     xf_order,
     xf_type,
     xf_parent,
     xb_object,
 )
-
+from .fields import xf_section_tree_title
 
 class XB_Main(XF_Block):
     name = 'main_block'
@@ -24,20 +23,20 @@ class XB_Main(XF_Block):
     )
     list_fields = (
         xf_id,
-        xf_tree_title,
+        xf_section_tree_title,
         XF_String('tree_path', label=u'url'),
         xf_type,
         xf_order,
     )
     sort_fields = (
         xf_id,
-        xf_tree_title,
+        xf_section_tree_title,
         xf_slug,
         xf_order,
     )
     filter_fields = (
         xf_id,
-        xf_tree_title,
+        xf_section_tree_title,
         xf_slug,
         xf_type,
     )
@@ -46,7 +45,7 @@ class XB_Main(XF_Block):
         xf_parent,
         xf_slug,
         xf_order,
-        xf_tree_title,
+        xf_section_tree_title,
     )
 
 xb_main = XB_Main()

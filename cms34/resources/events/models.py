@@ -1,26 +1,34 @@
 # -*- coding: utf8 -*-
 from cms34.model import (
     ModelFactory,
-    mf_id,
-    mf_dt,
-    mf_publish_dt,
-    mf_title,
-    mf_lead,
-    mf_body,
+)
+from cms34.mixed import (
+    xf_id,
+    xf_dt,
+    xf_publish_dt,
+    xf_title,
+    xf_lead,
+    xf_body,
 )
 
-class Event(ModelFactory):
+
+class MFY_Event(ModelFactory):
     title = u'Событие'
+    model = 'Event'
 
     fields = [
-        mf_id,
-        mf_dt,
-        mf_publish_dt,
-        mf_title,
-        mf_lead,
-        mf_body,
+        xf_id,
+        xf_dt,
+        xf_publish_dt,
+        xf_title,
+        xf_lead,
+        xf_body,
     ]
 
-class EventsListSection(ModelFactory):
+
+class MFY_EventsListSection(ModelFactory):
     title = u'Список событий'
+    model = 'EventsListSection'
+
+    fields = [xf_id]
 

@@ -1,0 +1,11 @@
+<div class="tree_expand init-block"
+     data-block-name="tree_expand"
+     data-id="{{ item.id }}"
+     data-parent="{{ item.parent_id or '' }}"
+     data-childs="{{ item.has_childs and 1 or '' }}"
+     data-level="{{ item.tree_level }}"
+>   
+    <img class="tree_expand_open_button" src="/cms34-static/img/tree/plus.png">
+    <img class="tree_expand_close_button" src="/cms34-static/img/tree/minus.png">
+</div>
+

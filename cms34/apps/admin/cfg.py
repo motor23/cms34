@@ -6,7 +6,10 @@ from collections import OrderedDict
 import iktomi.templates, iktomi.cms
 import memcache
 
-from ..common.cfg import Cfg as CfgBase
+from ..common.cfg import (
+    Cfg as CfgBase,
+    FASTCGI_PREFORKED_DEFAULTS,
+)
 
 
 class Cfg(CfgBase):
@@ -57,6 +60,13 @@ class Cfg(CfgBase):
 
     MODEL_LOCK_TIMEOUT = 5*60
     MODEL_LOCK_RENEW = 60
+
+    FASTCGI_PARAMS = dict(
+        FASTCGI_PREFORKED_DEFAULTS,
+        maxSpare=8,
+        minSpare=8,
+        maxChildren=2,
+    )
 
     @property
     def FLUP_ARGS(self):

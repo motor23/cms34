@@ -7,6 +7,10 @@ from iktomi.cms.ajax_file_upload import (
     StreamFileUploadHandler,
     StreamImageUploadHandler,
 )
+from .html_body_handlers import (
+    HtmlBodyHandler,
+)
+
 
 class SFP_Base(object):
 
@@ -65,5 +69,13 @@ class SFP_ImageUpload(SFP_Base):
 
     def create_config(self, factory, cfg):
         cfg.Stream.actions = cfg.Stream.actions + [StreamImageUploadHandler()]
+
+
+class SFP_HtmlBody(SFP_Base):
+
+    handler_cls = HtmlBodyHandler
+
+    def create_config(self, factory, cfg):
+        cfg.Stream.actions = cfg.Stream.actions + [HtmlBodyHandler()]
 
 

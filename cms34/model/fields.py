@@ -279,7 +279,7 @@ class MF_Parent(MF_M2ORelation):
         def tree_path(self):
             slugs = [self.slug] + [item.slug for item in self.parents]
             slugs.reverse()
-            return '/' + '/'.join(slugs)
+            return '/' + '/'.join(slugs) + '/'
 
         return dict(model_dict,
                     parents=parents,

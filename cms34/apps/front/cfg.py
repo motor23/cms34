@@ -20,7 +20,7 @@ class Cfg(CfgBase):
     def TEMPLATES(self):
         return [
             path.join(self.SITE_DIR, 'templates'),
-        #    path.join(self.CMS34_DIR, 'templates'),
+            path.join(self.CMS34_DIR, 'templates'),
         ]
 
     @property

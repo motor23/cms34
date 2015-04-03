@@ -79,10 +79,10 @@ class VP_Response(Plugin):
 
     def template_name(self, template):
         folders = [self.templates_folder]
-        parent = self.view.parent
-        while parent:
-            folders.insert(0, parent.response.templates_folder)
-            parent = parent.parent
+        #parent = self.view.parent
+        #while parent:
+        #    folders.insert(0, parent.response.templates_folder)
+        #    parent = parent.parent
         return '%s/%s' % ('/'.join(folders), template)
 
     def template(self, template, kwargs):

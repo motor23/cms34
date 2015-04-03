@@ -31,14 +31,6 @@ class Application(BaseApplication):
         from iktomi.cli.fcgi import Flup
         return Flup(self, **self.cfg.FLUP_ARGS)
 
-    def command_db(self):
-        import models.initial
-        from models import metadata_dict
-        from iktomi.cli.sqla import Sqla
-        return Sqla(self.db_maker, metadata_dict,
-                    initial=models.initial.install)
-
-
     @cached_property
     def db_maker(self):
         import models

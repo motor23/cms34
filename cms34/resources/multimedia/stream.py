@@ -12,15 +12,16 @@ from ...mixed import (
     xf_lead,
     xf_dt,
     xf_publish_dt,
-    xf_type,
     xb_object,
 )
+from .fields import xf_media_type_img
 
 
 class XB_Main(XF_Block):
     name = 'media_block'
     label = u'Медиа'
     list_fields = (
+        xf_media_type_img,
         xf_title,
         xf_dt,
         xf_publish_dt,
@@ -30,13 +31,13 @@ class XB_Main(XF_Block):
         xf_publish_dt,
     )
     filter_fields = (
-        xf_type,
+        xf_media_type_img,
         xf_title,
         xf_dt,
         xf_publish_dt,
     )
     item_fields = (
-        xf_type,
+        xf_media_type_img,
         xf_dt,
         xf_publish_dt,
         xf_title,

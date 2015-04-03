@@ -1,0 +1,29 @@
+{% macro list_field(name, field, item, url, loop) %}
+    {%- set field_val = field(env, item, url, loop) %}
+
+    {%- if field_val.attrs is defined %}
+        {%- set attrs = field_val.attrs %}
+    {%- else %}
+        {%- set attrs = {} %}
+    {%- endif %}
+
+    <td class="field_{{ name }}{% if field.classname is defined %} {{ field.classname }}{% endif %}{% if field.image %} has-image{% endif %}">
+      {%- if field.link_to_item -%}
+        <a data-id="{{ item.id }}"
+             {%- if read_allowed %} href="{{ url }}"{% endif %}>
+          {%- include field.template -%}
+        </a>
+      {%- else -%}
+        {% include field.template %}
+      {%- endif -%}
+    </td>
+{% endmacro %}
+
+<table class="list_fields_container">
+<tr>
+{% for _field in field.fields %}
+     {{ list_field(_field.name, _field, item, url, loop) }}
+{% endfor %}
+</tr>
+</table>
+
