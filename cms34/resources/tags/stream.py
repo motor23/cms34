@@ -15,7 +15,11 @@ class RegionsStreamFactory(StreamFactory):
     title = u'Регионы'
     limit = 40
     initial_sort = 'title'
-    permissions = {'wheel': 'x'}
+
+    permissions = {
+        'wheel':'x',
+        'editor':'x',
+    }
 
     fields = [xf_region_id, xf_title]
     item_fields = list_fields = sort_fields = fields

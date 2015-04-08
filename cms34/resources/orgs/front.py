@@ -39,16 +39,16 @@ class V_OrgsList(ResourceView):
 
     @view_handler
     def h_index(self, env, data):
-        orgs = env.app.resources.get_sections(
+        orgs = env.resources.get_sections(
                                          parent_id=self.section.id,
                                          type='org')
 
-        dirs = env.app.resources.get_sections(
+        dirs = env.resources.get_sections(
                                          parent_id=self.section.id,
                                          type='dir')
         groups = []
         for group in dirs:
-            orgs = env.app.resources.get_sections(
+            orgs = env.resources.get_sections(
                                         parent_id=group.id,
                                         type='org')
             groups.append((group, orgs))

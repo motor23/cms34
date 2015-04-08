@@ -16,7 +16,8 @@ def create_handler(app):
         static_files(app.cfg.FRONT_MEDIA_DIR, app.cfg.MEDIA_URL),
 
         h_caching | cache(enable=app.cfg.CACHE_ENABLED) | cases(
-            h_index,
+            prefix('/en') | app.i18n.handler('en') | h_index,
+            app.i18n.handler('ru') | h_index,
         ),
         HTTPNotFound,
 )

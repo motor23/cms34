@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<p>Type: {{ view.section.type }}</p>
+
+<h1>{{ view.section.title }}</h1>
+
+{% for event in paginator %}
+<p><a href="{{ env.view.url_for_obj(event) }}">{{ event.title }}</a></p>
+{% endfor %}
+
+{% endblock %}

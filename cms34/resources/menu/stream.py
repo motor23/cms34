@@ -43,6 +43,11 @@ class MenuStreamFactory(StreamFactory):
     initial_sort = 'order'
     plugins = [SFP_Tree]
 
+    permissions = {
+        'wheel':'rwxdcp',
+        'editor':'rwxdcp',
+    }
+
     item_fields = [
         xb_object,
         xb_main,

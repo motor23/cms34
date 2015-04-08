@@ -1,0 +1,7 @@
+{% macro main(breadcrumbs) %}
+<a href="{{ env.lang.root.index }}">Главная</a>
+{% for section, title in breadcrumbs[:-1] %}
+    > <a href="{{ env.url_for_obj(section) }}">{{ title }}</a>
+{% endfor %}
+<hr>
+{% endmacro %}

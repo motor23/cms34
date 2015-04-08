@@ -54,6 +54,11 @@ class MediaStreamFactory(StreamFactory):
     item_form_factory = TypedItemFormFactory
     plugins = [SFP_FileUpload, SFP_ImageUpload]
 
+    permissions = {
+        'wheel':'rwxdcp',
+        'editor':'rwxdcp',
+    }
+
     list_fields = [
         xb_object,
         XF_Img('admin_preview', label=u'Превью'),

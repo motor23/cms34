@@ -10,9 +10,7 @@ permissions = {'admin': 'rwxcd'}
 ROLES = [
     ('wheel',   u'Полный доступ'),
     ('admin',   u'Администратор'),
-    ('publisher', u'Выпускающий редактор'),
     ('editor',  u'Редактор'),
-    ('struct',  u'Редактор структуры'),
 ]
 
 title = u"Редакторы"

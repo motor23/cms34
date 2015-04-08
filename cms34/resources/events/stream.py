@@ -47,6 +47,11 @@ class EventsStreamFactory(StreamFactory):
     title = u'События'
     limit = 40
 
+    permissions = {
+        'wheel':'rwxdcp',
+        'editor':'rwxdcp',
+    }
+
     blocks = [
         xb_object,
         xb_main,

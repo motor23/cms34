@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<p>Type: {{ view.section.type }}</p>
+
+<h1>{{ view.section.title }}</h1>
+{% for group, group_persons in groups %}
+    <h2>{{ group.title }}</h2>
+    {% for person in group_persons %}
+    <p><a href="{{ env.url_for_obj(person) }}">{{ person.first_name }} {{ person.last_name }} {{ person.patronymic }}</a></p>
+    {% endfor %}
+{% endfor %}
+
+
+<h2>Персоны</h2>
+{% for person in persons %}
+<p><a href="{{ env.url_for_obj(person) }}">{{ person.first_name }} {{ person.last_name }} {{ person.patronymic }}</a></p>
+{% endfor %}
+
+{% endblock %}

@@ -59,6 +59,11 @@ class SectionsStreamFactory(StreamFactory):
     plugins = [SFP_Tree]
     item_form_factory = TypedItemFormFactory
 
+    permissions = {
+        'wheel':'rwxdcp',
+        'editor':'rwxdcp',
+    }
+
     common_fields = [
         xb_object,
         xb_main,

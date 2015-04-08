@@ -10,21 +10,13 @@ class LanguageLocation(Location):
         Location.__init__(self, *builders, **kwargs)
 
 
-class Language(WebHandler):
-    def __init__(self, available, active):
-        self.available = available
+class H_SetActiveLanguage(WebHandler):
+    def __init__(self, i18n, active):
+        self.i18n = i18n
         self.active = active
-        self._next_handler = namespace(active)
 
     def __call__(self, env, data):
-        env.langs = [Lang(lang, env.root, env.cfg.I18N_TRANSLATIONS_DIR, 'front', 'iktomi-forms')
-                     for lang in self.available]
-        env.available_languages = self.available
-        for lang in env.langs:
-            if lang == self.active:
-                lang.configure_environment(env)
-            else:
-                env.other_lang = lang
+        self.i18n.set_active_lang(env, self.active)
         return self.next_handler(env, data)
 
     def _filter_locations(self, _locations):
@@ -38,6 +30,10 @@ class Language(WebHandler):
     def _locations(self):
         locations = WebHandler._locations(self)
         return self._filter_locations(locations)
+
+
+def H_Language(i18n, active):
+    return namespace(active) | H_SetActiveLanguage(i18n, active)
 
 
 class for_languages(WebHandler):

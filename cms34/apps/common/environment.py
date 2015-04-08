@@ -32,10 +32,15 @@ class BaseEnvironment(web.AppEnvironment):
 
     @cached_property
     def root(self):
-        if self.request:
-            return self.app.root.bind_to_env(self._root_storage)
-        else:
-            return self.app.root
+        try:
+            if self.request:
+                return self.app.root.bind_to_env(self._root_storage)
+            else:
+                return self.app.root
+        except Exception, exc:
+            import traceback
+            traceback.print_exc()
+            raise Exception(exc)
 
     def finalize(self):
         pass

@@ -4,7 +4,10 @@ import sys
 import memcache
 from collections import OrderedDict
 
-from ..common.cfg import Cfg as CfgBase
+from ..common.cfg import (
+    Cfg as CfgBase,
+    FASTCGI_PREFORKED_DEFAULTS,
+)
 import iktomi.templates, iktomi.cms
 
 
@@ -36,6 +39,13 @@ class Cfg(CfgBase):
 
     MODEL_LOCK_TIMEOUT = 5*60
     MODEL_LOCK_RENEW = 60
+
+    FASTCGI_PARAMS = dict(
+        FASTCGI_PREFORKED_DEFAULTS,
+        maxSpare=8,
+        minSpare=8,
+        maxChildren=2,
+    )
 
     @property
     def FLUP_ARGS(self):
@@ -79,4 +89,16 @@ class Cfg(CfgBase):
     }
 
     FLOOD_PROTECTION_ENABLED = True
+
+    @property
+    def I18N_DIR(self):
+        return os.path.join(CFG_DIR, 'i18n') #XXX
+
+    @property
+    def I18N_MAPPING_FILE(self):
+        return os.path.join(I18N_DIR, 'mapping.ini')
+
+    @property
+    def I18N_TRANSLATIONS_DIR(self):
+        os.path.join(I18N_DIR, 'translations')
 

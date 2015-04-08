@@ -5,6 +5,7 @@ from iktomi.unstable.db.sqla.public_query import PublicQuery
 
 from ..common.app import Application as BaseApplication
 from ..common.sessionmakers import binded_filesessionmaker
+from ..common.i18n import I18n as I18n
 
 
 class Application(BaseApplication):
@@ -58,4 +59,19 @@ class Application(BaseApplication):
             transient_url=None,
             persistent_url=None,
         )
+
+    @cached_property
+    def i18n(self):
+        return self.i18n_cls(['ru', 'en'],
+                    translations_dir=self.cfg.I18N_TRANSLATIONS_DIR,
+                    categories=['front', 'iktomi-forms'])
+
+
+    class i18n_cls(I18n):
+        def set_active_lang(self, env, active):
+            I18n.set_active_lang(self, env, active)
+            env._models = env.models
+            env.models = getattr(env.models, active)
+            env._shared_models = env.shared_models
+            env.shared_models = getattr(env.shared_models, active)
 

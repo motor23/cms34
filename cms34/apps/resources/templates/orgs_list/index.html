@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<p>Type: {{ view.section.type }}</p>
+
+<h1>{{ view.section.title }}</h1>
+{% for group, group_orgs in groups %}
+    <h2>{{ group.title }}</h2>
+    {% for org in group_orgs %}
+    <p><a href="{{ env.url_for_obj(org) }}">{{ org.title }}</a></p>
+    {% endfor %}
+{% endfor %}
+
+
+<h2>Органы</h2>
+{% for org in orgs %}
+<p><a href="{{ env.url_for_obj(org) }}">{{ org.title }}</a></p>
+{% endfor %}
+
+{% endblock %}

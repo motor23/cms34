@@ -1,0 +1,16 @@
+{% macro main(section=None) %}
+{% set cur_item = section and env.menu.get_item(section_id=section.id) or None %}
+{% for selected_item, menu in env.menu.get_menus(cur_item) %}
+<p>
+     {% for item in menu %}
+         {% if loop.index0 %}&nbsp;|&nbsp;{% endif %}
+         {% if item.id==selected_item.id %}
+         {{ item.title }}
+         {% else %}
+         <a href="{{ env.menu.url_for_item(item) }}">{{ item.title }}</a>
+         {% endif %}
+     {% endfor %}
+</p>
+{% endfor %}
+<hr>
+{% endmacro %}

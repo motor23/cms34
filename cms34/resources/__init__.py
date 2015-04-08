@@ -4,7 +4,7 @@ from ..front.view import BaseView, HView
 class H_Resources(WebHandler):
 
     _sections = {}
-    _handler = None
+    _handler = cases()
 
     def __init__(self, resources):
         self.resources = resources
@@ -14,6 +14,7 @@ class H_Resources(WebHandler):
         return self.handler()._locations()
 
     def __call__(self, env, data):
+        env.resources = self.resources
         return self.handler().__call__(env, data)
 
     @property
@@ -46,9 +47,6 @@ def H_Section(resources, section=None):
     handlers = []
     for subsection in subsections:
         resource = resources.get_resource(subsection.type)
-        if not resource:
-            print subsection.type
-            continue
         handler = resource.handler(resources, subsection)
         handler = prefix('/' + subsection.slug, name=subsection.slug) | handler
         handlers.append(handler)
@@ -72,7 +70,6 @@ class Resources(object):
 
     def get_resource(self, name):
         res = self.resources_dict.get(name)
-        return res
         assert res is not None, 'Unknown resource, name="%s"' % name
         return res
 

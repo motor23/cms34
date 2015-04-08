@@ -49,6 +49,11 @@ class OptionsStreamFactory(StreamFactory):
     limit = 40
     preview = True
 
+    permissions = {
+        'wheel':'rwxdcp',
+        'editor':'rwxdcp',
+    }
+
     item_form_factory = TypedItemFormFactory
 
     base_fields = [

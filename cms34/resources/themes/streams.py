@@ -30,8 +30,13 @@ xb_main = XB_Main()
 class ThemesStreamFactory(StreamFactory):
     name = 'themes'
     model = 'Theme'
-    title = u'Тема'
+    title = u'Темы'
     limit = 40
+
+    permissions = {
+        'wheel':'rwxdcp',
+        'editor':'rwxdcp',
+    }
 
     blocks = [
         xb_object,

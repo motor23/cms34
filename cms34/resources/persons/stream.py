@@ -64,6 +64,11 @@ class PersonsStreamFactory(StreamFactory):
     limit = 40
     preview = True
 
+    permissions = {
+        'wheel':'rwxdcp',
+        'editor':'rwxdcp',
+    }
+
     blocks = (
         xb_object,
         xb_main,

@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<p>Type: {{ view.section.type }}</p>
+<p>ФИО: {{ person.first_name }} {{ person.last_name }} {{ person.patronymic }}</p>
+<p>Должность: {{ person.post }}</p>
+{% endblock %}

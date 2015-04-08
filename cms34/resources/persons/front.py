@@ -39,16 +39,16 @@ class V_PersonsList(ResourceView):
 
     @view_handler
     def h_index(self, env, data):
-        persons = env.app.resources.get_sections(
+        persons = env.resources.get_sections(
                                          parent_id=self.section.id,
                                          type='person')
 
-        dirs = env.app.resources.get_sections(
+        dirs = env.resources.get_sections(
                                          parent_id=self.section.id,
                                          type='dir')
         groups = []
         for group in dirs:
-            persons = env.app.resources.get_sections(
+            persons = env.resources.get_sections(
                                         parent_id=group.id,
                                         type='person')
             groups.append((group, persons))

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<p>Type: {{ view.section.type }}</p>
+
+<h1>{{ view.section.title }}</h1>
+{% for group, group_themes in groups %}
+    <h2>{{ group.title }}</h2>
+    {% for theme in group_themes %}
+    <p><a href="{{ env.url_for_obj(theme) }}">{{ theme.title }}</a></p>
+    {% endfor %}
+{% endfor %}
+
+
+<h2>Темы</h2>
+{% for theme in themes %}
+<p><a href="{{ env.url_for_obj(theme) }}">{{ theme.title }}</a></p>
+{% endfor %}
+
+{% endblock %}

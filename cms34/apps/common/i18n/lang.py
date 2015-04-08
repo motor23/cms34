@@ -26,7 +26,7 @@ class delegate_cached(property):
 
 class Lang(str):
 
-    def __new__(cls, name, root, translations_dir, *categories):
+    def __new__(cls, name, root, translations_dir, categories=[]):
         self = str.__new__(cls, name)
         self.format = Format(name)
         self.timezone = timezone('Europe/Moscow')
@@ -34,19 +34,9 @@ class Lang(str):
         self._translations = get_translations(translations_dir, self, categories)
         return self
 
-    def configure_environment(self, env):
-        env.lang = self
-        env.models = getattr(env.models, self)
-        env.shared_models = getattr(env.shared_models, self)
-
     @cached_property
     def url_for(self):
         return self.root.build_url
-
-    @cached_property
-    def other(self):
-        # TODO: Move it to environment
-        raise DeprecationWarning('Moved to environment')
 
     def months(self, **kwargs):
         type = kwargs.get('type', 'stand-alone')
