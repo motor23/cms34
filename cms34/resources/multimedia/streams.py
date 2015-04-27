@@ -14,7 +14,14 @@ from ...mixed import (
     xf_publish_dt,
     xb_object,
 )
-from .fields import xf_media_type_img
+from .fields import (
+    xf_media_type_img,
+    xb_photos,
+    xb_photo_upload,
+    xb_file_upload,
+    xb_poster_upload,
+    xb_video_upload,
+)
 
 
 class XB_Main(XF_Block):
@@ -43,11 +50,12 @@ class XB_Main(XF_Block):
         xf_title,
     )
 
+
 xb_main = XB_Main()
 
 
-class MediaStreamFactory(StreamFactory):
-    stream_name = 'multimedia'
+class SFY_Multimedia(StreamFactory):
+    name = 'multimedia'
     model = 'Media'
     title = u'Медиа'
     limit = 40
@@ -74,10 +82,8 @@ class MediaStreamFactory(StreamFactory):
     ]
     sort_fields = list_fields
     item_fields = {
-        'photo': fields,
-        'photoset': fields,
-        'video': fields,
-        'file': fields,
+        'photo': fields + [xb_photo_upload],
+        'photoset': fields + [xb_photos],
+        'video': fields + [xb_poster_upload, xb_video_upload],
+        'file': fields + [xb_file_upload],
     }
-
-

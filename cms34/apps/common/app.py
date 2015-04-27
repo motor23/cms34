@@ -116,3 +116,8 @@ class Application(BaseApplication):
     def template_engine(self):
         return AppTemplateEngine(self.cfg.TEMPLATES)
 
+    @cached_property
+    def models(self):
+        import models
+        return models
+

@@ -52,6 +52,7 @@ class ModelFactory(object):
                        bases=None,
                        rel_cls_bases=None,
                        plugins=None,
+                       common_plugins=[],
                        main_factory=None):
         self.register = register or self.register
         assert self.register, \
@@ -59,6 +60,8 @@ class ModelFactory(object):
         self.bases = bases or self.bases
         self.rel_cls_bases = rel_cls_bases or self.rel_cls_bases
         plugins = plugins or self.plugins
+        self.common_plugins = common_plugins
+        plugins = plugins + common_plugins
         self.plugins = [plugin(self) for plugin in plugins]
         self.main_factory = main_factory or self  # For List model template
         for field in self.fields:
@@ -106,7 +109,7 @@ class ModelFactoryPlugin(object):
     def register(self): pass
 
 
-class I18nPlugin(ModelFactoryPlugin):
+class MFP_I18n(ModelFactoryPlugin):
 
     def get_model_dict(self, model_dict, models):
         if models.lang != models.main_lang:
@@ -118,9 +121,9 @@ class I18nPlugin(ModelFactoryPlugin):
                       [remote]),)
 
 
-class TypesPlugin(ModelFactoryPlugin):
+class MFP_Types(ModelFactoryPlugin):
 
-    class TypePlugin(ModelFactoryPlugin):
+    class MFP_Type(ModelFactoryPlugin):
 
         parent_factory = None
         get_parent_factory = prop_getter('parent_factory')
@@ -145,7 +148,7 @@ class TypesPlugin(ModelFactoryPlugin):
     def __init__(self, factory):
         ModelFactoryPlugin.__init__(self, factory)
         self.types = getattr(self.factory, 'types', None)
-        assert self.types, \
+        assert self.types is not None, \
                u'You must specify types param, factory=%s' % factory
 
     def get_model_dict(self, model_dict, models):
@@ -172,7 +175,32 @@ class TypesPlugin(ModelFactoryPlugin):
 
     def register(self):
         for identity, type_factory in self.types:
-            type_plugin = self.TypePlugin(
+            if not type_factory:
+                continue
+            type_plugin = self.MFP_Type(
+                parent_factory=self.factory,
+                identity=identity)
+            type_factory(
+                self.factory.register,
+                bases=[self.factory.name] + type_factory.bases,
+                rel_cls_bases=self.factory.rel_cls_bases,
+                plugins=[type_plugin] + type_factory.plugins,
+                common_plugins=self.factory.common_plugins,
+            )
+
+
+class MFP_SingleTableTypes(MFP_Types):
+    class MFP_Type(MFP_Types.MFP_Type):
+        def get_model_dict(self, model_dict, models):
+            mapper_args = model_dict.setdefault('__mapper_args__', {})
+            mapper_args['polymorphic_identity'] = self.identity
+            model_dict['__tablename__'] = None
+
+    def register(self):
+        for identity, type_factory in self.types:
+            if not type_factory:
+                continue
+            type_plugin = self.MFP_Type(
                 parent_factory=self.factory,
                 identity=identity)
             type_factory(
@@ -183,15 +211,7 @@ class TypesPlugin(ModelFactoryPlugin):
             )
 
 
-class SingleTableTypesPlugin(TypesPlugin):
-    class TypePlugin(TypesPlugin.TypePlugin):
-        def get_model_dict(self, model_dict, models):
-            mapper_args = model_dict.setdefault('__mapper_args__', {})
-            mapper_args['polymorphic_identity'] = self.identity
-            model_dict['__tablename__'] = None
-
-
-class AddFieldsPlugin(ModelFactoryPlugin):
+class MFP_AddFields(ModelFactoryPlugin):
     fields = None
     get_fields = prop_getter('fields')
 

@@ -22,10 +22,10 @@ class V_Page(ResourceView):
     plugins = [VP_Response, VP_PagesQuery]
 
     @classmethod
-    def cases(cls, resources, section):
+    def cases(cls, sections, section):
         return [
             match('/', name='index') | cls.h_index,
-            resources.h_section(section),
+            sections.h_section(section),
         ]
 
     @view_handler

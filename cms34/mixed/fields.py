@@ -78,6 +78,8 @@ __all__ = (
     'XF_ExpHtml',
     'XF_Body',
     'XF_TreeTitle',
+    'XB_Object',
+    'XB_Content',
     'xf_slug',
     'xf_title',
     'xf_tree_title',
@@ -90,7 +92,7 @@ __all__ = (
     'xf_publish_dt',
     'xf_html',
     'xf_body',
-    'XB_Object',
+    'xf_file',
     'xb_object',
 )
 
@@ -464,10 +466,11 @@ class XF_Parent(XF_Simple):
 
 
 class XF_Group(XF_Base):
-    model_fields = []
-    list_fields = []
-    filter_fields = []
-    item_fields = []
+    fields = []
+    model_fields = property(lambda self: self.fields)
+    list_fields = property(lambda self: self.fields)
+    filter_fields = property(lambda self: self.fields)
+    item_fields = property(lambda self: self.fields)
 
     def model_register(self, factory=None, register=None):
         for field in self.model_fields:
@@ -512,6 +515,10 @@ class XF_Block(XF_Group):
 
 
 class XF_File(XF_Simple):
+    
+    name='file'
+    label=u'Фаил'
+
     def _model_field(self, factory=None):
         return MF_File(self.name)
 
@@ -670,13 +677,17 @@ xf_dt = XF_Dt()
 xf_publish_dt = XF_PublishDt()
 xf_html = XF_Html()
 xf_body = XF_Body()
-
+xf_file = XF_File()
 
 class XB_Object(XF_Block):
     name = 'object_block'
     label = u'Объект'
     fields = [xf_id]
-    model_fields = list_fields = filter_fields = item_fields = fields
+
+
+class XB_Content(XF_Block):
+    name = 'content'
+    label = u'Контент'
 
 
 xb_object = XB_Object()

@@ -1,11 +1,12 @@
 # -*- coding: utf8 -*-
 from iktomi.forms import convs
 
-from ....mixed.fields import (
+from cms34.mixed.fields import (
     XF_Id,
     XF_StreamSelect,
+    XF_Block,
 )
-from ....stream.item_fields import (
+from cms34.stream.item_fields import (
     IF_StreamSelect,
 )
 from .model import (
@@ -92,3 +93,16 @@ xf_tags = XF_Tags()
 xf_region = XF_Region()
 xf_regions = XF_Regions()
 
+
+class XB_Tags(XF_Block):
+    name = 'region_block'
+    label = u'Классификаторы'
+    fields = [xf_region]
+
+
+class XB_Region(XF_Block):
+    name = 'region_block'
+    label = u'Регион'
+    fields = [xf_region]
+
+xb_region = XB_Region()

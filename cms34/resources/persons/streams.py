@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-from ...stream import (
+from cms34.stream import (
     StreamFactory,
+    SFP_ImageUpload,
 )
-from ...mixed import (
+from cms34.mixed import (
     XF_Block,
     xb_object,
     XF_Img,
@@ -13,6 +14,10 @@ from .fields import (
     xf_patronymic,
     xf_post,
 )
+from ..sections.fields import (
+    xb_section_object
+)
+
 
 
 class XB_Main(XF_Block):
@@ -58,7 +63,8 @@ xb_main = XB_Main()
 xb_photo = XB_Photo()
 
 
-class PersonsStreamFactory(StreamFactory):
+class SFY_Persons(StreamFactory):
+    name = 'persons'
     model = 'Person'
     title = u'Персоны'
     limit = 40
@@ -68,12 +74,10 @@ class PersonsStreamFactory(StreamFactory):
         'wheel':'rwxdcp',
         'editor':'rwxdcp',
     }
+    plugins = [SFP_ImageUpload]
 
-    blocks = (
-        xb_object,
+    fields = [
+        xb_section_object,
         xb_main,
         xb_photo,
-    )
-    list_fields = sort_fields = filter_fields = item_fields = blocks
-
-
+    ]

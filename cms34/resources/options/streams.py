@@ -20,21 +20,17 @@ class XB_Main(XF_Block):
     initial_sort = 'order'
     list_fields = [
         xf_title,
-        xf_publish_dt,
         xf_order,
     ]
     sort_fields = [
-        xf_publish_dt,
         xf_order,
     ]
     filter_fields = [
         xf_type,
         xf_title,
-        xf_publish_dt,
     ]
     item_fields = [
         xf_type,
-        xf_publish_dt,
         xf_title,
         xf_order,
     ]
@@ -42,7 +38,7 @@ class XB_Main(XF_Block):
 xb_main = XB_Main()
 
 
-class OptionsStreamFactory(StreamFactory):
+class SFY_Options(StreamFactory):
     name = 'options'
     model = 'Options'
     title = u'Опции'
@@ -56,11 +52,11 @@ class OptionsStreamFactory(StreamFactory):
 
     item_form_factory = TypedItemFormFactory
 
-    base_fields = [
+    common_fields = [
         xb_object,
         xb_main,
     ]
-    sort_fields = filter_fields = list_fields = base_fields
+    sort_fields = filter_fields = list_fields = common_fields
     item_fields = {}
 
 

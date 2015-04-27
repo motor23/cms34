@@ -16,7 +16,8 @@ from .fields import (
     xf_post,
 )
 
-class Person(ModelFactory):
+class MFY_Person(ModelFactory):
+    model = 'Person'
     title = u'Персона'
     base_path = 'person'
 

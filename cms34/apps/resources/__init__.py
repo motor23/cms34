@@ -1,7 +1,6 @@
 # -*- coding:utf8 -*-
 from iktomi.utils import cached_property
-from cms34.resources import Resources
-
+from cms34.resources import V_Sections
 from ..common.cached_db import CachedDbMaker
 from ..front import Application as BaseApplication
 
@@ -9,16 +8,6 @@ from ..front import Application as BaseApplication
 class Application(BaseApplication):
 
     resources = []
-
-    @cached_property
-    def resources_ru(self):
-        from models.front import SectionRu
-        return Resources(self, SectionRu, resources=self.resources)
-
-    @cached_property
-    def resources_en(self):
-        from models.front import SectionEn
-        return Resources(self, SectionEn, resources=self.resources)
 
     @cached_property
     def cached_db_maker(self):
@@ -37,7 +26,24 @@ class Application(BaseApplication):
         from .environment import Environment
         return Environment
 
+    @cached_property
+    def sections_ru(self):
+        return V_Sections(
+                   cached_db=self.cached_db_maker(),
+                   models=self.models.front.ru,
+                   resources=self.resources,
+        )
+
+    @cached_property
+    def sections_en(self):
+        return V_Sections(
+                   cached_db=self.cached_db_maker(),
+                   models=self.models.front.en,
+                   resources=self.resources,
+        )
+
     class i18n_cls(BaseApplication.i18n_cls):
         def set_active_lang(self, env, active):
             BaseApplication.i18n_cls.set_active_lang(self, env, active)
-            env.resources = getattr(env.app, 'resources_%s' % active)
+            env.sections = getattr(env.app, 'sections_%s' % active)
+

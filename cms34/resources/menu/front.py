@@ -28,10 +28,10 @@ class Menu(object):
                 return self.url_for_item(child_menu[0])
             else:
                 return self.env.root.index
-        section_list = self.env.resources.get_sections(id=item.section_id)
+        section_list = self.env.sections.get_sections(id=item.section_id)
         if not section_list:
             return self.env.root.index
-        return self.env.resources.url_for_section(self.env.root, section_list[0])
+        return self.env.sections.url_for_section(self.env.root, section_list[0])
 
     def _get_menus(self, item=None):
         menu = self.get_menu(item)

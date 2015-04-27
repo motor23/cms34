@@ -9,7 +9,7 @@ from .fields import (
     xf_region_id,
 )
 
-class RegionsStreamFactory(StreamFactory):
+class SFY_Regions(StreamFactory):
     name = 'regions'
     model = 'Region'
     title = u'Регионы'

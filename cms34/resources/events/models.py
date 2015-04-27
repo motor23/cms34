@@ -10,7 +10,7 @@ from cms34.mixed import (
     xf_lead,
     xf_body,
 )
-
+from ..sections.fields import xf_section
 
 class MFY_Event(ModelFactory):
     title = u'Событие'
@@ -23,6 +23,7 @@ class MFY_Event(ModelFactory):
         xf_title,
         xf_lead,
         xf_body,
+        xf_section,
     ]
 
 

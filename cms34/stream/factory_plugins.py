@@ -79,3 +79,12 @@ class SFP_HtmlBody(SFP_Base):
         cfg.Stream.actions = cfg.Stream.actions + [HtmlBodyHandler()]
 
 
+class SFP_ChildFactories(SFP_Base):
+
+    def create_config(self, factory, cfg):
+        item_fields = dict(factory.item_fields)
+        for _factory in factory.child_factories:
+            item_fields[_factory.name] = _factory.item_fields
+        factory.item_fields = item_fields
+
+

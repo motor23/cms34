@@ -1,42 +1,41 @@
-# -*- coding: utf8 -*-
-
+# -*- coding: utf-8 -*-
 from cms34.stream import (
     StreamFactory,
 )
 from cms34.mixed.fields import (
     XB_Content,
-    xf_lead,
+    xf_title,
+    xf_slug,
+    xf_dt,
+    xf_body,
 )
 from ..sections.fields import (
-    xb_section_object
+    xb_section_object,
 )
 
-
 class XB_Content(XB_Content):
-    list_fields = [
-        xf_lead,
-    ]
     item_fields = [
-        xf_lead,
+        xf_body,
     ]
 
 xb_content = XB_Content()
 
 
-class SFY_Themes(StreamFactory):
-    name = 'themes'
-    model = 'Theme'
-    title = u'Темы'
+class SFY_Pages(StreamFactory):
+    name = 'pages'
+    model = 'Page'
+    title = u'Страницы'
     limit = 40
+    preview = True
 
     permissions = {
         'wheel':'rwxdcp',
         'editor':'rwxdcp',
     }
 
-    fields = [
+    item_fields = [
         xb_section_object,
         xb_content,
     ]
-    list_fields = sort_fields = filter_fields = item_fields = fields
+    list_fields = filter_fields = sort_fields = item_fields
 

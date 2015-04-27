@@ -18,7 +18,7 @@ class V_Theme(ResourceView):
     plugins = [VP_Response, VP_ThemesQuery]
 
     @classmethod
-    def cases(cls, resources, section):
+    def cases(cls, sections, section):
         return [match('/', name='index') | cls.h_index]
 
     @view_handler
@@ -33,22 +33,22 @@ class V_ThemesList(ResourceView):
     plugins = [VP_Response, VP_ThemesQuery]
 
     @classmethod
-    def cases(cls, resources, section):
+    def cases(cls, sections, section):
         return [match('/', name='index') | cls.h_index,
-                resources.h_section(section)]
+                sections.h_section(section)]
 
     @view_handler
     def h_index(self, env, data):
-        themes = env.resources.get_sections(
+        themes = env.sections.get_sections(
                                          parent_id=self.section.id,
                                          type='theme')
 
-        dirs = env.resources.get_sections(
+        dirs = env.sections.get_sections(
                                          parent_id=self.section.id,
                                          type='dir')
         groups = []
         for group in dirs:
-            themes = env.app.resources.get_sections(
+            themes = env.sections.get_sections(
                                         parent_id=group.id,
                                         type='theme')
             groups.append((group, themes))

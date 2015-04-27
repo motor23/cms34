@@ -134,15 +134,17 @@ class StreamFactory(object):
     register = None
     name = None
     stream_bases = (PublishStream,)
-    list_fields = []
-    filter_fields = []
-    item_fields = []
+    fields = []
+    list_fields = None
+    filter_fields = None
+    item_fields = None
     permissions = {'wheel':'rwxdcp'}
     limit = None
     list_fields_factory = ListFieldsFactory
     filter_form_factory = FilterFormFactory
     item_form_factory = ItemFormFactory
     plugins = []
+    common_plugins = []
 
     class Cfg(object): pass
 
@@ -154,11 +156,12 @@ class StreamFactory(object):
         assert self.name, \
                u'You must specify name param, cls=%s' % self.__class__
         self.__dict__.update(kwargs)
-        self.plugins = map(lambda x:x(self), self.plugins)
+        self.plugins = map(lambda x:x(self), self.plugins+self.common_plugins)
         self.cfg = self.create_config()
         register(self.name, self.create_stream())
 
     def create_config(self):
+        print self.name
         cfg = self.Cfg()
         cfg.title = self.title
         cfg.permissions = self.permissions
@@ -180,21 +183,22 @@ class StreamFactory(object):
 
     def create_list_fields(self):
         factory = self.list_fields_factory
-        fields = self.list_fields
+        fields = (self.list_fields is None) and self.fields or self.list_fields
         for plugin in self.plugins:
             factory, fields = plugin.create_list_fields(factory, fields)
         return factory(fields).get_fields()
 
     def create_filter_form(self):
         factory = self.filter_form_factory
-        fields = self.filter_fields
+        fields = (self.filter_fields is None) and self.fields \
+                                              or self.filter_fields
         for plugin in self.plugins:
             factory, fields = plugin.create_item_form(factory, fields)
         return factory(fields, stream_factory=self)
 
     def create_item_form(self):
         factory = self.item_form_factory
-        fields = self.item_fields
+        fields = (self.item_fields is None) and self.fields or self.item_fields
         for plugin in self.plugins:
             factory, fields = plugin.create_item_form(factory, fields)
         return factory(fields, stream_factory=self)

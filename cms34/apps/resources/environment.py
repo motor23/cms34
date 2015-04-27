@@ -19,7 +19,7 @@ class Environment(EnvironmentBase):
 
     @storage_method
     def url_for_obj(storage, obj):
-        url = storage.resources.url_for_section(storage.lang.root, obj)
+        url = storage.sections.url_for_section(storage.lang.root, obj)
         if url:
             return url
 

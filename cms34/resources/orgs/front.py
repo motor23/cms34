@@ -18,7 +18,7 @@ class V_Org(ResourceView):
     plugins = [VP_Response, VP_OrgsQuery]
 
     @classmethod
-    def cases(cls, resources, section):
+    def cases(cls, sections, section):
         return [match('/', name='index') | cls.h_index]
 
     @view_handler
@@ -33,22 +33,22 @@ class V_OrgsList(ResourceView):
     plugins = [VP_Response, VP_OrgsQuery]
 
     @classmethod
-    def cases(cls, resources, section):
+    def cases(cls, sections, section):
         return [match('/', name='index') | cls.h_index,
-                resources.h_section(section)]
+                sections.h_section(section)]
 
     @view_handler
     def h_index(self, env, data):
-        orgs = env.resources.get_sections(
+        orgs = env.sections.get_sections(
                                          parent_id=self.section.id,
                                          type='org')
 
-        dirs = env.resources.get_sections(
+        dirs = env.sections.get_sections(
                                          parent_id=self.section.id,
                                          type='dir')
         groups = []
         for group in dirs:
-            orgs = env.resources.get_sections(
+            orgs = env.sections.get_sections(
                                         parent_id=group.id,
                                         type='org')
             groups.append((group, orgs))

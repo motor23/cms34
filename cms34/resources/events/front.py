@@ -27,7 +27,7 @@ class V_EventsList(ResourceView):
     paginator = ModelPaginator
 
     @classmethod
-    def cases(cls, resources, section):
+    def cases(cls, sections, section):
         return [
             match('/', name='index') | cls.h_index,
             match('/<int:item_id>/', name='item') | cls.h_item,

@@ -4,18 +4,14 @@ from cms34.model import (
     mf_id,
     mf_title,
     mf_body,
-    mf_slug,
 )
 
 
-class Page(ModelFactory):
+class MFY_Page(ModelFactory):
     title = u'Страница'
+    model = 'Page'
 
     fields = [
         mf_id,
-        mf_slug,
-        mf_title,
         mf_body,
     ]
-
-

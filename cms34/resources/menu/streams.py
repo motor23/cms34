@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from ...stream import (
+from cms34.stream import (
     StreamFactory,
     SFP_Tree,
 )
-from ...mixed import (
+from cms34.mixed import (
     XF_Block,
     xf_tree_title,
     xf_slug,
@@ -11,6 +11,7 @@ from ...mixed import (
     xf_order,
     xb_object,
 )
+from ..sections.fields import xf_section
 
 
 class XB_Main(XF_Block):
@@ -19,7 +20,6 @@ class XB_Main(XF_Block):
     list_fields = [
         xf_tree_title,
         xf_order,
-        #StdText(name='tree_path', label=u'url'),
     ]
     sort_fields = [
         xf_order,
@@ -30,14 +30,15 @@ class XB_Main(XF_Block):
         xf_order,
         xf_parent,
         xf_tree_title,
+        xf_section,
     ]
 
 
 xb_main = XB_Main()
 
 
-class MenuStreamFactory(StreamFactory):
-    stream_name = 'menu'
+class SFY_Menu(StreamFactory):
+    name = 'menu'
     model = 'Menu'
     title = u'Меню'
     initial_sort = 'order'

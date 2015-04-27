@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-from ...stream import (
+from cms34.stream import (
     StreamFactory,
 )
-from ...mixed.fields import (
-    XF_Block,
+from cms34.mixed import (
+    XF_StreamSelect,
+    XB_Content,
     xf_title,
     xf_lead,
     xf_dt,
     xf_publish_dt,
     xf_body,
-    XF_StreamSelect,
     xb_object,
 )
+from ..sections.fields import xb_section
 
-class XB_Main(XF_Block):
-    name = 'event_block'
-    label = u'Материал'
+
+class XB_Content(XB_Content):
     list_fields = [
         xf_title,
         xf_lead,
@@ -39,9 +39,9 @@ class XB_Main(XF_Block):
         xf_body,
     ]
 
-xb_main = XB_Main()
+xb_content = XB_Content()
 
-class EventsStreamFactory(StreamFactory):
+class SFY_Events(StreamFactory):
     name = 'events'
     model = 'Event'
     title = u'События'
@@ -52,9 +52,10 @@ class EventsStreamFactory(StreamFactory):
         'editor':'rwxdcp',
     }
 
-    blocks = [
+    fields = [
         xb_object,
-        xb_main,
+        xb_content,
+        xb_section,
     ]
-    list_fields = sort_fields = filter_fields = item_fields = blocks
+    list_fields = sort_fields = filter_fields = item_fields = fields
 

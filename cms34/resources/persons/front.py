@@ -18,7 +18,7 @@ class V_Person(ResourceView):
     plugins = [VP_Response, VP_PersonsQuery]
 
     @classmethod
-    def cases(cls, resources, section):
+    def cases(cls, sections, section):
         return [match('/', name='index') | cls.h_index]
 
     @view_handler
@@ -33,22 +33,22 @@ class V_PersonsList(ResourceView):
     plugins = [VP_Response, VP_PersonsQuery]
 
     @classmethod
-    def cases(cls, resources, section):
+    def cases(cls, sections, section):
         return [match('/', name='index') | cls.h_index,
-                resources.h_section(section)]
+                sections.h_section(section)]
 
     @view_handler
     def h_index(self, env, data):
-        persons = env.resources.get_sections(
+        persons = env.sections.get_sections(
                                          parent_id=self.section.id,
                                          type='person')
 
-        dirs = env.resources.get_sections(
+        dirs = env.sections.get_sections(
                                          parent_id=self.section.id,
                                          type='dir')
         groups = []
         for group in dirs:
-            persons = env.resources.get_sections(
+            persons = env.get_sections.get_sections(
                                         parent_id=group.id,
                                         type='person')
             groups.append((group, persons))

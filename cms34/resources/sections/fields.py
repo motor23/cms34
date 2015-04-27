@@ -1,11 +1,19 @@
 # -*- coding: utf8 -*-
 
-from ...mixed import (
+from cms34.mixed import (
     XF_StreamSelect,
     XF_TreeTitle,
     XF_TypeImg,
+    XF_Parent,
+    XF_Block,
+    XB_Object,
+    xf_id,
+    xf_title,
+    xf_slug,
+    xf_type,
+    xf_order,
 )
-from ...stream import (
+from cms34.stream import (
     lf_tree_expand,
     LF_String,
 )
@@ -28,5 +36,41 @@ class XF_SectionTreeTitle(XF_TreeTitle):
             ),
         ]
 
+
+class XF_SectionParent(XF_Parent):
+    stream_name = 'sections'
+    model = 'Section'
+
+xf_section_parent = XF_SectionParent()
+
+
+class XB_SectionObject(XB_Object):
+    list_fields = [
+        xf_id,
+        xf_slug,
+        xf_title,
+    ]
+    item_fields = [
+        xf_id,
+        xf_type,
+        xf_section_parent,
+        xf_slug,
+        xf_order,
+        xf_title,
+    ]
+
+
 xf_section = XF_Section()
 xf_section_tree_title  = XF_SectionTreeTitle()
+xb_section_object = XB_SectionObject()
+
+
+class XB_Section(XF_Block):
+    label = u'Раздел'
+    name = 'section_block'
+    fields = [
+        xf_section,
+    ]
+
+xb_section = XB_Section()
+

@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-from ...model.factories import ModelFactory, SingleTableTypesPlugin
+from ...model.factories import ModelFactory, MFP_Types
 from ...mixed.fields import (
     xf_id,
     xf_title,
@@ -11,8 +11,8 @@ from ...mixed.fields import (
 
 class MFY_Section(ModelFactory):
     title = u'Раздел'
-    name = 'Section'
-    plugins = [SingleTableTypesPlugin]
+    model = 'Section'
+    plugins = [MFP_Types]
 
     fields = [
         xf_id,
@@ -24,9 +24,12 @@ class MFY_Section(ModelFactory):
     types = []
     resources = []
 
-    def __init__(self, *args, **kwargs):
-        self.types += [(r.name, r.section_model) for r in self.resources]
-        ModelFactory.__init__(self, *args, **kwargs)
+    def __init__(self, register, resources=[], **kwargs):
+        self.resources = resources
+        r_types = [(r.name, r.section_model_factory) for r in self.resources \
+                                                   if r.section_model_factory]
+        self.types = self.types + r_types
+        ModelFactory.__init__(self, register, **kwargs)
 
 
 class MFY_DirSection(ModelFactory):
