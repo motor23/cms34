@@ -1,6 +1,12 @@
 # -*- coding: utf8 -*-
 from .. import ResourceBase
-from .models import MFY_Media
+from .models import (
+    MFY_Media,
+    MFY_Photo,
+    MFY_Video,
+    MFY_File,
+    MFY_PhotoSet,
+)
 from .streams import SFY_Multimedia
 
 

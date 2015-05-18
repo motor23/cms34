@@ -28,6 +28,7 @@ from ..stream import (
    LF_Container,
    LF_EnumImg,
    FF_TextSearch,
+   FF_Int,
    FF_Id,
    FF_Select,
    FF_TabSelect,
@@ -131,11 +132,15 @@ class XF_Base(object):
     def item_form(self, fields_dict, models, factory=None):
         raise NotImplementedError()
 
+    def sort_field(self, fields_dict, models, factory=None):
+        pass
+
 
 class XF_Simple(XF_Base):
 
     initial = None
     required = False
+    sortable = False
 
     def __init__(self, name=None, **kwargs):
         XF_Base.__init__(self, name, **kwargs)
@@ -187,11 +192,16 @@ class XF_Simple(XF_Base):
         field = self._item_field(models, factory)
         field.item_form(fields_dict, models, factory)
 
+    def sort_field(self, fields_dict, models, factory=None):
+        if self.sortable:
+            fields_dict[self.name] = self.name
+
 
 class XF_String(XF_Simple):
     max_length = 255
     min_length = 0
     regex = None
+    sortable = True
 
     def _model_field(self, factory=None):
         return MF_String(self.name,
@@ -219,6 +229,7 @@ class XF_Slug(XF_String):
     required = True
     min_length = 2
     regex = r'^[A-Za-z][A-Za-z0-9_-]+$'
+    sortable = True
 
 
 class XF_Text(XF_String):
@@ -243,6 +254,7 @@ class XF_Title(XF_Text):
     name = 'title'
     label = u'Заголовок'
     required = True
+    sortable = True
 
 
 class XF_TreeTitle(XF_Title):
@@ -272,13 +284,18 @@ class XF_Lead(XF_Text):
 class XF_Slug(XF_String):
     name = 'slug'
     label = u'Слаг'
+    required = True
 
 
 class XF_Int(XF_Simple):
+    sortable = True
 
     def _model_field(self, factory=None):
         return MF_Int(self.name,
                        default=self.initial,)
+
+    def _filter_field(self, models, factory=None):
+        return FF_Int(self.name, label=self.label)
 
     def _item_field(self, models, factory=None):
         return IF_Int(self.name,
@@ -295,6 +312,7 @@ class XF_Order(XF_Int):
 
 
 class XF_Bool(XF_Simple):
+    sortable = True
 
     def _model_field(self, factory=None):
         return MF_Bool(self.name,
@@ -312,6 +330,7 @@ class XF_Id(XF_Simple):
     name = 'id'
     label = u'ID'
     autoincrement = True
+    sortable = True
 
     def _model_field(self, factory=None):
         return MF_Id(self.name,
@@ -332,7 +351,9 @@ class XF_Id(XF_Simple):
 
 
 class XF_Select(XF_Simple):
+
     choices = None
+
     def _model_field(self, factory=None):
         return MF_Enum(self.name, choices=self.choices)
 
@@ -471,6 +492,7 @@ class XF_Group(XF_Base):
     list_fields = property(lambda self: self.fields)
     filter_fields = property(lambda self: self.fields)
     item_fields = property(lambda self: self.fields)
+    sort_fields = property(lambda self: self.fields)
 
     def model_register(self, factory=None, register=None):
         for field in self.model_fields:
@@ -504,6 +526,10 @@ class XF_Group(XF_Base):
         for field in self.item_fields:
             field.item_form(fields_dict, models, factory)
 
+    def sort_field(self, fields_dict, models, factory=None):
+        for field in self.sort_fields:
+            field.sort_field(fields_dict, models, factory)
+
 
 class XF_Block(XF_Group):
 
@@ -535,8 +561,16 @@ class XF_Img(XF_Simple):
     resize = None
     fill_from = None
 
+    show_thumbnail = False
+    show_size = False
+    crop = False
+
     def _model_field(self, factory=None):
-        return MF_Img(self.name)
+        return MF_Img(self.name,
+                    image_sizes=self.image_sizes,
+                    fill_from=self.fill_from,
+                    resize=self.resize,
+                    )
 
     def _list_field(self):
        return LF_Img(self.name, label=self.label)
@@ -544,15 +578,16 @@ class XF_Img(XF_Simple):
     def _item_field(self, models, factory=None):
         return IF_Img(self.name,
                     label=self.label,
-                    image_sizes=self.image_sizes,
-                    fill_from=self.fill_from,
-                )
+                    show_thumbnail=self.show_thumbnail,
+                    crop=self.crop,
+                    )
 
 
 class XF_DateTime(XF_Simple):
 
     format="%d-%m-%Y %H:%M"
     initial = datetime.now
+    sortable = True
 
     def _model_field(self, factory=None):
         return MF_DateTime(self.name,
@@ -658,7 +693,6 @@ class XF_List(XF_Simple):
                     fields=self.fields,)
 
     def _item_field(self, models, factory=None):
-        print self.get_model(factory), factory.name
         return IF_List(self.name,
                     label=self.label,
                     model=self.get_model(factory),

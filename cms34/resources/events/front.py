@@ -12,11 +12,21 @@ from .. import ResourceView
 class VP_EventsQuery(VP_Query):
     model = 'Event'
     order = ('dt', 'desc')
-    limit = 20
+    paginator_limit = 20
 
-    def create_query(self):
-        return self.view.env.db.query(self.get_model())\
-                            .filter_by(section_id=self.view.section.id)
+    @property
+    def query(self):
+        return self._query(self.env, section_id=self.view.section.id)
+
+    @classmethod
+    def _query(cls, env, section_id=None):
+        query = cls._base_query(env)
+        if section_id:
+            query = query.filter_by(section_id=section_id)
+        query = query.order_by(cls._get_order(env))
+        if cls.limit:
+            query = query.limit(cls.limit)
+        return query
 
 
 class V_EventsList(ResourceView):
@@ -31,12 +41,13 @@ class V_EventsList(ResourceView):
         return [
             match('/', name='index') | cls.h_index,
             match('/<int:item_id>/', name='item') | cls.h_item,
+            sections.h_section(section),
         ]
 
     @view_handler
     def h_index(self, env, data):
         paginator = self.paginator(env.request, self.query.query,
-                                limit=self.query.limit)
+                                limit=self.query.paginator_limit)
         return self.response.template('index',
                                       dict(paginator=paginator))
 
@@ -47,7 +58,6 @@ class V_EventsList(ResourceView):
             raise HTTPNotFound()
         return self.response.template('item', dict(event=event))
 
-
-    def _url_for_obj(self, root, obj):
-        if isinstance(obj, self.query.get_model()):
-            return root.item(item_id=obj.id)
+    @classmethod
+    def _url_for_obj(cls, root, obj):
+        return root.item(item_id=obj.id)

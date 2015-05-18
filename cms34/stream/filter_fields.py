@@ -1,15 +1,21 @@
 # -*- coding: utf8 -*-
+from collections import OrderedDict
+
 from iktomi.forms import Field
 from iktomi.cms.forms import convs, widgets, fields
+from iktomi.cms.forms.fields import SortField
 
 __all__ = (
     'FF_Base',
+    'FF_Text',
+    'FF_Int',
     'FF_TextSearch',
     'FF_Id',
     'FF_Select',
     'FF_TabSelect',
     'FF_DateTimeFromTo',
     'FF_StreamSelect',
+    'FF_Sort',
     'ff_id',
 )
 
@@ -57,6 +63,12 @@ class FF_Text(FF_Base):
 
     def create_widget(self, model, factory=None):
         return widgets.TextInput()
+
+
+class FF_Int(FF_Text):
+
+    def create_conv(self, models, factory=None):
+        return convs.Int()
 
 
 class FF_TextSearch(FF_Text):
@@ -135,6 +147,40 @@ class FF_StreamSelect(FF_Base):
             default_filters=self.default_filters,
         )
 
+
+class FF_Sort(FF_Base):
+
+    name = 'sort'
+    fields = []
+    initial = None
+
+    def create_field(self, models, factory=None):
+        return SortField(self.name,
+            choices=self.get_choices(models, factory),
+            initial=self.get_initial(models, factory),
+            )
+
+    def get_choices(self, models, factory=None):
+        result = OrderedDict()
+        for field in self.fields:
+            if isinstance(field, tuple):
+                result[field[0]] = field[1]
+            else:
+                field.sort_field(result, models, factory)
+        return result.items()
+
+    def get_initial(self, models, factory=None):
+        if self.initial is None:
+            if self.fields:
+                return self.get_choices(models, factory)[0][0]
+            else:
+                return 'id'
+        if isinstance(self.initial, basestring):
+            return self.initial
+        else:
+            result = OrderedDict()
+            self.initial.sort_field(result, models, factory)
+            return result.keys()[0]
 
 
 ff_id = FF_Id()

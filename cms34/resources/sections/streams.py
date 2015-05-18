@@ -29,6 +29,7 @@ class SFY_Sections(StreamFactory):
     initial_sort = 'order'
     plugins = [SFP_Tree, SFP_FileUpload, SFP_ImageUpload]
     item_form_factory = TypedItemFormFactory
+    sort_initial_field='order'
 
     permissions = {
         'wheel':'rwxdcp',

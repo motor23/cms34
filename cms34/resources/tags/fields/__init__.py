@@ -9,6 +9,9 @@ from cms34.mixed.fields import (
 from cms34.stream.item_fields import (
     IF_StreamSelect,
 )
+from ....stream.item_fields import (
+    IF_StreamSelect,
+)
 from .model import (
     MF_RegionId,
     MF_Region,
@@ -20,16 +23,23 @@ __all__ = (
     'XF_RegionId',
     'XF_Region',
     'XF_Regions',
+    'XB_Tags',
+    'XB_Regions',
     'xf_region_id',
     'xf_tags',
     'xf_region',
     'xf_regions',
+    'xb_tags',
+    'xb_regions',
 )
 
 class XF_Tags(XF_StreamSelect):
     name = 'tags'
-    remote_cls_name = 'Tag'
-    ordered = False
+    label = u'Теги'
+    model = 'Tag'
+    stream_name = 'tags'
+    ordered = True
+    multiple = True
 
 
 class XF_RegionId(XF_Id):
@@ -97,7 +107,7 @@ xf_regions = XF_Regions()
 class XB_Tags(XF_Block):
     name = 'region_block'
     label = u'Классификаторы'
-    fields = [xf_region]
+    fields = [xf_tags]
 
 
 class XB_Region(XF_Block):
@@ -105,4 +115,6 @@ class XB_Region(XF_Block):
     label = u'Регион'
     fields = [xf_region]
 
+xb_tags = XB_Tags()
 xb_region = XB_Region()
+

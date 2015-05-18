@@ -16,3 +16,4 @@ class V_DirSection(ResourceView):
     def _url_for_index(cls, root):
         return None
 
+

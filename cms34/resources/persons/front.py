@@ -8,9 +8,6 @@ class VP_PersonsQuery(VP_Query):
     order = ('order', 'asc')
     limit = 20
 
-    def create_query(self):
-        return self.view.env.db.query(self.get_model())
-
 
 class V_Person(ResourceView):
 
@@ -39,7 +36,7 @@ class V_PersonsList(ResourceView):
 
     @view_handler
     def h_index(self, env, data):
-        persons = env.sections.get_sections(
+        free_persons = self.query.query.filter_by(
                                          parent_id=self.section.id,
                                          type='person')
 
@@ -48,11 +45,11 @@ class V_PersonsList(ResourceView):
                                          type='dir')
         groups = []
         for group in dirs:
-            persons = env.get_sections.get_sections(
+            persons = self.query.query.filter_by(
                                         parent_id=group.id,
                                         type='person')
             groups.append((group, persons))
-        return self.response.template('index', dict(persons=persons,
+        return self.response.template('index', dict(free_persons=free_persons,
                                                     groups=groups))
 
     def breadcrumbs(self, children=[]):

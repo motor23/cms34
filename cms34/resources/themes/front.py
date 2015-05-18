@@ -8,9 +8,6 @@ class VP_ThemesQuery(VP_Query):
     order = ('order', 'asc')
     limit = 20
 
-    def create_query(self):
-        return self.view.env.db.query(self.get_model())
-
 
 class V_Theme(ResourceView):
 

@@ -41,8 +41,8 @@ class SFY_Menu(StreamFactory):
     name = 'menu'
     model = 'Menu'
     title = u'Меню'
-    initial_sort = 'order'
     plugins = [SFP_Tree]
+    sort_initial_field='order'
 
     permissions = {
         'wheel':'rwxdcp',

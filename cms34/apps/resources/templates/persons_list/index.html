@@ -13,7 +13,7 @@
 
 
 <h2>Персоны</h2>
-{% for person in persons %}
+{% for person in free_persons %}
 <p><a href="{{ env.url_for_obj(person) }}">{{ person.first_name }} {{ person.last_name }} {{ person.patronymic }}</a></p>
 {% endfor %}
 

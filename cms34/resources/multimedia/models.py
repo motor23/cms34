@@ -17,6 +17,9 @@ from .fields import (
     xf_sd,
     xf_hd,
     xf_poster_orig,
+    xf_aspect,
+    xf_poster_4_3,
+    xf_poster_16_9,
 )
 
 
@@ -46,6 +49,9 @@ class MFY_Video(ModelFactory):
         xf_sd,
         xf_hd,
         xf_poster_orig,
+        xf_aspect,
+        xf_poster_4_3,
+        xf_poster_16_9,
     ]
 
 class MFY_File(ModelFactory):

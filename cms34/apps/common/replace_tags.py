@@ -21,7 +21,7 @@ replacer = MarkupExpander()
 
 replacer.add_filter(Tag(
     name='iktomi_media',
-    collection='media',
+    collection='medias',
     template=lambda target: 'tags/media_{}'.format(target.type),
 ))
 

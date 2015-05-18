@@ -1,4 +1,7 @@
 # -*- coding: utf8 -*-
+from iktomi.unstable.utils.image_resizers import (
+    ResizeCrop,
+)
 from ...mixed.fields import (
     XF_StreamSelect,
     XF_Select,
@@ -84,9 +87,32 @@ class XF_Hd(XF_File):
     name = 'hd'
     label=u'Видео hd'
 
+
 class XF_PosterOrig(XF_Img):
     name='poster_orig'
     label=u'Постер в исходном разрешении'
+
+class XF_Poster4_3(XF_Img):
+    label=u'Постер 4:3',
+    name = 'poster_4_3'
+    image_sizes = (640, 480)
+    resize = ResizeCrop()
+    fill_from = 'poster_orig'
+    required = True
+    show_thumbnail = True
+    show_size = True
+    crop = True
+
+class XF_Poster16_9(XF_Img):
+    label=u'Постер 16:9',
+    name = 'poster_16_9'
+    image_sizes = (640, 360)
+    resize = ResizeCrop()
+    fill_from = 'poster_orig'
+    required = True
+    show_thumbnail = True
+    show_size = True
+    crop = True
 
 
 xf_media_select = XF_MediaSelect()
@@ -101,6 +127,8 @@ xf_img_orig = XF_ImgOrig()
 xf_sd = XF_Sd()
 xf_hd = XF_Hd()
 xf_poster_orig = XF_PosterOrig()
+xf_poster_4_3 = XF_Poster4_3()
+xf_poster_16_9 = XF_Poster16_9()
 
 
 class XB_Media(XF_Block):
@@ -144,6 +172,8 @@ class XB_PosterUpload(XF_Block):
     label = u'Постер'
     item_fields = [
         xf_poster_orig,
+        xf_poster_4_3,
+        xf_poster_16_9,
     ]
 
 xb_media = XB_Media()

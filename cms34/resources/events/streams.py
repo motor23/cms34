@@ -18,19 +18,10 @@ from ..sections.fields import xb_section
 class XB_Content(XB_Content):
     list_fields = [
         xf_title,
-        xf_lead,
         xf_dt,
         xf_publish_dt,
     ]
-    sort_fields = [
-        xf_dt,
-        xf_publish_dt,
-    ]
-    filter_fields = [
-        xf_title,
-        xf_dt,
-        xf_publish_dt,
-    ]
+    sort_fields = filter_fields = list_fields
     item_fields = [
         xf_dt,
         xf_publish_dt,
@@ -41,11 +32,13 @@ class XB_Content(XB_Content):
 
 xb_content = XB_Content()
 
+
 class SFY_Events(StreamFactory):
     name = 'events'
     model = 'Event'
     title = u'События'
     limit = 40
+    sort_initial_field = '-dt'
 
     permissions = {
         'wheel':'rwxdcp',

@@ -18,28 +18,55 @@ class V_Sections(object):
         for subsection in subsections:
             resource = self.resources.get_resource(subsection.type)
             handler = resource.handler(self, subsection)
-            handler = prefix('/' + subsection.slug, name=subsection.slug) | \
-                      handler
+            handler = prefix('/' + (subsection.slug or ''),
+                             name=subsection.slug) | handler
             handlers.append(handler)
         return cases(*handlers)
 
     def get_sections(self, **kwargs):
-        return self.cached_db.query(self.model)\
-                             .filter_by(**kwargs).all()
+        result = []
+        sections = self.cached_db.query(self.model)\
+                             .filter_by(**kwargs).order_by('order').all()
+        #remove sections with double (slugs, parant_id) pairs 
+        pairs = []
+        for section in sections:
+            pair = (section.slug, section.parent_id)
+            if pair not in pairs:
+                pairs.append(pair)
+                result.append(section)
+        return result
+
+    def get_section(self, **kwargs):
+        sections = self.get_sections(**kwargs)
+        return sections and sections[0] or None
+
+    def get_section_parents(self, section):
+        result = []
+        if section.parent_id is None:
+            return result
+        parent_id = section.parent_id
+        while parent_id:
+            parent = self.get_section(id=parent_id)
+            if not parent: # parent not published
+                return None
+            result.append(parent)
+            parent_id = parent.parent_id
+        return result
 
     def url_for_obj(self, root, obj):
         if isinstance(obj, self.model):
             return self.url_for_section(root, obj)
         if hasattr(obj, 'section'):
-            section_root = self.root_for_section(root, section)
-            url = self.resources.get_resource(section.type).view_cls\
+            section_root = self.root_for_section(root, obj.section)
+            url = self.resources.get_resource(obj.section.type).view_cls\
                                 ._url_for_obj(section_root, obj)
             if url:
                 return url
         return None
 
     def root_for_section(self, root, section):
-        slugs = [section.slug] + [p.slug for p in section.parents]
+        parents = self.get_section_parents(section)
+        slugs = [section.slug] + [p.slug for p in parents]
         slugs.reverse()
         return root.build_subreverse('.'.join(slugs))
 
@@ -55,6 +82,9 @@ class V_Sections(object):
                 return self.url_for_section(root, sections[0])
             else:
                 return None
+
+    def clear(self):
+        self.cached_db.clear()
 
 
 class H_Sections(WebHandler):
@@ -85,20 +115,35 @@ class H_Sections(WebHandler):
         return self._handler
 
     def rebuild_sections_dict(self):
+        self.sections.clear()
         section_items = self.sections.get_sections()
-        sections = dict([(section.id, section.tree_path) \
-                                              for section in section_items])
+        sections = [(section.id, self.tree_path(section)) \
+                                              for section in section_items]
+        sections = dict(filter(lambda x: x[1], sections))
         if sections == self._sections:
             return False
         else:
             self._sections = sections
             return True
 
+    def tree_path(self, section):
+        # default tree_path raise Exception when get relation
+        parents = self.sections.get_section_parents(section)
+        if parents is None:
+            return None
+        slugs = [section.slug] + [item.slug for item in parents]
+        slugs.reverse()
+        slugs = map(lambda x: x or '', slugs)
+        return '/' + '/'.join(slugs) + '/'
+
+
 
 class ResourceView(BaseView):
 
     def __init__(self, env, cls, section=None):
         self.section = section
+        if section:
+            env.section = section
         BaseView.__init__(self, env, cls)
 
     @classmethod

@@ -223,7 +223,11 @@ class IF_Img(IF_Simple):
         return fields.AjaxImageField(self.name,
                              conv=self.create_conv(models, factory),
                              widget=self.create_widget(models, factory),
-                             label=self.label,)
+                             label=self.label,
+                             show_thumbnail=self.show_thumbnail,
+                             show_size=self.show_size,
+                             crop=self.crop,
+                             )
 
     def create_conv(self, models, factory=None):
         return fields.AjaxImageField.conv(required=self.required)

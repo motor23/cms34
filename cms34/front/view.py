@@ -10,10 +10,6 @@ class HView(WebHandler):
         self.kwargs = kwargs
 
     def view(self, env, data):
-        contexts = dict(getattr(env, 'views_contexts', {}))
-        contexts[self.view_cls.name] = {}
-        env.view_contexts = contexts
-
         view = self.view_cls(env, data, **self.kwargs)
         views = getattr(env, 'views', [])
         views.append(view)
@@ -25,28 +21,22 @@ class HView(WebHandler):
 
 class Context(object):
 
-    def __init__(self, env, name):
+    def __init__(self, env, key):
         self._env = env
-        self._name = name
+        self._key = key
 
     def __getattr__(self, name):
         if name[0]=='_':
             return object.__getattribute__(self, name)
-        context = self.get_context()
-        if context.has_attr(name):
-            return context[name]
-        else:
-            raise AttributeError(name)
+        return getattr(self._env, self._get_prop_key(name))
 
     def __setattr__(self, name, value):
         if name[0]=='_':
             return object.__setattr__(self, name, value)
-        context = dict(self.get_context())
-        context[name] = value
-        self._env.view_contexts[self._name] = context
+        setattr(self._env, self._get_prop_key(name), value)
 
-    def get_context(self):
-        return self._env.view_contexts[self._name]
+    def _get_prop_key(self, prop_name):
+        return '%s_%s' % (self._key, prop_name)
 
 
 class BaseView(object):
@@ -63,9 +53,12 @@ class BaseView(object):
             subreverse = subreverse(**data.as_dict())
         self.root = subreverse
         self.parent = getattr(env, 'view', None)
-        self.context = Context(env, self.name)
+        self.c = Context(env, 'view_context_%s' % self.namespace)
         for plugin in self.plugins:
-            plugin(self)
+            assert not hasattr(self, plugin.name), \
+                   'property %s already exists' % plugin.name
+            p = plugin(self)
+            setattr(self, plugin.name, p)
 
     @classmethod
     def cases(cls):

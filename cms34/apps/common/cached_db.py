@@ -6,16 +6,15 @@
 #  cquery = cdb.query(Model).filter_by(parent=5, type='text').order_by('id')
 #  result = cquery.all()
 #
-from sqlalchemy.orm import sessionmaker
-
 
 class CachedQuery(object):
 
-    def __init__(self, parent, cls, items=None):
+    def __init__(self, parent, cls, items=None, with_polymorphic=False):
         self.parent = parent
+        self.with_polymorphic = with_polymorphic
         self.cls = cls
         if items is None:
-            self.items = parent.items(cls)
+            self.items = parent.items(cls, with_polymorphic=with_polymorphic)
         else:
             self.items = items
 
@@ -54,47 +53,49 @@ class CachedDb(object):
     def __init__(self, maker):
         self.maker = maker
         self.cached_query = {}
-        self.session = sessionmaker()()
-        self.db = self.maker.db_maker()
+        self.db_maker = self.maker.db_maker
         self.cache = self.maker.cache
-        # add obj to section for relations
-        for model in self.maker.preloaded_models:
-            self.query(model)
+        self.clear()
 
-    def query(self, cls):
+    def query(self, cls, with_polymorphic=False):
         query = self.cached_query.get(cls.__name__)
         if query:
             return query
         else:
-            return self.cached_query.setdefault(cls.__name__,
-                                                self.maker.query_cls(self, cls))
+            query = self.maker.query_cls(self, cls, 
+                                         with_polymorphic=with_polymorphic)
+            return self.cached_query.setdefault(cls.__name__, query)
 
-    def items(self, cls):
+    def items(self, cls, with_polymorphic=False):
         items = self.items_from_cache(cls)
         if items is None:
-            items = self.items_from_db(cls)
+            items = self.items_from_db(cls, with_polymorphic=with_polymorphic)
             self.items_to_cache(cls, items)
         return items
 
     def items_key(self, cls):
         return self.maker.cache_prefix + cls.__name__
 
-    def items_from_db(self, cls):
-        return self.db.query(cls).limit(self.maker.db_limit).all()
+    def items_from_db(self, cls, with_polymorphic=False):
+        db = self.maker.db_maker() #XXX
+        query = db.query(cls)
+        if with_polymorphic:
+            query = query.with_polymorphic('*')
+        result = query.limit(self.maker.db_limit).all()
+        db.close()
+        return result
 
     def items_from_cache(self, cls):
         if self.maker.cache_enabled:
-            items = self.cache.get(self.items_key(cls))
-            if items:
-                for item in items:
-                    if item not in self.session.new:
-                        self.session.add(item)
-            return items
+            return self.cache.get(self.items_key(cls))
 
     def items_to_cache(self, cls, items):
         if self.maker.cache_enabled:
             self.cache.set(self.items_key(cls), items,
                            time=self.maker.cache_timeout)
+
+    def clear(self):
+        self.cached_query = {}
 
 
 class CachedDbMaker(object):
@@ -103,7 +104,6 @@ class CachedDbMaker(object):
     cache_enabled = True
     cache_timeout = 60
     query_cls = CachedQuery
-    preloaded_models = []
     cached_db_cls = CachedDb
 
     def __init__(self, db_maker, cache, **kwargs):

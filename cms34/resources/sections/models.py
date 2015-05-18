@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
-from ...model.factories import ModelFactory, MFP_Types
-from ...mixed.fields import (
+from cms34.model.factories import ModelFactory, MFP_Types
+from cms34.mixed import (
     xf_id,
     xf_title,
     xf_slug,

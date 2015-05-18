@@ -34,6 +34,7 @@ class SFY_Orgs(StreamFactory):
     title = u'Организации'
     limit = 40
     preview = True
+    sort_initial_field = 'title'
 
     permissions = {
         'wheel':'rwxdcp',

@@ -21,8 +21,13 @@ class Environment(EnvironmentBase):
     def get_template_globals(self, env):
         result = EnvironmentBase.get_template_globals(self, env)
         return dict(result,
-            replace_tags=replace_tags
+            replace_tags=replace_tags,
+            lang=env.lang,
         )
 
     def url_for_obj(self, obj):
         raise NotImplementedError
+
+    @cached_property
+    def cached_db(self):
+        return self.app.cached_db_maker()

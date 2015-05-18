@@ -8,7 +8,7 @@ from iktomi.utils.html import Cleaner
 from iktomi.cms.stream_actions import GetAction
 from iktomi import web
 
-from models.admin import WithState
+from iktomi.cms.publishing.model import AdminWithState as WithState
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +25,7 @@ class HtmlBodyHandler(GetAction):
         'photo': 'photolink',
         'photoset': 'photosetlink',
         'video': 'videolink',
+        'file': 'filelink'
     }
 
     @property

@@ -76,7 +76,7 @@ class SFP_HtmlBody(SFP_Base):
     handler_cls = HtmlBodyHandler
 
     def create_config(self, factory, cfg):
-        cfg.Stream.actions = cfg.Stream.actions + [HtmlBodyHandler()]
+        cfg.Stream.actions = cfg.Stream.actions + [self.handler_cls()]
 
 
 class SFP_ChildFactories(SFP_Base):

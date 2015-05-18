@@ -17,11 +17,18 @@ class Environment(EnvironmentBase):
     def cached_db(self):
         return self.app.cached_db_maker()
 
+    def get_template_globals(self, env):
+        result = EnvironmentBase.get_template_globals(self, env)
+        return dict(result,
+            url_for_obj=self.url_for_obj,
+        )
+
     @storage_method
     def url_for_obj(storage, obj):
-        url = storage.sections.url_for_section(storage.lang.root, obj)
-        if url:
-            return url
+        if isinstance(obj, storage.models.Menu):
+            return storage.menu.url_for_item(obj)
+        url = storage.sections.url_for_obj(storage.lang.root, obj)
+        return url and url or '#'
 
     @storage_cached_property
     def menu(storage):

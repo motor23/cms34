@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-from ...stream import (
+from cms34.stream import (
     StreamFactory,
     TypedItemFormFactory,
+    SFP_ImageUpload,
 )
 
-from ...mixed import (
+from cms34.mixed import (
     XF_Block,
     xb_object,
     xf_title,
@@ -22,9 +23,6 @@ class XB_Main(XF_Block):
         xf_title,
         xf_order,
     ]
-    sort_fields = [
-        xf_order,
-    ]
     filter_fields = [
         xf_type,
         xf_title,
@@ -33,6 +31,10 @@ class XB_Main(XF_Block):
         xf_type,
         xf_title,
         xf_order,
+    ]
+    sort_fields = [
+       xf_title,
+       xf_order,
     ]
 
 xb_main = XB_Main()
@@ -44,6 +46,7 @@ class SFY_Options(StreamFactory):
     title = u'Опции'
     limit = 40
     preview = True
+    plugins = [SFP_ImageUpload]
 
     permissions = {
         'wheel':'rwxdcp',

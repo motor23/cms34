@@ -34,6 +34,7 @@ class XB_Main(XF_Block):
         xf_publish_dt,
     )
     sort_fields = (
+        xf_title,
         xf_dt,
         xf_publish_dt,
     )
@@ -61,6 +62,7 @@ class SFY_Multimedia(StreamFactory):
     limit = 40
     item_form_factory = TypedItemFormFactory
     plugins = [SFP_FileUpload, SFP_ImageUpload]
+    sort_initial_field = '-dt'
 
     permissions = {
         'wheel':'rwxdcp',

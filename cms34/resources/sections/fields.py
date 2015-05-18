@@ -47,9 +47,9 @@ xf_section_parent = XF_SectionParent()
 class XB_SectionObject(XB_Object):
     list_fields = [
         xf_id,
-        xf_slug,
         xf_title,
     ]
+    filter_fields = sort_fields = list_fields
     item_fields = [
         xf_id,
         xf_type,

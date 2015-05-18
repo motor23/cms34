@@ -27,6 +27,7 @@ class SFY_Pages(StreamFactory):
     title = u'Страницы'
     limit = 40
     preview = True
+    sort_initial_field = 'title'
 
     permissions = {
         'wheel':'rwxdcp',

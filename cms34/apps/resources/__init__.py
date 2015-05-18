@@ -1,4 +1,5 @@
 # -*- coding:utf8 -*-
+from iktomi.web import Reverse
 from iktomi.utils import cached_property
 from cms34.resources import V_Sections
 from ..common.cached_db import CachedDbMaker
@@ -9,11 +10,14 @@ class Application(BaseApplication):
 
     resources = []
 
+    @property
+    def root(self):\
+        # XXX Is it is fast? 
+        return Reverse.from_handler(self.handler)
+
     @cached_property
     def cached_db_maker(self):
-        from models.front import SectionRu, SectionEn, MenuRu, MenuEn
         return CachedDbMaker(self.db_maker, self.cache,
-                        preladed_models=[SectionRu, SectionEn, MenuRu, MenuEn],
                         cache_enabled=self.cfg.CACHE_ENABLED)
 
     @cached_property

@@ -1,8 +1,11 @@
+import jinja2
+
 __all__ = (
     'remove_from_url',
     'append_to_url',
     'filesizeformat',
     'nl2br',
+    'make_breaks',
 )
 
 def remove_from_url(url, key):
@@ -29,6 +32,9 @@ def filesizeformat(value, binary=False):
 
 def nl2br(value):
     return jinja2.Markup(value.replace('\n', '<br/>'))
+
+def make_breaks(value):
+    return jinja2.Markup(jinja2.Markup("<br/>").join(value.split('\n')))
 
 
 all_filters = dict((k, v) for k, v in locals().items() if k in __all__)

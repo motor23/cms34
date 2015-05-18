@@ -28,6 +28,7 @@ class SFY_Themes(StreamFactory):
     model = 'Theme'
     title = u'Темы'
     limit = 40
+    sort_initial_field = 'title'
 
     permissions = {
         'wheel':'rwxdcp',

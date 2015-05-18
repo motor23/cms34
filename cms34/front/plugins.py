@@ -1,77 +1,74 @@
 from webob.exc import HTTPNotFound
+from cms34.stream import FilterFormFactory
+from .view import Context
 
-class Plugin(object):
-
-    name = None
-    view_properties = []
+class ViewPlugin(object):
 
     def __init__(self, view):
-        self.view = view
         self.env = view.env
-        setattr(view, self.name, self)
-        for prop in self.view_properties:
-            if hasattr(view, prop):
-                value = getattr(view, prop)
-                setattr(self, prop, value)
-            assert hasattr(self, prop), \
-                   'View name="%s": You must set "%s" property' % \
-                                                        (self.view.name, prop)
+        self.view = view
+        self.c = Context(self.env, '%s_%s' % (self.view.c._key, self.name))
 
 
-class VP_Query(Plugin):
+class VP_Query(ViewPlugin):
 
+    model = None
     name = 'query'
-
-    view_properties = ['model', 'order_field', 'order_asc', 'limit']
-
     order_field = 'id'
     order_asc = True
-    limit = 30
+    limit = None
 
     @property
-    def models(self):
-        return self.view.env.models
+    def query(self):
+        return self._query(self.env)
+
+    def get_or_404(self, **kwargs):
+        return self._get_or_404(self.env, **kwargs)
 
     def get_model(self, name=None):
-        return getattr(self.models, name or self.model)
+        return self._get_model(self.env, name=name)
 
-    def get_order(self):
-        field = getattr(self.get_model(), self.order_field)
-        if self.order_asc:
+    @classmethod
+    def _models(cls, env):
+        return env.models
+
+    @classmethod
+    def _get_model(cls, env, name=None):
+        return getattr(cls._models(env), name or cls.model)
+
+    @classmethod
+    def _get_order(cls, env):
+        field = getattr(cls._get_model(env), cls.order_field)
+        if cls.order_asc:
             return field.asc()
         else:
             return field.desc()
 
-    def create_query(self):
-        return self.view.env.db.query(self.model)\
+    @classmethod
+    def _base_query(cls, env):
+        return env.db.query(cls._get_model(env))
 
-    def all(self):
-        return self.query.order_by(self.get_order()).limit(self.limit).all()
+    @classmethod
+    def _query(cls, env):
+        query = cls._base_query(env).order_by(cls._get_order(env))
+        if cls.limit:
+            query = query.limit(cls.limit)
+        return query
 
-    def get_or_404(self, **kwargs):
-        obj = self.query.filter_by(**kwargs).first()
+    @classmethod
+    def _get_or_404(cls, env, **kwargs):
+        obj = cls._base_query(env).filter_by(**kwargs).first()
         if obj is None:
             raise HTTPNotFound()
         return obj
 
-    @property
-    def query(self):
-        if hasattr(self.view.context, 'query'):
-            return self.view.context.query
-        else:
-            query = self.create_query()
-            self.query = query
-            return query
-
-    @query.setter
-    def query(self, query):
-        self.view.context.query = query
+    def __call__(self):
+        return self.query
 
 
-class VP_Response(Plugin):
+class VP_Response(ViewPlugin):
 
     name = 'response'
-    view_properties = ['templates_folder']
 
     @property
     def templates_folder(self):
@@ -89,4 +86,39 @@ class VP_Response(Plugin):
         kwargs.setdefault('view', self.view)
         return self.view.env.render_to_response(self.template_name(template),
                                                 kwargs)
+
+
+class VP_Filter(ViewPlugin):
+
+    name = 'filter'
+    Factory = FilterFormFactory
+    initials = {}
+    active = False
+
+    def init(self, initials={}, **kwargs):
+        factory = self.Factory(view=self.view, **kwargs)
+        initials = dict(self.initials, **initials)
+        self.c.form = factory(self.env, None, initials)
+        self.active = True
+
+    def get_form(self):
+        try:
+            return self.c.form
+        except AttributeError:
+            self.init()
+            return self.c.form
+
+    def accept(self, data=None):
+        if data is None:
+            data = self.env.request.GET
+        self.get_form().accept(data)
+
+    def filter(self, query):
+        return self.get_form().filter(query)
+
+    def __call__(self, query):
+        return self.filter(query)
+
+    def render(self):
+        return self.get_form().render()
 

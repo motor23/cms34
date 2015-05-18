@@ -5,7 +5,16 @@ class Menu(object):
         self.model = model
 
     def get_items(self, **kwargs):
-        return self.env.cached_db.query(self.model).filter_by(**kwargs).all()
+        result = []
+        items = self.env.cached_db.query(self.model).filter_by(**kwargs)\
+                                                   .order_by('order').all()
+        for item in items:
+            if item.section_id:
+                section = self.env.sections.get_section(id=item.section_id)
+                if not section:
+                    continue
+            result.append(item)
+        return result
 
     def get_item(self, **kwargs):
         items = self.get_items(**kwargs)
@@ -23,15 +32,15 @@ class Menu(object):
 
     def url_for_item(self, item):
         if not item.section_id:
-            child_menu = self.get_child_menu(item)
-            if child_menu:
-                return self.url_for_item(child_menu[0])
+            child_item = self.get_item(parent_id=item.id)
+            if child_item:
+                return self.url_for_item(child_item)
             else:
                 return self.env.root.index
-        section_list = self.env.sections.get_sections(id=item.section_id)
-        if not section_list:
+        section = self.env.sections.get_section(id=item.section_id)
+        if not section:
             return self.env.root.index
-        return self.env.sections.url_for_section(self.env.root, section_list[0])
+        return self.env.sections.url_for_section(self.env.root, section)
 
     def _get_menus(self, item=None):
         menu = self.get_menu(item)
@@ -44,7 +53,18 @@ class Menu(object):
     def get_menus(self, item=None):
         menus = self._get_menus(item)
         if item:
-            menus+=[(None, self.get_child_menu(item))]
+            child_menu = self.get_child_menu(item)
+            if child_menu:
+                menus+=[(None, child_menu)]
         return menus
 
+    def get_menus_by_section(self, section=None):
+        if section:
+            menu_item = self.get_item(section_id=section.id)
+            while not menu_item and section.parent_id:
+                section = self.env.sections.get_section(id=section.parent_id)
+                menu_item = self.get_item(section_id=section.id)
+        else:
+            menu_item = None
+        return self.get_menus(menu_item)
 

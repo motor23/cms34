@@ -69,6 +69,7 @@ class SFY_Persons(StreamFactory):
     title = u'Персоны'
     limit = 40
     preview = True
+    sort_initial_field = 'title'
 
     permissions = {
         'wheel':'rwxdcp',
@@ -81,3 +82,4 @@ class SFY_Persons(StreamFactory):
         xb_main,
         xb_photo,
     ]
+    list_fields = sort_fields = filter_fields = item_fields = fields

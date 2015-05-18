@@ -5,6 +5,9 @@ from iktomi.cms.stream import FilterForm
 from iktomi.cms.publishing.i18n_stream import PublishStream
 from iktomi.cms.forms import ModelForm
 
+from .filter_fields import FF_Sort
+
+
 def dict_to_register(streams_dict):
     def register(name, stream):
         streams_dict[name] = stream
@@ -32,12 +35,18 @@ class FormFactoryBase(object):
     fields = []
     name = 'Form'
     stream_factory = None
+    model = None
 
-    def __init__(self, fields=None, stream_factory=None, **kwargs):
+    def __init__(self, fields=None, stream_factory=None, model=None, **kwargs):
+        self.__dict__.update(kwargs)
         self.fields = (fields is not None) and fields or self.fields
         assert self.fields is not None, \
                u'You must specify "fields" property, cls=%s' % self.__class__
         self.stream_factory = stream_factory or self.stream_factory
+        assert not (stream_factory and model)
+        self.model = self.stream_factory and self.stream_factory.model or \
+                     model or self.model
+        assert self.model
 
     def __call__(self, env, *args, **kwargs):
         return self.get_form(env, *args, **kwargs)(env, *args, **kwargs)
@@ -55,7 +64,9 @@ class FormFactory(FormFactoryBase):
     bases = (ModelForm,)
 
     def get_form(self, env, *args, **kwargs):
-        return type(self.name, self.bases, self.get_form_dict(env.models))
+        return type(self.name,
+                    self.bases,
+                    self.get_form_dict(env.models, **kwargs))
 
     def get_form_dict(self, models):
         raise NotImplementedError
@@ -66,11 +77,11 @@ class FilterFormFactory(FormFactory):
     bases = (FilterForm,)
     name = 'FilterForm'
 
-    def get_form_dict(self, models):
+    def get_form_dict(self, models, **kwargs):
         form_dict = OrderedDict()
         fields_dict = OrderedDict()
         for field in self.fields:
-            field.filter_field(fields_dict, models,  self.stream_factory)
+            field.filter_field(fields_dict, models,  self)
         form_dict['fields_dict'] = fields_dict
         form_dict['fields'] = fields_dict.values()
 
@@ -84,9 +95,11 @@ class FilterFormFactory(FormFactory):
                     self.stream_factory)
             return defaults_dict
         form_dict['defaults'] = defaults
+        form_dict['model'] = getattr(models, self.model)
 
         for field in self.fields:
-            field.filter_form(form_dict, models, self.stream_factory)
+            field.filter_form(form_dict, models, self)
+        form_dict.update(kwargs)
         return form_dict
 
 
@@ -95,7 +108,7 @@ class ItemFormFactory(FormFactory):
     bases = (ModelForm,)
     name = 'ItemForm'
 
-    def get_form_dict(self, models):
+    def get_form_dict(self, models, **kwargs):
         form_dict = OrderedDict()
         fields_dict = OrderedDict()
         for field in self.fields:
@@ -104,6 +117,7 @@ class ItemFormFactory(FormFactory):
         form_dict['fields'] = fields_dict.values()
         for field in self.fields:
             field.item_form(form_dict, models, self.stream_factory)
+        form_dict.update(kwargs)
         return form_dict
 
 
@@ -137,6 +151,8 @@ class StreamFactory(object):
     fields = []
     list_fields = None
     filter_fields = None
+    sort_fields = []
+    sort_initial_field = None
     item_fields = None
     permissions = {'wheel':'rwxdcp'}
     limit = None
@@ -161,7 +177,6 @@ class StreamFactory(object):
         register(self.name, self.create_stream())
 
     def create_config(self):
-        print self.name
         cfg = self.Cfg()
         cfg.title = self.title
         cfg.permissions = self.permissions
@@ -192,9 +207,16 @@ class StreamFactory(object):
         factory = self.filter_form_factory
         fields = (self.filter_fields is None) and self.fields \
                                               or self.filter_fields
+        fields = fields + [self.create_sort_filter_field()]
         for plugin in self.plugins:
             factory, fields = plugin.create_item_form(factory, fields)
         return factory(fields, stream_factory=self)
+
+    def create_sort_filter_field(self):
+        return FF_Sort(
+            fields=self.sort_fields,
+            initial=self.sort_initial_field,
+            )
 
     def create_item_form(self):
         factory = self.item_form_factory

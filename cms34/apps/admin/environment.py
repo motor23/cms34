@@ -33,6 +33,7 @@ class Context(EnvironmentBase.Context):
 class Environment(EnvironmentBase):
     Context = Context
     auth_model = models.admin.AdminUser
+    object_tray_model = models.admin.ObjectTray #XXX tmp huck
 
     def __init__(self, app, **kwargs):
         EnvironmentBase.__init__(self, app, **kwargs)

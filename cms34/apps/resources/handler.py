@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from webob.exc import HTTPNotFound
-from cms34.resources import V_Sections
 from iktomi.web import static_files, prefix, cases, namespace, match
 from ..common.caching import Caching, cache
 
