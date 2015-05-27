@@ -1,6 +1,8 @@
 <html>
 <head>
     <meta charset="utf-8">
+    {{ context.css_tag('app.css') }}
+    {{ context.js_tag('app.css') }}
 </head>
 <body>
 {% if view and view.section %}

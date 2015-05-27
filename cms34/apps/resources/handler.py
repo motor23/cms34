@@ -12,6 +12,7 @@ def create_handler(app):
     h_caching = Caching(app.cache, duration=app.cfg.CACHE_TIME)
     return cases(
         static_files(app.cfg.STATIC_DIR, app.cfg.STATIC_URL),
+        static_files(app.cfg.DEV_STATIC_DIR, app.cfg.DEV_STATIC_URL),
         static_files(app.cfg.FRONT_MEDIA_DIR, app.cfg.MEDIA_URL),
 
         h_caching | cache(enable=app.cfg.CACHE_ENABLED) | cases(

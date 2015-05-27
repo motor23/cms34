@@ -27,6 +27,7 @@ class MFY_Photo(ModelFactory):
     model = 'Photo'
     title = u'Фото'
     base_path = 'photo'
+
     fields = [
         xf_id,
         xf_img_orig,
@@ -84,7 +85,7 @@ class MFY_Media(ModelFactory):
 
     @hybrid_factory_method.model
     @property
-    def admin_preview(obj):
+    def img_admin_preview(obj):
         prop = getattr(obj.factory, 'admin_preview_property', None)
         if prop:
             return getattr(obj, prop)

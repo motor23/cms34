@@ -10,7 +10,7 @@ __all__ = (
     'LF_Id',
     'LF_Relation',
     'LF_Img',
-    'LF_Preview',
+    'LF_AdminPreview',
     'LF_PreviewRelation',
     'LF_DateTime',
     'LF_TreeTitle',
@@ -22,7 +22,7 @@ __all__ = (
     'LF_EnumImg',
     'lf_title',
     'lf_id',
-    'lf_preview',
+    'lf_admin_preview',
     'lf_preview_relation',
     'lf_tree_title',
     'lf_tree_expand',
@@ -102,8 +102,9 @@ class LF_Img(LF_Base):
                                            image=True)
 
 
-class LF_Preview(LF_Img):
+class LF_AdminPreview(LF_Img):
     name = 'img_admin_preview'
+    label = u'Превью'
 
 
 class LF_PreviewRelation(LF_Img):
@@ -207,7 +208,7 @@ class LF_EnumImg(LF_SimpleImg):
 
 lf_id = LF_Id()
 lf_title = LF_Title()
-lf_preview = LF_Preview()
+lf_admin_preview = LF_AdminPreview()
 lf_preview_relation = LF_PreviewRelation()
 lf_tree_expand = LF_TreeExpand()
 

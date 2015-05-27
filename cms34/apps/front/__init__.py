@@ -1,4 +1,5 @@
 # -*- coding:utf8 -*-
+from subprocess import Popen
 from iktomi.utils import cached_property
 from iktomi.unstable.db.files import FileManager, ReadonlyFileManager
 from iktomi.unstable.db.sqla.public_query import PublicQuery
@@ -20,13 +21,20 @@ class Application(BaseApplication):
         from .environment import Environment
         return Environment
 
+    def grunt(self, task, wait=False):
+        p = Popen('grunt %s --gruntfile %s' % (task, self.cfg.GRUNT_FILE),
+                  shell=True)
+        if wait:
+            p.wait()
+
     def command_front(self):
         from iktomi.cli.app import App
         shell_namespace = {
             'app': self,
             'db': self.db_maker(),
         }
-        return App(self, shell_namespace=shell_namespace)
+        return App(self, shell_namespace=shell_namespace,
+                   bootstrap=lambda: self.grunt('front_watch'))
 
     def command_front_fcgi(self):
         from iktomi.cli.fcgi import Flup

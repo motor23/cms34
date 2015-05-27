@@ -3,6 +3,7 @@ from iktomi.utils.storage import (storage_cached_property,
                                   storage_method,
                                   storage_property)
 from iktomi.utils import cached_property
+from jinja2 import Markup
 
 from ..common.environment import Environment as EnvironmentBase
 from ..common.replace_tags import replace_tags
@@ -10,7 +11,17 @@ from ..common.replace_tags import replace_tags
 import models
 
 
-class Context(EnvironmentBase.Context): pass
+class Context(EnvironmentBase.Context):
+
+    def css_tag(self, filename, media='screen, projection'):
+        url = self.env.url_for_static('css/{}'.format(filename))
+        return Markup('<link rel="stylesheet" type="text/css" '\
+                      'media="{}" href="{}"/>'.format(media, url))
+
+    def js_tag(self, filename):
+        url = self.env.url_for_static('js/{}'.format(filename))
+        return Markup('<script type="text/javascript" src="{}">'\
+                      '</script>'.format(url))
 
 
 class Environment(EnvironmentBase):

@@ -33,6 +33,10 @@ class Cfg(BaseCfg):
     ROOT = os.path.dirname(os.path.abspath(__main__.__file__))
 
     @property
+    def SITE_DIR(self):
+        raise NotImplementedError
+
+    @property
     def THIRD_PARTY_DIR(self):
         return os.path.join(self.ROOT, 'third-party')
 
@@ -69,6 +73,20 @@ class Cfg(BaseCfg):
         return os.path.join(self.MEDIA_DIR, 'shared')
 
     UID = 'someuid'
+
+    DEV_STATIC = False
+
+    @property
+    def STATIC_DIR(self):
+        return os.path.join(self.SITE_DIR, 'static')
+
+    @property
+    def DEV_STATIC_DIR(self):
+        return os.path.join(self.SITE_DIR, 'dev_static')
+
+    STATIC_URL = '/static/'
+    DEV_STATIC_URL = '/dev_static/'
+
 
     def config_path(self):
         for path in [self.THIRD_PARTY_DIR]:

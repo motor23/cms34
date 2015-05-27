@@ -5,7 +5,7 @@ from ...stream import (
     SFP_FileUpload,
     SFP_ImageUpload,
 )
-from ...mixed import (
+from cms34.mixed import (
     XF_Block,
     XF_Img,
     xf_title,
@@ -14,6 +14,7 @@ from ...mixed import (
     xf_publish_dt,
     xb_object,
 )
+from cms34.stream import lf_admin_preview
 from .fields import (
     xf_media_type_img,
     xb_photos,
@@ -71,7 +72,7 @@ class SFY_Multimedia(StreamFactory):
 
     list_fields = [
         xb_object,
-        XF_Img('admin_preview', label=u'Превью'),
+        lf_admin_preview,
         xb_main,
     ]
     filter_fields = [
@@ -82,7 +83,10 @@ class SFY_Multimedia(StreamFactory):
         xb_object,
         xb_main,
     ]
-    sort_fields = list_fields
+    sort_fields = [
+        xb_object,
+        xb_main,
+    ]
     item_fields = {
         'photo': fields + [xb_photo_upload],
         'photoset': fields + [xb_photos],

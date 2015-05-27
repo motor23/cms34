@@ -26,11 +26,6 @@ class Cfg(CfgBase):
             path.join(self.CMS34_DIR, 'templates'),
         ]
 
-    @property
-    def STATIC_DIR(self):
-        return path.join(self.SITE_DIR, 'static')
-
-    STATIC_URL = '/static/'
     MEDIA_URL = FRONT_MEDIA_URL = '/media/'
 
     @property
@@ -101,4 +96,9 @@ class Cfg(CfgBase):
     @property
     def I18N_TRANSLATIONS_DIR(self):
         os.path.join(I18N_DIR, 'translations')
+
+    @property
+    def GRUNT_FILE(self):
+        return path.join(self.ROOT, './Gruntfile.js')
+
 

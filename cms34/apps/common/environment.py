@@ -51,7 +51,10 @@ class BaseEnvironment(web.AppEnvironment):
         return self.root.build_url
 
     def url_for_static(self, path):
-        return self.cfg.STATIC_URL + path
+        if self.cfg.DEV_STATIC:
+            return self.cfg.DEV_STATIC_URL + path
+        else:
+            return self.cfg.STATIC_URL + path
 
 
 class Environment(BaseEnvironment):
