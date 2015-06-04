@@ -18,7 +18,8 @@ class Application(BaseApplication):
     @cached_property
     def cached_db_maker(self):
         return CachedDbMaker(self.db_maker, self.cache,
-                        cache_enabled=self.cfg.CACHE_ENABLED)
+                             cache_enabled=self.cfg.CACHE_ENABLED,
+                             db_limit=self.cfg.CACHE_DB_LIMIT)
 
     @cached_property
     def handler(self):

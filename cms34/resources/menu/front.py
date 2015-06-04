@@ -24,11 +24,20 @@ class Menu(object):
         parent_id = item and item.parent_id or None
         return self.get_items(parent_id=parent_id)
 
-    def get_child_menu(self, item):
-        return self.get_items(parent_id=item.id)
+    def get_child_menu(self, item=None):
+        return self.get_items(parent_id=item and item.id or None)
 
     def get_parent(self, item):
         return self.get_item(id=item.parent_id)
+
+    def get_parents(self, item):
+        result = []
+        parent = self.get_parent(item)
+        while parent:
+            result.append(parent)
+            parent = self.get_parent(parent)
+        result.reverse()
+        return result
 
     def url_for_item(self, item):
         if not item.section_id:
@@ -67,4 +76,22 @@ class Menu(object):
         else:
             menu_item = None
         return self.get_menus(menu_item)
+
+
+    def get_menu_tree(self, level=1, selected_item=None, item=None):
+        if selected_item:
+            selected_items = self.get_parents(selected_item) + [selected_item]
+        else:
+            selected_items = []
+        return self._get_menu_tree(level, selected_items, item)
+
+    def _get_menu_tree(self, level=1, selected_items=[], item=None):
+        result = []
+        if level:
+            for subitem in self.get_child_menu(item):
+                submenu = self._get_menu_tree(level-1, selected_items, subitem)
+                selected =  subitem in selected_items
+                result.append((subitem, selected, submenu))
+        return result
+
 

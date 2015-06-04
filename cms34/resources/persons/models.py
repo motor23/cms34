@@ -30,15 +30,15 @@ class MFY_Person(ModelFactory):
         MF_Img('img_orig'),
     ]
 
-#    @hybrid_factory_method.factory
-#    @cached_property
-#    def title(self):
-#        return u'Персона'
-
-#    @title.model
-#    @property
-#    def title(self):
-#        return u' '.join([self.last_name, self.first_name, self.patronymic])
+   # @hybrid_factory_method.factory
+   # @cached_property
+   # def title(self):
+   #     return u'Персона'
+   # 
+   # @title.model
+   # @property
+   # def title(self):
+   #     return u' '.join([self.last_name, self.first_name, self.patronymic])
 
 
 class PersonsListSection(ModelFactory):

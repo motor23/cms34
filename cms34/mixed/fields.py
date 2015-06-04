@@ -413,6 +413,7 @@ class XF_StreamSelect(XF_Simple):
     default_filters = {}
     ordered = False
     rel = None
+    required = False
 
     def _model_field(self, factory=None):
         if self.multiple:
@@ -442,6 +443,7 @@ class XF_StreamSelect(XF_Simple):
             default_filters=self.default_filters,
             ordered=self.ordered,
             rel=self.rel,
+            required=self.required,
         )
 
     def _filter_field(self, models, factory=None):
