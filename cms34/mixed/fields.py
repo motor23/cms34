@@ -3,54 +3,53 @@ from datetime import datetime
 
 from ..utils import prop_getter
 from ..model import (
-   MF_String,
-   MF_Text,
-   MF_Int,
-   MF_Bool,
-   MF_Id,
-   MF_M2ORelation,
-   MF_M2MRelation,
-   MF_Parent,
-   MF_File,
-   MF_Img,
-   MF_DateTime,
-   MF_Enum,
-   MF_Html,
-   MF_ExpHtml,
-   MF_List,
+    MF_String,
+    MF_Text,
+    MF_Int,
+    MF_Bool,
+    MF_Id,
+    MF_M2ORelation,
+    MF_M2MRelation,
+    MF_Parent,
+    MF_File,
+    MF_Img,
+    MF_DateTime,
+    MF_Enum,
+    MF_Html,
+    MF_ExpHtml,
+    MF_List,
 )
 from ..stream import (
-   LF_String,
-   LF_Id,
-   LF_Img,
-   LF_Relation,
-   LF_DateTime,
-   LF_Container,
-   LF_EnumImg,
-   FF_TextSearch,
-   FF_Int,
-   FF_Id,
-   FF_Select,
-   FF_TabSelect,
-   FF_DateTimeFromTo,
-   FF_StreamSelect,
-   IF_String,
-   IF_Text,
-   IF_Int,
-   IF_Bool,
-   IF_Id,
-   IF_Select,
-   IF_StreamSelect,
-   IF_File,
-   IF_Img,
-   IF_Block,
-   IF_DateTime,
-   IF_Html,
-   IF_ExpHtml,
-   IF_List,
-   lf_tree_expand,
+    LF_String,
+    LF_Id,
+    LF_Img,
+    LF_Relation,
+    LF_DateTime,
+    LF_Container,
+    LF_EnumImg,
+    FF_TextSearch,
+    FF_Int,
+    FF_Id,
+    FF_Select,
+    FF_TabSelect,
+    FF_DateTimeFromTo,
+    FF_StreamSelect,
+    IF_String,
+    IF_Text,
+    IF_Int,
+    IF_Bool,
+    IF_Id,
+    IF_Select,
+    IF_StreamSelect,
+    IF_File,
+    IF_Img,
+    IF_Block,
+    IF_DateTime,
+    IF_Html,
+    IF_ExpHtml,
+    IF_List,
+    lf_tree_expand,
 )
-
 
 __all__ = (
     'XF_Base',
@@ -97,8 +96,8 @@ __all__ = (
     'xb_object',
 )
 
-class XF_Base(object):
 
+class XF_Base(object):
     name = None
     label = None
     permissions = "rw"
@@ -137,7 +136,6 @@ class XF_Base(object):
 
 
 class XF_Simple(XF_Base):
-
     initial = None
     required = False
     sortable = False
@@ -147,18 +145,18 @@ class XF_Simple(XF_Base):
 
     def _model_field(self, factory=None):
         raise NotImplementedError(
-                            'cls=%s, name=%s' % (self.__class__, self.name))
+            'cls=%s, name=%s' % (self.__class__, self.name))
 
     def _list_field(self):
         return LF_String(self.name, label=self.label)
 
     def _filter_field(self, models, factory=None):
         raise NotImplementedError(
-                            'cls=%s, name=%s' % (self.__class__, self.name))
+            'cls=%s, name=%s' % (self.__class__, self.name))
 
     def _item_field(self, models, factory=None):
         raise NotImplementedError(
-                            'cls=%s, name=%s' % (self.__class__, self.name))
+            'cls=%s, name=%s' % (self.__class__, self.name))
 
     def model_register(self, factory=None, register=None):
         field = self._model_field(factory)
@@ -238,7 +236,7 @@ class XF_Text(XF_String):
 
     def _model_field(self, factory=None):
         return MF_Text(self.name,
-                       default=self.initial,)
+                       default=self.initial, )
 
     def _item_field(self, models, factory=None):
         return IF_Text(self.name,
@@ -247,7 +245,7 @@ class XF_Text(XF_String):
                        min_length=self.min_length,
                        initial=self.initial,
                        permissions=self.permissions,
-                       required=self.required,)
+                       required=self.required)
 
 
 class XF_Title(XF_Text):
@@ -258,21 +256,20 @@ class XF_Title(XF_Text):
 
 
 class XF_TreeTitle(XF_Title):
-
     list_fields = []
 
     def _list_field(self):
         return LF_Container('%s_container' % self.name,
-                    label = self.label,
-                    fields = self.container_list_fields(),
-        )
+                            label=self.label,
+                            fields=self.container_list_fields(),
+                            )
 
     def container_list_fields(self):
         return [
             lf_tree_expand,
             LF_String(self.name,
-                label=self.label,
-            ),
+                      label=self.label,
+                      ),
         ]
 
 
@@ -292,7 +289,7 @@ class XF_Int(XF_Simple):
 
     def _model_field(self, factory=None):
         return MF_Int(self.name,
-                       default=self.initial,)
+                      default=self.initial, )
 
     def _filter_field(self, models, factory=None):
         return FF_Int(self.name, label=self.label)
@@ -302,7 +299,7 @@ class XF_Int(XF_Simple):
                       label=self.label,
                       initial=self.initial,
                       permisssions=self.permissions,
-                      required=self.required,)
+                      required=self.required, )
 
 
 class XF_Order(XF_Int):
@@ -316,14 +313,14 @@ class XF_Bool(XF_Simple):
 
     def _model_field(self, factory=None):
         return MF_Bool(self.name,
-                       default=self.initial,)
+                       default=self.initial, )
 
     def _item_field(self, models, factory=None):
         return IF_Bool(self.name,
                        label=self.label,
                        initial=self.initial,
                        permissions=self.permissions,
-                       required=self.required,)
+                       required=self.required, )
 
 
 class XF_Id(XF_Simple):
@@ -347,11 +344,10 @@ class XF_Id(XF_Simple):
 
     def _item_field(self, models, factory=None):
         return IF_Id(self.name,
-                     label=self.label,)
+                     label=self.label, )
 
 
 class XF_Select(XF_Simple):
-
     choices = None
 
     def _model_field(self, factory=None):
@@ -369,7 +365,8 @@ class XF_Select(XF_Simple):
         return IF_Select(self.name,
                          label=self.label,
                          choices=self.choices,
-                         permissions=self.permissions)
+                         permissions=self.permissions,
+                         required=self.required)
 
 
 class XF_Type(XF_Select):
@@ -390,18 +387,16 @@ class XF_Type(XF_Select):
 
 
 class XF_TypeImg(XF_Type):
-
     img_url_teplate = LF_EnumImg.img_url_template
 
     def _list_field(self):
         return LF_EnumImg(self.name,
-                    label=self.label,
-                    img_url_template=self.img_url_template,
-        )
+                          label=self.label,
+                          img_url_template=self.img_url_template,
+                          )
 
 
 class XF_StreamSelect(XF_Simple):
-
     model = None
     stream_name = None
     multiple = False
@@ -460,8 +455,7 @@ class XF_StreamSelect(XF_Simple):
     def _list_field(self):
         return LF_Relation(self.name,
                            label=self.label,
-                           multiple=self.multiple,)
-
+                           multiple=self.multiple, )
 
 
 class XF_Parent(XF_Simple):
@@ -534,7 +528,6 @@ class XF_Group(XF_Base):
 
 
 class XF_Block(XF_Group):
-
     def item_field(self, fields_dict, models, factory=None):
         field = IF_Block(self.name,
                          label=self.label,
@@ -543,9 +536,8 @@ class XF_Block(XF_Group):
 
 
 class XF_File(XF_Simple):
-    
-    name='file'
-    label=u'Фаил'
+    name = 'file'
+    label = u'Фаил'
 
     def _model_field(self, factory=None):
         return MF_File(self.name)
@@ -558,7 +550,6 @@ class XF_File(XF_Simple):
 
 
 class XF_Img(XF_Simple):
-
     image_sizes = None
     resize = None
     fill_from = None
@@ -569,25 +560,24 @@ class XF_Img(XF_Simple):
 
     def _model_field(self, factory=None):
         return MF_Img(self.name,
-                    image_sizes=self.image_sizes,
-                    fill_from=self.fill_from,
-                    resize=self.resize,
-                    )
+                      image_sizes=self.image_sizes,
+                      fill_from=self.fill_from,
+                      resize=self.resize,
+                      )
 
     def _list_field(self):
-       return LF_Img(self.name, label=self.label)
+        return LF_Img(self.name, label=self.label)
 
     def _item_field(self, models, factory=None):
         return IF_Img(self.name,
-                    label=self.label,
-                    show_thumbnail=self.show_thumbnail,
-                    crop=self.crop,
-                    )
+                      label=self.label,
+                      show_thumbnail=self.show_thumbnail,
+                      crop=self.crop,
+                      )
 
 
 class XF_DateTime(XF_Simple):
-
-    format="%d-%m-%Y %H:%M"
+    format = "%d-%m-%Y %H:%M"
     initial = datetime.now
     sortable = True
 
@@ -611,13 +601,13 @@ class XF_DateTime(XF_Simple):
 
 
 class XF_Dt(XF_DateTime):
-    name='dt'
-    label=u'Дата'
+    name = 'dt'
+    label = u'Дата'
 
 
 class XF_PublishDt(XF_DateTime):
-    name='publish_dt'
-    label=u'Дата публикации'
+    name = 'publish_dt'
+    label = u'Дата публикации'
 
 
 class XF_Html(XF_Simple):
@@ -645,7 +635,6 @@ class XF_Html(XF_Simple):
 
 
 class XF_ExpHtml(XF_Html):
-
     allowed_elements = IF_ExpHtml.allowed_elements
     allowed_protocols = IF_ExpHtml.allowed_protocols
     allowed_attributes = IF_ExpHtml.allowed_attributes
@@ -657,28 +646,25 @@ class XF_ExpHtml(XF_Html):
 
     def _item_field(self, models, factory=None):
         return IF_ExpHtml(self.name,
-                       label=self.label,
-                       allowed_elements=self.allowed_elements,
-                       allowed_protocols=self.allowed_protocols,
-                       allowed_attributes=self.allowed_attributes,
-                       button_blocks=self.button_blocks,
-                       stylesheets=self.stylesheets,
-                       )
+                          label=self.label,
+                          allowed_elements=self.allowed_elements,
+                          allowed_protocols=self.allowed_protocols,
+                          allowed_attributes=self.allowed_attributes,
+                          button_blocks=self.button_blocks,
+                          stylesheets=self.stylesheets,
+                          )
+
 
 class XF_Body(XF_ExpHtml):
     name = 'body'
 
 
 class XF_List(XF_Simple):
-
     name = 'links'
     label = u'xxxx'
     fields = []
     model = None
     parent_model = None
-
-    def get_model(self, factory=None):
-        return self.model % keys
 
     def get_template_locals(self, factory=None):
         l = {'name': self.name}
@@ -691,14 +677,14 @@ class XF_List(XF_Simple):
 
     def _model_field(self, factory=None):
         return MF_List(self.name,
-                    remote_cls_name=self.get_model(factory),
-                    fields=self.fields,)
+                       remote_cls_name=self.get_model(factory),
+                       fields=self.fields, )
 
     def _item_field(self, models, factory=None):
         return IF_List(self.name,
-                    label=self.label,
-                    model=self.get_model(factory),
-                    fields=self.fields,)
+                       label=self.label,
+                       model=self.get_model(factory),
+                       fields=self.fields, )
 
 
 xf_slug = XF_Slug()
@@ -714,6 +700,7 @@ xf_publish_dt = XF_PublishDt()
 xf_html = XF_Html()
 xf_body = XF_Body()
 xf_file = XF_File()
+
 
 class XB_Object(XF_Block):
     name = 'object_block'
