@@ -95,10 +95,11 @@ class LF_Relation(LF_String):
 
 class LF_Img(LF_Base):
 
-    width='200px'
+    classname = ''
 
     def list_field(self, fields_dict):
-        fields_dict[self.name] = ListField(self.name, self.label, self.width,
+        fields_dict[self.name] = ListField(self.name, self.label,
+                                           classname=self.classname,
                                            image=True)
 
 

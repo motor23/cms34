@@ -30,6 +30,7 @@ class SFY_Sections(StreamFactory):
     plugins = [SFP_Tree, SFP_FileUpload, SFP_ImageUpload]
     item_form_factory = TypedItemFormFactory
     sort_initial_field='order'
+    obj_endpoint = True
 
     permissions = {
         'wheel':'rwxdcp',

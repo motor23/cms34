@@ -23,6 +23,16 @@ class Context(EnvironmentBase.Context):
         return Markup('<script type="text/javascript" src="{}">'\
                       '</script>'.format(url))
 
+    def preview_buttons(self, item, buttons=['edit']):
+        if not getattr(self.env.cfg, 'PREVIEW', False):
+            return u''
+        parent_env = self.env.parent_env
+        parent_env._push(models=self.env.models, lang=self.env.lang)
+        result = parent_env.context.preview_buttons(item, buttons)
+        parent_env._pop()
+        return result
+
+
 
 class Environment(EnvironmentBase):
     Context = Context

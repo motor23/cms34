@@ -39,6 +39,7 @@ class SFY_Events(StreamFactory):
     title = u'События'
     limit = 40
     sort_initial_field = '-dt'
+    obj_endpoint = True
 
     permissions = {
         'wheel':'rwxdcp',

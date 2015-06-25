@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
   <head>
-  <link rel="stylesheet" type="text/css" href="/cms34-static/css/wysihtml5-content.css">
+  <link rel="stylesheet" type="text/css" href="{{ url_for_static('css/wysihtml5-content.css') }}">
   <style>
     body{
       padding: 0; margin: 0;
@@ -15,18 +15,13 @@
       }
     a { cursor: default; }
   </style>
-
   </head>
   <body>
-  {% if files_block %}
-    <h1>{{ files_block.title }}</h1>
-    <ul>
-    {% for file in files_block.files if file %}
-      <li><a href="javascript:void(0)">{{ file.title }}</a></li>
-    {% endfor %}
-    </ul>
+  {% if media %}
+    <img src="{{ media.img_admin_preview.url }}" width="397" height="265" />
+    <p>{{ media.title }}</p>
   {% else %}
-    <h1>Блок файлов удалён</h1>
+    <h1>Видео удалено или не создано на данном языке</h1>
   {% endif %}
   </body>
 </html>

@@ -2,6 +2,8 @@
 
 __all__ = ['Application', 'AppEnvironment']
 
+import logging
+
 from webob.exc import HTTPException, HTTPInternalServerError, \
                       HTTPNotFound
 from webob import Request
@@ -13,30 +15,32 @@ from iktomi.web import (
     Application as BaseApplication,
     Reverse,
 )
-from iktomi.cli.base import Cli
+from .cli import AppCliDict, AppCli
+from .caching import MemcacheClient
 
 
-class DeferredCommand(Cli):
-
-    def __init__(self, func):
-        self.get_digest = func
-
-    @cached_property
-    def digest(self):
-        return self.get_digest()
-
-    def description(self, *args, **kwargs):
-        return self.digest.description(*args, **kwargs)
-
-    def __call__(self, *args, **kwargs):
-        return self.digest(*args, **kwargs)
+logger = logging.getLogger()
 
 
 class Application(BaseApplication):
 
-    def __init__(self, cfg, **kwargs):
-        self.cfg = cfg
+    cli_dict = AppCliDict([AppCli])
+    plugins = []
+
+    def __init__(self, cfg=None, **kwargs):
+        self.cfg = cfg or self.cfg_class()()
         self.__dict__.update(kwargs)
+        for plugin in self.plugins:
+            plugin(self)
+
+    @classmethod
+    def custom(cls, custom_cfg_path):
+        return cls(cls.cfg_class().custom(custom_cfg_path))
+
+    @classmethod
+    def cfg_class(cls):
+        from .cfg import Cfg
+        return Cfg
 
     @cached_property
     def handler(self):
@@ -51,8 +55,8 @@ class Application(BaseApplication):
         from .environment import BaseEnvironment
         return BaseEnvironment
 
-    def create_environment(self, request=None):
-        return self.env_class.create(self, request=request)
+    def create_environment(self, request=None, **kwargs):
+        return self.env_class.create(self, request=request, **kwargs)
 
     def handle(self, env, data):
         '''
@@ -95,14 +99,6 @@ class Application(BaseApplication):
         return result
 
     @cached_property
-    def commands(self):
-        commands = {}
-        for name in dir(self):
-            if name.startswith('command_'):
-                commands[name[8:]] = DeferredCommand(getattr(self, name))
-        return commands
-
-    @cached_property
     def db_maker(self):
         return binded_filesessionmaker(self.cfg.DATABASES,
                                    engine_params=self.cfg.DATABASE_PARAMS,
@@ -110,7 +106,7 @@ class Application(BaseApplication):
 
     @cached_property
     def cache(self):
-        return memcache.Client(self.cfg.MEMCACHE)
+        return MemcacheClient(self.cfg.MEMCACHE, self.cfg.CACHE_PREFIX)
 
 
     def template_engine(self):

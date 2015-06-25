@@ -23,12 +23,15 @@ class Context(object):
 
 class BaseEnvironment(web.AppEnvironment):
 
-    def __init__(self, app, request=None, **kwargs):
+    def __init__(self, app, request=None, route_state=None, **kwargs):
         StorageFrame.__init__(self, **kwargs)
         self.app = app
         self.cfg = app.cfg
         self.request = request
-        self._route_state = RouteState(request)
+        if route_state:
+            self._route_state = route_state
+        else:
+            self._route_state = RouteState(request)
 
     @cached_property
     def root(self):

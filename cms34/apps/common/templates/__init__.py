@@ -8,7 +8,7 @@ from webob.response import Response
 from .filters import all_filters
 from .functions import all_functions
 from .macros import MacrosLib
-from .tags import Show
+from .tags import Show, Preview
 from .cache import BlockCacheExtension
 
 
@@ -52,7 +52,7 @@ class TemplateEngine(object):
 
 class AppTemplateEngine(TemplateEngine):
 
-    extensions = ['jinja2.ext.i18n', Show, BlockCacheExtension]
+    extensions = ['jinja2.ext.i18n', Show, BlockCacheExtension, Preview]
 
     filters = {}
     filters.update(all_filters)

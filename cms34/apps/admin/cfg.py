@@ -6,13 +6,15 @@ from collections import OrderedDict
 import iktomi.templates, iktomi.cms
 import memcache
 
-from ..common.cfg import (
-    Cfg as CfgBase,
-    FASTCGI_PREFORKED_DEFAULTS,
-)
+from ..common.cfg import Cfg as CfgBase
+from ..common.dispatcher import Cfg as DispatcherCfgBase
 
 
 class Cfg(CfgBase):
+
+    @property
+    def DEFAULT_CUSTOM_CFG(self):
+        return path.join(self.CFG_DIR, 'admin.py')
 
     @property
     def SITE_DIR(self):
@@ -61,13 +63,6 @@ class Cfg(CfgBase):
     MODEL_LOCK_TIMEOUT = 5*60
     MODEL_LOCK_RENEW = 60
 
-    FASTCGI_PARAMS = dict(
-        FASTCGI_PREFORKED_DEFAULTS,
-        maxSpare=8,
-        minSpare=8,
-        maxChildren=2,
-    )
-
     @property
     def FLUP_ARGS(self):
         return dict(
@@ -96,6 +91,7 @@ class Cfg(CfgBase):
         ])
 
     MEMCACHE = ['127.0.0.1:11211']
+    CACHE_PREFIX = 'admin'
 
     DATABASES = {
         'admin': 'mysql://root@localhost/admin?charset=utf8',
@@ -109,5 +105,22 @@ class Cfg(CfgBase):
         'max_overflow': 50,
         'pool_recycle': 3600,
     }
+
+
+class DispatcherCfg(DispatcherCfgBase):
+
+    @property
+    def DEFAULT_CUSTOM_CFG(self):
+        return path.join(self.CFG_DIR, 'dispatcher_admin.py')
+
+    @property
+    def FLUP_ARGS(self):
+        return dict(
+            fastcgi_params = self.FASTCGI_PARAMS,
+            umask = 0,
+            bind = path.join(self.RUN_DIR, 'admin.sock'),
+            pidfile = path.join(self.RUN_DIR, 'admin.pid'),
+            logfile = path.join(self.LOG_DIR, 'admin.log'),
+        )
 
 

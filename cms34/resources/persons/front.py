@@ -5,8 +5,8 @@ from .. import ResourceView
 
 class VP_PersonsQuery(VP_Query):
     model = 'Person'
-    order = ('order', 'asc')
-    limit = 20
+    order_field = 'order'
+    order_asc = True
 
 
 class V_Person(ResourceView):

@@ -11,7 +11,8 @@ from .. import ResourceView
 
 class VP_EventsQuery(VP_Query):
     model = 'Event'
-    order = ('dt', 'desc')
+    order_field = 'dt'
+    order_asc = False
     paginator_limit = 20
 
     @property

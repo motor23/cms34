@@ -1,6 +1,8 @@
 # coding: utf-8
 import logging
 from hashlib import md5
+
+import memcache
 from iktomi.web import WebHandler, Response, request_filter
 
 
@@ -103,3 +105,32 @@ class Caching(WebHandler):
         headers = dict(response.headerlist)
         body = response.body
         self.backend.store(self.client, key, headers, body, duration)
+
+
+class MemcacheClient(object):
+
+    def __init__(self, servers, prefix=''):
+        self.client = memcache.Client(servers)
+        self.prefix = prefix
+
+    def get(self, key):
+        return self.client.get(self.prefix + key)
+
+    def set(self, key, value, time=0):
+        return self.client.set(self.prefix + key, value, time)
+
+    def add(self, key, value, time=0):
+        return self.client.add(self.prefix + key, value, time)
+
+    def delete(self, key, time=0):
+        return self.client.delete(self.prefix + key)
+
+    def cas(self, key, value, time=0):
+        return self.client.cas(self.prefix + key, value, time)
+
+    @property
+    def cas_ids(self):
+        return self.client.cas_ids
+
+    def gets(self, key):
+        return self.client.gets(self.prefix + key)

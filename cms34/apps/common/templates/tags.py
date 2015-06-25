@@ -18,7 +18,8 @@ class Show(Extension):
                                       ', '.join(self.allowed_languages), lineno)
 
         body = parser.parse_statements(['name:endshow'], drop_needle=True)
-        node = nodes.CallBlock(self.call_method('_show_support', [nodes.Const(token.value)]),
+        node = nodes.CallBlock(self.call_method('_show_support',
+                                                [nodes.Const(token.value)]),
             [], [], body).set_lineno(lineno)
         return node
 
@@ -26,3 +27,22 @@ class Show(Extension):
         if self.environment.globals['env'].lang == lang:
             return caller()
         return u''
+
+
+
+class Preview(Extension):
+
+    tags = set(['preview'])
+
+    def parse(self, parser):
+        lineno = parser.stream.next().lineno
+        body = parser.parse_statements(['name:endpreview'], drop_needle=True)
+        node = nodes.CallBlock(self.call_method('_show_support'),
+            [], [], body).set_lineno(lineno)
+        return node
+
+    def _show_support(self, caller=None):
+        if getattr(self.environment.globals['env'].cfg, 'PREVIEW', False):
+            return caller()
+        return u''
+

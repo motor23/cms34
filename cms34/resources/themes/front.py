@@ -5,7 +5,8 @@ from .. import ResourceView
 
 class VP_ThemesQuery(VP_Query):
     model = 'Theme'
-    order = ('order', 'asc')
+    order_field = 'order'
+    order_asc = True
     limit = 20
 
 

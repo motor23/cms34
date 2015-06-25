@@ -1,0 +1,32 @@
+<link rel="stylesheet" type="text/css" media="screen, projection" href="{{ '/cms-static/css/top_menu.css' }}"/>
+<link rel="stylesheet" type="text/css" media="screen, projection" href="{{ '/cms34-static/css/preview.css' }}"/>
+
+<script src="/cms-static/js/lib/mootools-core-1.4.5-full-compat-yc"></script>
+<script src="/cms34-static/js/preview.js"></script>
+<div class="navigation">
+      <div class="links">
+      {% set user = env.user %}
+        {% if user %}
+        <form action="{{ env.url_for('logout') }}" method="POST">
+          <span class="links__link user">Привет, 
+            <b>
+              {{ user.name }}
+            {%- if env.context.user_tray is defined and context.user_tray %}
+              <a href="{{ url_for("tray", tray=context.user_tray.id) }}" class="tray-count" title="Рабочая папка пользователя">
+                {{ context.user_tray.object_count }}
+              </a>
+            {%- endif -%}
+            </b>
+
+          </span>
+          <a class="quit" onclick="this.parentElement.submit();return false" href="" title="Завершить сеанс">Завершить сеанс</a>
+        </form>
+        {% else %}
+          <div>
+            <a href="{{ url_for('login') }}">Авторизация</a>
+          </div>
+        {% endif %}
+      </div>
+     {{ context.top_menu.render() }}
+</div>
+

@@ -6,6 +6,26 @@ import logging.config
 
 import __main__
 
+FASTCGI_PREFORKED_DEFAULTS = dict(
+    preforked=True,
+    multiplexed=False,
+    minSpare=1,
+    maxSpare=5,
+    maxChildren=50,
+    maxRequests=0,
+)
+
+# Do not change defaults, overwrite params in FASTCGI_PARAMS instead
+FASTCGI_THREADED_DEFAULTS = dict(
+    preforked=False,
+    multithreaded=True,
+    multiprocess=False,
+    multiplexed=False,
+    minSpare=1,
+    maxSpare=5,
+    maxThreads=sys.maxint,
+)
+
 
 class BaseCfg(object):
 
@@ -21,6 +41,14 @@ class BaseCfg(object):
         l = {}
         execfile(filepath, dict(cfg=self), l)
         self.update_cfg(l)
+
+    @classmethod
+    def custom(cls, cfg_path=None):
+        cfg = cls()
+        silent = not bool(cfg_path)
+        cfg_path = cfg_path or cfg.DEFAULT_CUSTOM_CFG
+        cfg.update_from_py(cfg_path, silent=silent)
+        return cfg
 
 
 class Cfg(BaseCfg):
@@ -87,6 +115,22 @@ class Cfg(BaseCfg):
     STATIC_URL = '/static/'
     DEV_STATIC_URL = '/dev_static/'
 
+    FASTCGI_PARAMS = dict(
+        FASTCGI_PREFORKED_DEFAULTS,
+        maxSpare=8,
+        minSpare=8,
+        maxChildren=2,
+    )
+
+    @property
+    def FLUP_ARGS(self):
+        return dict(
+            fastcgi_params = self.FASTCGI_PARAMS,
+            umask = 0,
+            bind = path.join(self.RUN_DIR, 'app.sock'),
+            pidfile = path.join(self.RUN_DIR, 'app.pid'),
+            logfile = path.join(self.LOG_DIR, 'app.log'),
+        )
 
     def config_path(self):
         for path in [self.THIRD_PARTY_DIR]:
@@ -129,24 +173,4 @@ logging.config.dictConfig({
     },
 })
 
-
-FASTCGI_PREFORKED_DEFAULTS = dict(
-    preforked=True,
-    multiplexed=False,
-    minSpare=1,
-    maxSpare=5,
-    maxChildren=50,
-    maxRequests=0,
-)
-
-# Do not change defaults, overwrite params in FASTCGI_PARAMS instead
-FASTCGI_THREADED_DEFAULTS = dict(
-    preforked=False,
-    multithreaded=True,
-    multiprocess=False,
-    multiplexed=False,
-    minSpare=1,
-    maxSpare=5,
-    maxThreads=sys.maxint,
-)
 

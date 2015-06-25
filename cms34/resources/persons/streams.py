@@ -19,34 +19,18 @@ from ..sections.fields import (
 )
 
 
-
 class XB_Main(XF_Block):
     name = 'person_block'
     label = u'Персона'
-    list_fields = [
+
+    fields = [
         xf_last_name,
         xf_first_name,
         xf_patronymic,
         xf_post,
     ]
-    sort_fields = [
-        xf_last_name,
-        xf_first_name,
-        xf_patronymic,
-        xf_post,
-    ]
-    filter_fields = [
-        xf_last_name,
-        xf_first_name,
-        xf_patronymic,
-        xf_post,
-    ]
-    item_fields = [
-        xf_last_name,
-        xf_first_name,
-        xf_patronymic,
-        xf_post,
-    ]
+
+    list_fields = sort_fields = filter_fields = item_fields = fields
 
 
 class XB_Photo(XF_Block):
@@ -72,8 +56,8 @@ class SFY_Persons(StreamFactory):
     sort_initial_field = 'title'
 
     permissions = {
-        'wheel':'rwxdcp',
-        'editor':'rwxdcp',
+        'wheel': 'rwxdcp',
+        'editor': 'rwxdcp',
     }
     plugins = [SFP_ImageUpload]
 

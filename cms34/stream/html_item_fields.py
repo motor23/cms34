@@ -153,7 +153,7 @@ class IF_ExpHtml(IF_Html):
                         'table', 'tr', 'td',
                         'iktomi_doclink', 'iktomi_media', 'iktomi_files',
                         'table', 'td', 'tr')
-    allowed_attributes = ('data-align', 'item_id', 'id')
+    allowed_attributes = ('data-align', 'item_id', 'id', 'class')
     allowed_protocols = ('model',)
     allowed_classes = dict(convs.Html.allowed_classes,
                            p=_p_cls_test,

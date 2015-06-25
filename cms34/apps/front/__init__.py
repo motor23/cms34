@@ -1,5 +1,4 @@
 # -*- coding:utf8 -*-
-from subprocess import Popen
 from iktomi.utils import cached_property
 from iktomi.unstable.db.files import FileManager, ReadonlyFileManager
 from iktomi.unstable.db.sqla.public_query import PublicQuery
@@ -7,9 +6,31 @@ from iktomi.unstable.db.sqla.public_query import PublicQuery
 from ..common.app import Application as BaseApplication
 from ..common.sessionmakers import binded_filesessionmaker
 from ..common.i18n import I18n as I18n
+from ..common.cli import AppCliDict, AppCli, FcgiCli, WatchCli
+from ..common.dispatcher import DispatcherApp
+
+
+class AppCli(AppCli):
+    name = 'front'
+
+class FcgiCli(FcgiCli):
+    name = 'front_fcgi'
 
 
 class Application(BaseApplication):
+
+    cli_dict = AppCliDict([AppCli, FcgiCli, WatchCli])
+
+    class Dispatcher(DispatcherApp):
+        @classmethod
+        def cfg_class(cls):
+            from .cfg import DispatcherCfg
+            return DispatcherCfg
+
+    @classmethod
+    def cfg_class(cls):
+        from .cfg import Cfg
+        return Cfg
 
     @cached_property
     def handler(self):
@@ -20,25 +41,6 @@ class Application(BaseApplication):
     def env_class(self):
         from .environment import Environment
         return Environment
-
-    def grunt(self, task, wait=False):
-        p = Popen('grunt %s --gruntfile %s' % (task, self.cfg.GRUNT_FILE),
-                  shell=True)
-        if wait:
-            p.wait()
-
-    def command_front(self):
-        from iktomi.cli.app import App
-        shell_namespace = {
-            'app': self,
-            'db': self.db_maker(),
-        }
-        return App(self, shell_namespace=shell_namespace,
-                   bootstrap=lambda: self.grunt('front_watch'))
-
-    def command_front_fcgi(self):
-        from iktomi.cli.fcgi import Flup
-        return Flup(self, **self.cfg.FLUP_ARGS)
 
     @cached_property
     def db_maker(self):

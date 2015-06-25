@@ -26,7 +26,7 @@ class V_Sections(object):
     def get_sections(self, **kwargs):
         result = []
         sections = self.cached_db.query(self.model)\
-                             .filter_by(**kwargs).order_by('order').all()
+                                 .filter_by(**kwargs).order_by('order').all()
         #remove sections with double (slugs, parant_id) pairs 
         pairs = []
         for section in sections:

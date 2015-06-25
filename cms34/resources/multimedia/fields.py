@@ -93,7 +93,7 @@ class XF_PosterOrig(XF_Img):
     label=u'Постер в исходном разрешении'
 
 class XF_Poster4_3(XF_Img):
-    label=u'Постер 4:3',
+    label=u'Постер 4:3'
     name = 'poster_4_3'
     image_sizes = (640, 480)
     resize = ResizeCrop()
@@ -104,7 +104,7 @@ class XF_Poster4_3(XF_Img):
     crop = True
 
 class XF_Poster16_9(XF_Img):
-    label=u'Постер 16:9',
+    label=u'Постер 16:9'
     name = 'poster_16_9'
     image_sizes = (640, 360)
     resize = ResizeCrop()

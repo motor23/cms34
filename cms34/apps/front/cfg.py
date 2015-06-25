@@ -4,14 +4,15 @@ import sys
 import memcache
 from collections import OrderedDict
 
-from ..common.cfg import (
-    Cfg as CfgBase,
-    FASTCGI_PREFORKED_DEFAULTS,
-)
-import iktomi.templates, iktomi.cms
+from ..common.cfg import Cfg as CfgBase
+from ..common.dispatcher import Cfg as DispatcherCfgBase
 
 
 class Cfg(CfgBase):
+
+    @property
+    def DEFAULT_CUSTOM_CFG(self):
+        return path.join(self.CFG_DIR, 'front.py')
 
     @property
     def SITE_DIR(self):
@@ -35,13 +36,6 @@ class Cfg(CfgBase):
     MODEL_LOCK_TIMEOUT = 5*60
     MODEL_LOCK_RENEW = 60
 
-    FASTCGI_PARAMS = dict(
-        FASTCGI_PREFORKED_DEFAULTS,
-        maxSpare=8,
-        minSpare=8,
-        maxChildren=2,
-    )
-
     @property
     def FLUP_ARGS(self):
         return dict(
@@ -62,6 +56,7 @@ class Cfg(CfgBase):
         ])
 
     MEMCACHE = ['127.0.0.1:11211']
+    CACHE_PREFIX = 'front'
     CACHE_ENABLED = True
     CACHE_TIME = 60
     CACHE_BLOCKS_TIME = 60
@@ -101,4 +96,20 @@ class Cfg(CfgBase):
     def GRUNT_FILE(self):
         return path.join(self.ROOT, './Gruntfile.js')
 
+
+class DispatcherCfg(DispatcherCfgBase):
+
+    @property
+    def DEFAULT_CUSTOM_CFG(self):
+        return path.join(self.CFG_DIR, 'dispatcher_front.py')
+
+    @property
+    def FLUP_ARGS(self):
+        return dict(
+            fastcgi_params = self.FASTCGI_PARAMS,
+            umask = 0,
+            bind = path.join(self.RUN_DIR, 'front.sock'),
+            pidfile = path.join(self.RUN_DIR, 'front.pid'),
+            logfile = path.join(self.LOG_DIR, 'front.log'),
+        )
 

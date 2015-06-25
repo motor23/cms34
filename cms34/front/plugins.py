@@ -1,4 +1,4 @@
-from webob.exc import HTTPNotFound
+from webob.exc import HTTPNotFound, HTTPSeeOther
 from cms34.stream import FilterFormFactory
 from .view import Context
 
@@ -86,6 +86,12 @@ class VP_Response(ViewPlugin):
         kwargs.setdefault('view', self.view)
         return self.view.env.render_to_response(self.template_name(template),
                                                 kwargs)
+
+    def redirect_to(self, reverse, qs, **kwargs):
+        url = reverse.as_url
+        if qs:
+            url = url.qs_set(qs)
+        return HTTPSeeOther(location=str(url))
 
 
 class VP_Filter(ViewPlugin):

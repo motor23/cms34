@@ -161,6 +161,7 @@ class StreamFactory(object):
     item_form_factory = ItemFormFactory
     plugins = []
     common_plugins = []
+    obj_endpoint = False
 
     class Cfg(object): pass
 
@@ -186,6 +187,7 @@ class StreamFactory(object):
         cfg.list_fields = self.create_list_fields()
         cfg.FilterForm = self.create_filter_form()
         cfg.ItemForm = self.create_item_form()
+        cfg.obj_endpoint = self.obj_endpoint
         for plugin in self.plugins:
             plugin.create_config(self, cfg)
         return cfg

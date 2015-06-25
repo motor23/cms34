@@ -5,10 +5,34 @@ from iktomi.unstable.db.files import FileManager
 
 from ..common.app import Application as BaseApplication
 from ..common.sessionmakers import binded_filesessionmaker
+from ..common.cli import AppCliDict, AppCli, FcgiCli, DbCli
+from ..common.dispatcher import DispatcherApp
+
+
+class AppCli(AppCli):
+    name = 'admin'
+
+class FcgiCli(FcgiCli):
+    name = 'admin_fcgi'
 
 
 class Application(BaseApplication):
 
+    cli_dict = AppCliDict([AppCli, FcgiCli, DbCli])
+    preview_app_class = None
+
+    @classmethod
+    def cfg_class(cls):
+        from .cfg import Cfg
+        return Cfg
+
+
+    class Dispatcher(DispatcherApp):
+        @classmethod
+        def cfg_class(cls):
+            from .cfg import DispatcherCfg
+            return DispatcherCfg
+ 
     @cached_property
     def streams(env):
         from .streams import streams
@@ -33,27 +57,6 @@ class Application(BaseApplication):
     def env_class(self):
         from .environment import Environment
         return Environment
-
-
-    def command_admin(self):
-        from iktomi.cli.app import App
-        shell_namespace = {
-            'app': self,
-            'db': self.db_maker(),
-        }
-        return App(self, shell_namespace=shell_namespace)
-
-    def command_admin_fcgi(self):
-        from iktomi.cli.fcgi import Flup
-        return Flup(self, **self.cfg.FLUP_ARGS)
-
-    def command_db(self):
-        import models.initial
-        from models import metadata_dict
-        from iktomi.cli.sqla import Sqla
-        return Sqla(self.db_maker, metadata_dict,
-                    initial=models.initial.install)
-
 
     @cached_property
     def db_maker(self):
@@ -103,3 +106,23 @@ class Application(BaseApplication):
             persistent_root=self.cfg.PRIVTE_MEDIA_DIR,
             persistent_url=self.cfg.PRIVTE_MEDIA_URL,
         )
+
+    preview_enabled = False
+
+    @classmethod
+    def preview_cfg_class(cls):
+        from .preview_cfg import PreviewCfg
+        return PreviewCfg
+
+    @cached_property
+    def preview_app_class(self):
+        from ..front import Application
+        return Application
+
+    @cached_property
+    def preview_app(self):
+        preview_cfg_class = self.preview_cfg_class()
+        front_cfg_class = self.preview_app_class.cfg_class()
+        cfg_class = type('Cfg', (preview_cfg_class, front_cfg_class), {})
+        return self.preview_app_class(cfg_class(self.cfg))
+

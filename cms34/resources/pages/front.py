@@ -8,7 +8,8 @@ from ...front.plugins import VP_Response, VP_Query
 
 class VP_PagesQuery(VP_Query):
     model = 'Page'
-    order = ('order', 'asc')
+    order_field = 'order'
+    order_asc = True
     limit = 20
 
 

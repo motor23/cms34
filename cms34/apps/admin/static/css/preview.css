@@ -1,0 +1,41 @@
+.navigation {
+    color: #ffffff;
+    font: normal 0.8em Arial, sans-serif;
+    -webkit-font-smoothing: auto;
+}
+
+.navigation a{
+    text-decoration: underline;
+    cursor: auto;
+}
+
+.navigation .quit {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    /* Exit by SuperAtic LABS from The Noun Project, published under CC-BY */
+    background-image: url(/cms-static/css/../images/exit.svg);
+    background-size: 16px 16px;
+    font-size: 0px;
+    vertical-align: top;
+    margin-left: 20px;
+    cursor: pointer;
+}
+
+[data-preview] .preview_buttons{
+    display:none;
+}
+
+[data-preview]:hover .preview_buttons{
+    display:block;
+}
+
+[data-preview] .preview_buttons a{
+    color: #000;
+    font: normal 0.8em Arial, sans-serif;
+    text-decoration: underline;
+    -webkit-font-smoothing: auto;
+    margin-right: 10px;
+}
+
+

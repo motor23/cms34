@@ -5,7 +5,8 @@ from .. import ResourceView
 
 class VP_OrgsQuery(VP_Query):
     model = 'Org'
-    order = ('order', 'asc')
+    order_field = 'order'
+    order_asc = True
     limit = 20
 
 
