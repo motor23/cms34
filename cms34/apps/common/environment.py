@@ -28,7 +28,8 @@ class BaseEnvironment(web.AppEnvironment):
         self.app = app
         self.cfg = app.cfg
         self.request = request
-        self._route_state = RouteState(request)
+        if request:
+            self._route_state = RouteState(request)
 
     @cached_property
     def root(self):
