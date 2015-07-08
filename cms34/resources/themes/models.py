@@ -6,6 +6,7 @@ from ...mixed import (
     xf_lead,
     xf_dt,
     xf_publish_dt,
+    xf_body,
 )
 
 class MFY_Theme(ModelFactory):
@@ -16,6 +17,7 @@ class MFY_Theme(ModelFactory):
         xf_id,
         xf_title,
         xf_lead,
+        xf_body,
     ]
 
 

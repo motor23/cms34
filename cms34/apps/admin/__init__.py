@@ -110,19 +110,27 @@ class Application(BaseApplication):
     preview_enabled = False
 
     @classmethod
-    def preview_cfg_class(cls):
-        from .preview_cfg import PreviewCfg
-        return PreviewCfg
+    def preview_cfg_overload(cls):
+        from .preview import PreviewCfgOverload
+        return PreviewCfgOverload
 
     @cached_property
-    def preview_app_class(self):
+    def front_app_class(self):
         from ..front import Application
         return Application
 
     @cached_property
-    def preview_app(self):
-        preview_cfg_class = self.preview_cfg_class()
-        front_cfg_class = self.preview_app_class.cfg_class()
-        cfg_class = type('Cfg', (preview_cfg_class, front_cfg_class), {})
-        return self.preview_app_class(cfg_class(self.cfg))
+    def preview_app_overload(self):
+        from .preview import PreviewAppOverload
+        return PreviewAppOverload
 
+    @cached_property
+    def preview_app(self):
+        front_cfg_class = self.front_app_class.cfg_class()
+        preview_cfg = type('Cfg',
+                           (self.preview_cfg_overload(), front_cfg_class),
+                           {})(self.cfg)
+        preview_app = type('Application',
+                           (self.preview_app_overload, self.front_app_class),
+                           {})(preview_cfg, self)
+        return preview_app

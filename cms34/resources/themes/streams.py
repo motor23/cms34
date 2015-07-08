@@ -6,6 +6,7 @@ from cms34.stream import (
 from cms34.mixed.fields import (
     XB_Content,
     xf_lead,
+    xf_body,
 )
 from ..sections.fields import (
     xb_section_object
@@ -18,6 +19,7 @@ class XB_Content(XB_Content):
     ]
     item_fields = [
         xf_lead,
+        xf_body,
     ]
 
 xb_content = XB_Content()

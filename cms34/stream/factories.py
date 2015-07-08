@@ -148,6 +148,7 @@ class StreamFactory(object):
     register = None
     name = None
     stream_bases = (PublishStream,)
+    stream_actions = []
     fields = []
     list_fields = None
     filter_fields = None
@@ -193,7 +194,10 @@ class StreamFactory(object):
         return cfg
 
     def create_stream_cls(self):
-        return type('Stream', self.stream_bases, {})
+        stream_cls = type('Stream', self.stream_bases, {})
+        for plugin in self.plugins:
+            stream_cls = plugin.create_stream_cls(stream_cls)
+        return stream_cls
 
     def create_stream(self):
         return self.cfg.Stream(self.name, self.cfg)

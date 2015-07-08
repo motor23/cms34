@@ -62,7 +62,7 @@ class CachedDb(object):
         if query:
             return query
         else:
-            query = self.maker.query_cls(self, cls, 
+            query = self.maker.query_cls(self, cls,
                                          with_polymorphic=with_polymorphic)
             return self.cached_query.setdefault(cls.__name__, query)
 

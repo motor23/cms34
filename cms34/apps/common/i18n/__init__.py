@@ -29,8 +29,9 @@ class I18n(object):
                 env.lang = lang
                 env._root = env.root
                 env.root = lang.root
-                env._namespace = env.namespace
-                del env.namespace
+                if hasattr(env, 'namespace'):
+                    env._namespace = env.namespace
+                    del env.namespace
             else:
                 env.other_lang = lang
 

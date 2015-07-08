@@ -13,7 +13,6 @@ from iktomi.utils.storage import (
     storage_property,)
 
 from iktomi.web.route_state import RouteState
-import models
 
 
 class Context(object):
@@ -61,12 +60,15 @@ class BaseEnvironment(web.AppEnvironment):
 
 
 class Environment(BaseEnvironment):
-    models = models
     Context = Context
 
     def __init__(self, app, **kwargs):
         self.cfg = app.cfg
         BaseEnvironment.__init__(self, app, **kwargs)
+
+    @cached_property
+    def models(self):
+        return self.app.models
 
     @cached_property
     def db(self):
@@ -123,5 +125,4 @@ class Environment(BaseEnvironment):
 
     def finalize(self):
         self.db.close()
-
 

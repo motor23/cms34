@@ -1,15 +1,16 @@
 // preview
-$(window).ready(function(){
-    var a = $('.navigation a[href="/preview/"]');
-    a.parent('li').addClass('active');
+$(window).addEvent('domready', function(){
+    var a = $$('.navigation a[href="/preview/"]')[0];
+    a.parentElement.addClass('active');
 
-    var blocks = $('[data-preview]');
-    blocks.each(function(index, block){
-        var preview_buttons = $('<div class="preview_buttons"></div>');
-        $(block).append(preview_buttons);
-        var edit_url = $(block).data('preview-edit');
+    $$('[data-preview]').each(function(block){
+        var edit_url = block.get('data-preview-edit');
+        var where = block.get('data-preview-where');
+        var preview_buttons = new Element('div', {'class': "preview_buttons"});
+        preview_buttons.inject(block, where);
         if(edit_url){
-            preview_buttons.append($('<a href="'+edit_url+'">Редактировать</a>'))
+            var a = new Element('a', {'href': edit_url, 'html':'Редактировать'});
+            a.inject(preview_buttons)
         }
     });
 });

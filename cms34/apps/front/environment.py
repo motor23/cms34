@@ -23,12 +23,16 @@ class Context(EnvironmentBase.Context):
         return Markup('<script type="text/javascript" src="{}">'\
                       '</script>'.format(url))
 
-    def preview_buttons(self, item, buttons=['edit']):
+    def preview_buttons(self, item, buttons=['edit'],
+                        where='bottom', position='absolute', hidden=False):
         if not getattr(self.env.cfg, 'PREVIEW', False):
             return u''
         parent_env = self.env.parent_env
         parent_env._push(models=self.env.models, lang=self.env.lang)
-        result = parent_env.context.preview_buttons(item, buttons)
+        result = parent_env.context.preview_buttons(item, buttons,
+                                                    where=where,
+                                                    position=position,
+                                                    hidden=hidden,)
         parent_env._pop()
         return result
 
@@ -36,8 +40,14 @@ class Context(EnvironmentBase.Context):
 
 class Environment(EnvironmentBase):
     Context = Context
-    shared_models = models.shared
-    models = models.front
+
+    @cached_property
+    def models(self):
+        return self.app.front_models
+
+    @cached_property
+    def shared_models(self):
+        return self.app.shared_models
 
     def get_template_globals(self, env):
         result = EnvironmentBase.get_template_globals(self, env)
@@ -46,9 +56,10 @@ class Environment(EnvironmentBase):
             lang=env.lang,
         )
 
-    def url_for_obj(self, obj):
+    def url_for_obj(self, obj, default=None):
         raise NotImplementedError
 
     @cached_property
     def cached_db(self):
         return self.app.cached_db_maker()
+

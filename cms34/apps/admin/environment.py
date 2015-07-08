@@ -30,9 +30,14 @@ class Context(EnvironmentBase.Context):
     def users(self):
         return self.env.db.query(AdminUser).filter_by(active=True).all()
 
-    def preview_buttons(self, item, buttons=['edit']):
+    def preview_buttons(self, item, buttons=['edit'],
+                        where='bottom', position='absolute', hidden=False):
         result = {}
-        result['data-preview'] = 'bottom'
+        result['data-preview'] = 'buttons'
+        result['data-preview-where'] = where
+        result['data-preview-position'] = position
+        if hidden:
+            result['data-preview-hidden'] = 1
         for button in buttons:
             if button=='edit':
                 result['data-preview-edit'] = self.env.url_for_obj(item)
@@ -53,6 +58,11 @@ class Environment(EnvironmentBase):
         self.streams = app.streams
         self.dashboard = app.dashboard
         self.top_menu = app.top_menu
+        self.models_ = app.models
+
+    @property
+    def edit_log_model(self):
+        return self.models.admin.EditLog
 
     @storage_cached_property
     def item_lock(storage):

@@ -40,6 +40,7 @@ class XF_Tags(XF_StreamSelect):
     stream_name = 'tags'
     ordered = True
     multiple = True
+    allow_create = True
 
 
 class XF_RegionId(XF_Id):

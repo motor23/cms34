@@ -9,12 +9,13 @@ from webob.exc import HTTPException, HTTPInternalServerError, \
 from webob import Request
 import memcache
 from .templates import AppTemplateEngine
-from iktomi.utils import cached_property
 from iktomi.utils.storage import VersionedStorage
 from iktomi.web import (
     Application as BaseApplication,
     Reverse,
 )
+
+from cms34.utils import cached_property
 from .cli import AppCliDict, AppCli
 from .caching import MemcacheClient
 
@@ -25,13 +26,10 @@ logger = logging.getLogger()
 class Application(BaseApplication):
 
     cli_dict = AppCliDict([AppCli])
-    plugins = []
 
     def __init__(self, cfg=None, **kwargs):
         self.cfg = cfg or self.cfg_class()()
         self.__dict__.update(kwargs)
-        for plugin in self.plugins:
-            plugin(self)
 
     @classmethod
     def custom(cls, custom_cfg_path):
@@ -46,7 +44,7 @@ class Application(BaseApplication):
     def handler(self):
         raise NotImplementedError()
 
-    @cached_property
+    @property
     def root(self):
         return Reverse.from_handler(self.handler)
 
@@ -116,4 +114,3 @@ class Application(BaseApplication):
     def models(self):
         import models
         return models
-

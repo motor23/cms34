@@ -43,16 +43,29 @@ class Application(BaseApplication):
         return Environment
 
     @cached_property
+    def front_models(self):
+        return self.models.front
+
+    @cached_property
+    def shared_models(self):
+        return self.models.shared
+
+    @cached_property
+    def flood_models(self):
+        return self.models.flood
+
+    query_class = PublicQuery
+
+    @cached_property
     def db_maker(self):
-        import models
         return binded_filesessionmaker(self.cfg.DATABASES,
-                        engine_params=self.cfg.DATABASE_PARAMS,
-                        session_params={'query_cls': PublicQuery},
-                        default_file_manager=self.front_file_manager,
-                        file_managers={
-                            models.front.metadata: self.front_file_manager,
-                            models.shared.metadata: self.shared_file_manager,
-                        })
+                    engine_params=self.cfg.DATABASE_PARAMS,
+                    session_params={'query_cls': self.query_class},
+                    default_file_manager=self.front_file_manager,
+                    file_managers={
+                        self.front_models.metadata: self.front_file_manager,
+                        self.shared_models.metadata: self.shared_file_manager,
+                    })
 
     @cached_property
     def front_file_manager(self):

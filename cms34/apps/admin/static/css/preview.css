@@ -22,20 +22,37 @@
     cursor: pointer;
 }
 
-[data-preview] .preview_buttons{
+[data-preview-hidden] .preview_buttons{
     display:none;
 }
 
-[data-preview]:hover .preview_buttons{
+[data-preview-hidden]:hover .preview_buttons{
     display:block;
 }
 
 [data-preview] .preview_buttons a{
-    color: #000;
-    font: normal 0.8em Arial, sans-serif;
-    text-decoration: underline;
-    -webkit-font-smoothing: auto;
     margin-right: 10px;
+    -webkit-font-smoothing: auto;
+    font: normal 12px Arial, sans-serif;
+
+    border: none;
+    background: #7F8C8D;
+    color: #ffffff;
+    padding: 5px 8px;
+    line-height: 1.3em;
+    text-decoration: none;
+    text-shadow: none;
+    text-align: center;
+    margin: -2px 5px;
+    cursor: pointer;
+    border-radius: 3px;
+    min-height: 16px;
 }
 
-
+[data-preview-position="absolute"] .preview_buttons{
+    position:absolute;
+}
+[data-preview-position="absolute_right"] .preview_buttons{
+    position:absolute;
+    right:5px;
+}

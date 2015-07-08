@@ -6,17 +6,18 @@ from collections import OrderedDict
 import iktomi.templates, iktomi.cms
 import memcache
 
+from cms34.utils import cached_property
 from ..common.cfg import Cfg as CfgBase
 from ..common.dispatcher import Cfg as DispatcherCfgBase
 
 
 class Cfg(CfgBase):
 
-    @property
+    @cached_property
     def DEFAULT_CUSTOM_CFG(self):
         return path.join(self.CFG_DIR, 'admin.py')
 
-    @property
+    @cached_property
     def SITE_DIR(self):
         return path.join(self.ROOT, 'admin')
 
@@ -24,7 +25,7 @@ class Cfg(CfgBase):
     IKTOMI_CMS_DIR = path.dirname(path.abspath(iktomi.cms.__file__))
     CMS34_DIR = path.dirname(path.abspath(__file__))
 
-    @property
+    @cached_property
     def TEMPLATES(self):
         return [
             path.join(self.CMS34_DIR, 'templates'),
@@ -32,26 +33,26 @@ class Cfg(CfgBase):
             path.join(self.IKTOMI_TMPLATE_DIR, 'jinja2', 'templates'),
         ]
 
-    @property
+    @cached_property
     def CMS_STATIC_DIR(self):
         return path.join(self.IKTOMI_CMS_DIR, 'static')
 
     CMS_STATIC_URL = '/cms-static/'
 
-    @property
+    @cached_property
     def CMS34_STATIC_DIR(self):
         return path.join(self.CMS34_DIR, 'static')
 
     CMS34_STATIC_URL = '/cms34-static/'
     STATIC_URL = '/static/'
 
-    @property
+    @cached_property
     def ADMIN_FORM_TMP_DIR(self):
         return path.join(self.TMP_DIR, 'admin')
     PRIVATE_FORM_TMP_DIR = ADMIN_FORM_TMP_DIR
     SHARED_FORM_TMP_DIR = ADMIN_FORM_TMP_DIR
 
-    @property
+    @cached_property
     def PRIVATE_MEDIA_DIR(self):
         return path.join(self.MEDIA_DIR, 'private')
 
@@ -63,7 +64,7 @@ class Cfg(CfgBase):
     MODEL_LOCK_TIMEOUT = 5*60
     MODEL_LOCK_RENEW = 60
 
-    @property
+    @cached_property
     def FLUP_ARGS(self):
         return dict(
             fastcgi_params = self.FASTCGI_PARAMS,
@@ -73,7 +74,7 @@ class Cfg(CfgBase):
             logfile = path.join(self.LOG_DIR, 'admin.log'),
         )
 
-    @property
+    @cached_property
     def MANIFESTS(self):
         return OrderedDict([
             ("cms", {
@@ -109,11 +110,11 @@ class Cfg(CfgBase):
 
 class DispatcherCfg(DispatcherCfgBase):
 
-    @property
+    @cached_property
     def DEFAULT_CUSTOM_CFG(self):
         return path.join(self.CFG_DIR, 'dispatcher_admin.py')
 
-    @property
+    @cached_property
     def FLUP_ARGS(self):
         return dict(
             fastcgi_params = self.FASTCGI_PARAMS,

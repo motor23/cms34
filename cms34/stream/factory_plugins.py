@@ -7,19 +7,23 @@ from iktomi.cms.ajax_file_upload import (
     StreamFileUploadHandler,
     StreamImageUploadHandler,
 )
+from iktomi.cms.edit_log import EditLogHandler
+
 from .html_body_handlers import (
     HtmlBodyHandler,
 )
+from .stream_actions import PreviewAction
 
 
 class SFP_Base(object):
 
     def __init__(self, factory=None, **kwargs):
         self.factory = factory
+        self._kwargs = kwargs
         self.__dict__.update(kwargs)
 
     def __call__(self, factory):
-        return self.__class___(factory)
+        return self.__class__(factory=factory, **self._kwargs)
 
     def create_filter_form(self, factory, fields):
         return factory, fields
@@ -32,6 +36,9 @@ class SFP_Base(object):
 
     def create_config(self, factory, cfg):
         pass
+
+    def create_stream_cls(self, stream_cls):
+        return stream_cls
 
 
 class SFP_Tree(SFP_Base):
@@ -87,4 +94,20 @@ class SFP_ChildFactories(SFP_Base):
             item_fields[_factory.name] = _factory.item_fields
         factory.item_fields = item_fields
 
+
+class SFP_Action(SFP_Base):
+
+    def __init__(self, action, factory=None, **kwargs):
+        kwargs['action'] = action
+        SFP_Base.__init__(self, factory, **kwargs)
+
+    def create_stream_cls(self, stream_cls):
+        stream_cls.actions = stream_cls.actions + [self.action]
+        return stream_cls
+
+def SFP_Preview(**kwargs):
+    return SFP_Action(PreviewAction(**kwargs))
+
+def SFP_EditLog(**kwargs):
+    return SFP_Action(EditLogHandler(**kwargs))
 

@@ -10,6 +10,9 @@ __all__ = ['create_handler']
 
 def create_handler(app):
     h_caching = Caching(app.cache, duration=app.cfg.CACHE_TIME)
+    h_sections_ru = app.sections_maker('ru').handler()
+    h_sections_en = app.sections_maker('en').handler()
+
     return cases(
         static_files(app.cfg.STATIC_DIR, app.cfg.STATIC_URL),
         static_files(app.cfg.DEV_STATIC_DIR, app.cfg.DEV_STATIC_URL),
@@ -18,11 +21,11 @@ def create_handler(app):
         h_caching | cache(enable=app.cfg.CACHE_ENABLED) | cases(
             prefix('/en') | app.i18n.handler('en') | cases(
                 match('/', name='index') | h_index,
-                app.sections_en.handler(),
+                h_sections_en,
             ),
             app.i18n.handler('ru') | cases(
                 match('/', name='index') | h_index,
-                app.sections_ru.handler(),
+                h_sections_ru,
             ),
         ),
         HTTPNotFound,

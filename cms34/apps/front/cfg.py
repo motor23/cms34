@@ -4,23 +4,24 @@ import sys
 import memcache
 from collections import OrderedDict
 
+from cms34.utils import cached_property
 from ..common.cfg import Cfg as CfgBase
 from ..common.dispatcher import Cfg as DispatcherCfgBase
 
 
 class Cfg(CfgBase):
 
-    @property
+    @cached_property
     def DEFAULT_CUSTOM_CFG(self):
         return path.join(self.CFG_DIR, 'front.py')
 
-    @property
+    @cached_property
     def SITE_DIR(self):
         return path.join(self.ROOT, 'front')
 
     CMS34_DIR = path.dirname(path.abspath(__file__))
 
-    @property
+    @cached_property
     def TEMPLATES(self):
         return [
             path.join(self.SITE_DIR, 'templates'),
@@ -29,14 +30,14 @@ class Cfg(CfgBase):
 
     MEDIA_URL = FRONT_MEDIA_URL = '/media/'
 
-    @property
+    @cached_property
     def SHARED_FORM_TMP_DIR(self):
         return path.join(self.TMP_DIR, 'shared')
 
     MODEL_LOCK_TIMEOUT = 5*60
     MODEL_LOCK_RENEW = 60
 
-    @property
+    @cached_property
     def FLUP_ARGS(self):
         return dict(
             fastcgi_params = self.FASTCGI_PARAMS,
@@ -46,7 +47,7 @@ class Cfg(CfgBase):
             logfile = path.join(self.LOG_DIR, 'front.log'),
         )
 
-    @property
+    @cached_property
     def MANIFESTS(self):
         return OrderedDict([
             ("", {
@@ -80,30 +81,30 @@ class Cfg(CfgBase):
 
     FLOOD_PROTECTION_ENABLED = True
 
-    @property
+    @cached_property
     def I18N_DIR(self):
         return os.path.join(CFG_DIR, 'i18n') #XXX
 
-    @property
+    @cached_property
     def I18N_MAPPING_FILE(self):
         return os.path.join(I18N_DIR, 'mapping.ini')
 
-    @property
+    @cached_property
     def I18N_TRANSLATIONS_DIR(self):
         os.path.join(I18N_DIR, 'translations')
 
-    @property
+    @cached_property
     def GRUNT_FILE(self):
         return path.join(self.ROOT, './Gruntfile.js')
 
 
 class DispatcherCfg(DispatcherCfgBase):
 
-    @property
+    @cached_property
     def DEFAULT_CUSTOM_CFG(self):
         return path.join(self.CFG_DIR, 'dispatcher_front.py')
 
-    @property
+    @cached_property
     def FLUP_ARGS(self):
         return dict(
             fastcgi_params = self.FASTCGI_PARAMS,

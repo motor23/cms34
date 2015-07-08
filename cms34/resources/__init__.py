@@ -3,9 +3,9 @@ from ..front.view import BaseView, HView
 
 
 class V_Sections(object):
-    def __init__(self, cached_db, models, resources):
+    def __init__(self, cached_db, model, resources):
         self.cached_db = cached_db
-        self.model = getattr(models, resources.sections_model_factory.model)
+        self.model = model
         self.resources = resources
 
     def handler(self):
@@ -23,18 +23,25 @@ class V_Sections(object):
             handlers.append(handler)
         return cases(*handlers)
 
+
     def get_sections(self, **kwargs):
         result = []
         sections = self.cached_db.query(self.model)\
                                  .filter_by(**kwargs).order_by('order').all()
         #remove sections with double (slugs, parant_id) pairs 
+        # filter not published sections
         pairs = []
         for section in sections:
             pair = (section.slug, section.parent_id)
             if pair not in pairs:
                 pairs.append(pair)
-                result.append(section)
+                if self.get_section_parents(section) is not None:
+                    result.append(section)
         return result
+
+    def retrieve_sections(self, env, **kwargs):
+        ids = map(lambda x: x.id, self.get_sections(**kwargs))
+        return env.db.query(self.model).filter(self.model.id.in_(ids)).all()
 
     def get_section(self, **kwargs):
         sections = self.get_sections(**kwargs)
@@ -56,8 +63,10 @@ class V_Sections(object):
     def url_for_obj(self, root, obj):
         if isinstance(obj, self.model):
             return self.url_for_section(root, obj)
-        if hasattr(obj, 'section'):
+        if hasattr(obj, 'section') and obj.section:
             section_root = self.root_for_section(root, obj.section)
+            if not section_root:
+                return None
             url = self.resources.get_resource(obj.section.type).view_cls\
                                 ._url_for_obj(section_root, obj)
             if url:
@@ -66,12 +75,16 @@ class V_Sections(object):
 
     def root_for_section(self, root, section):
         parents = self.get_section_parents(section)
+        if parents is None:
+            return None
         slugs = [section.slug] + [p.slug for p in parents]
         slugs.reverse()
         return root.build_subreverse('.'.join(slugs))
 
     def url_for_section(self, root, section):
         section_root = self.root_for_section(root, section)
+        if not section_root:
+            return None
         url = self.resources.get_resource(section.type).view_cls\
                             ._url_for_index(section_root)
         if url:
@@ -207,13 +220,17 @@ class ResourcesBase(object):
         assert res is not None, 'Unknown resource, name="%s"' % name
         return res
 
-    def create_streams(self, register, **kwargs):
-        self.sections_stream_factory(register, self.resources, **kwargs)
+    def create_streams(self, register, names=None, **kwargs):
+        if not names or self.sections_stream_factory.name in names:
+            self.sections_stream_factory(register, self.resources, **kwargs)
         for f in self.stream_factories:
-            f(register, **kwargs)
+            if not names or f.name in names:
+                f(register, **kwargs)
 
-    def register_models(self, register, **kwargs):
+    def register_models(self, register, names=None, **kwargs):
         for f in self.model_factories:
-            f(register, **kwargs)
-        self.sections_model_factory(register, self.resources, **kwargs)
+            if not names or f.name in names:
+                f(register, **kwargs)
+        if not names or self.sections_model_factory.name in names:
+            self.sections_model_factory(register, self.resources, **kwargs)
 

@@ -31,24 +31,15 @@ class Application(BaseApplication):
         from .environment import Environment
         return Environment
 
-    @cached_property
-    def sections_ru(self):
+    def sections_maker(self, lang):
         return V_Sections(
                    cached_db=self.cached_db_maker(),
-                   models=self.models.front.ru,
-                   resources=self.resources,
-        )
-
-    @cached_property
-    def sections_en(self):
-        return V_Sections(
-                   cached_db=self.cached_db_maker(),
-                   models=self.models.front.en,
+                   model=getattr(self.front_models, lang).Section,
                    resources=self.resources,
         )
 
     class i18n_cls(BaseApplication.i18n_cls):
         def set_active_lang(self, env, active):
             BaseApplication.i18n_cls.set_active_lang(self, env, active)
-            env.sections = getattr(env.app, 'sections_%s' % active)
+            env.sections = env._sections[active]
 

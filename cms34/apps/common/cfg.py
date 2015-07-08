@@ -4,6 +4,8 @@ import sys
 import logging
 import logging.config
 
+from cms34.utils import cached_property
+
 import __main__
 
 FASTCGI_PREFORKED_DEFAULTS = dict(
@@ -41,6 +43,8 @@ class BaseCfg(object):
         l = {}
         execfile(filepath, dict(cfg=self), l)
         self.update_cfg(l)
+        for key, value in l.items():
+            setattr(self, key, value)
 
     @classmethod
     def custom(cls, cfg_path=None):
@@ -58,45 +62,47 @@ class Cfg(BaseCfg):
         self.config_path()
         self.config_uid()
 
-    ROOT = os.path.dirname(os.path.abspath(__main__.__file__))
+    @cached_property
+    def ROOT(self):
+        return os.path.dirname(os.path.abspath(__main__.__file__))
 
-    @property
+    @cached_property
     def SITE_DIR(self):
         raise NotImplementedError
 
-    @property
+    @cached_property
     def THIRD_PARTY_DIR(self):
         return os.path.join(self.ROOT, 'third-party')
 
-    @property
+    @cached_property
     def CFG_DIR(self):
         return os.path.join(self.ROOT, 'cfg')
 
-    @property
+    @cached_property
     def LOG_DIR(self):
         return os.path.join(self.ROOT, 'logs')
 
-    @property
+    @cached_property
     def RUN_DIR(self):
         return os.path.join(self.ROOT, 'run')
 
-    @property
+    @cached_property
     def TMP_DIR(self):
         return os.path.join(self.ROOT, 'tmp')
 
-    @property
+    @cached_property
     def MEDIA_DIR(self):
         return os.path.join(self.ROOT, 'media')
 
-    @property
+    @cached_property
     def ADMIN_MEDIA_DIR(self):
         return os.path.join(self.MEDIA_DIR, 'admin')
 
-    @property
+    @cached_property
     def FRONT_MEDIA_DIR(self):
         return os.path.join(self.MEDIA_DIR, 'front')
 
-    @property
+    @cached_property
     def SHARED_MEDIA_DIR(self):
         return os.path.join(self.MEDIA_DIR, 'shared')
 
@@ -104,11 +110,11 @@ class Cfg(BaseCfg):
 
     DEV_STATIC = False
 
-    @property
+    @cached_property
     def STATIC_DIR(self):
         return os.path.join(self.SITE_DIR, 'static')
 
-    @property
+    @cached_property
     def DEV_STATIC_DIR(self):
         return os.path.join(self.SITE_DIR, 'dev_static')
 
@@ -122,7 +128,7 @@ class Cfg(BaseCfg):
         maxChildren=2,
     )
 
-    @property
+    @cached_property
     def FLUP_ARGS(self):
         return dict(
             fastcgi_params = self.FASTCGI_PARAMS,

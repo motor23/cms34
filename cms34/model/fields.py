@@ -21,6 +21,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 
 from iktomi.utils import cached_property
 from iktomi.unstable.db.files import PersistentFile
+from iktomi.unstable.db.sqla.images import ImageFile
 from iktomi.cms.publishing.files import (
     PublicatedImageProperty,
     PublicatedFileProperty,
@@ -415,12 +416,17 @@ class MF_File(MF_Base):
             file_name,
             persistent_cls=self._File,
             name_template=('%s/%s/{random}' % (base_path, self.name)),
-            cache_properties={'extension': '%s_ext' % self.name},
+            cache_properties={
+                'extension': '%s_ext' % self.name,
+                'size': '%s_size' % self.name,
+            },
         )
         file_ext = Column(String(10))
+        file_size = Column(Integer)
         return {
             '%s_name' % self.name: file_name,
             '%s_ext' % self.name: file_ext,
+            '%s_size' % self.name: file_size,
             self.name: file,
         }
 
@@ -433,17 +439,41 @@ class MF_Img(MF_Base):
     base_path = None
     get_base_path = prop_getter('base_path', 'base_path')
 
+    class _File(ImageFile):
+
+        @cached_property
+        def extension(self):
+            ext = self.ext
+            if ext.startswith('.'):
+                ext = ext[1:]
+            return ext
+
     def get_dict(self, models, factory=None):
         base_path = self.get_base_path(factory)
         img_name = Column(VarBinary(250))
         img = PublicatedImageProperty(img_name,
             image_sizes=self.image_sizes,
+            persistent_cls=self._File,
             resize=self.resize,
             fill_from=self.fill_from,
-            name_template=('%s/%s/{random}' % (base_path, self.name))
+            name_template=('%s/%s/{random}' % (base_path, self.name)),
+            cache_properties={
+                'height': '%s_height' % self.name,
+                'width': '%s_width' % self.name,
+                'size': '%s_size' % self.name,
+                'extension': '%s_ext' % self.name,
+            }
         )
+        img_height = Column(Integer)
+        img_width = Column(Integer)
+        img_size = Column(Integer)
+        img_ext = Column(String(10))
         return {
             '%s_name' % self.name: img_name,
+            '%s_height' % self.name: img_height,
+            '%s_width' % self.name: img_width,
+            '%s_size' % self.name: img_size,
+            '%s_ext' % self.name: img_ext,
             self.name: img,
         }
 

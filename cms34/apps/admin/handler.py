@@ -23,6 +23,7 @@ def create_handler(app):
     return flash_message_handler | web.cases(
         static_files(app.cfg.CMS34_STATIC_DIR, app.cfg.CMS34_STATIC_URL),
         static_files(app.cfg.CMS_STATIC_DIR, app.cfg.CMS_STATIC_URL),
+        static_files(app.cfg.STATIC_DIR, app.cfg.STATIC_URL),
         static_files(app.cfg.PRIVATE_MEDIA_DIR, app.cfg.PRIVATE_MEDIA_URL),
         static_files(app.cfg.ADMIN_FORM_TMP_DIR, app.cfg.ADMIN_FORM_TMP_URL),
         static_files(app.cfg.SHARED_MEDIA_DIR, app.cfg.SHARED_MEDIA_URL),

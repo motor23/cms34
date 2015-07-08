@@ -9,6 +9,7 @@ from .fields import xb_region
 
 class R_Tags(ResourceBase):
     name = 'tags'
+    title = u'Ключевые слова'
     model_factories = [MFY_Tag]
     stream_factories = [SFY_Tags]
 
