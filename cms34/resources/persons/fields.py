@@ -12,16 +12,19 @@ class XF_FirstName(XF_String):
     initial = ''
 
 
+
 class XF_LastName(XF_String):
     name = 'last_name'
     label = u'Фамилия'
     initial = ''
 
 
+
 class XF_Patronymic(XF_String):
     name = 'patronymic'
     label = u'Отчество'
     initial = ''
+
 
 
 class XF_Post(XF_Text):

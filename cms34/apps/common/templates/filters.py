@@ -1,4 +1,6 @@
 import jinja2
+import urllib
+import urlparse
 
 __all__ = (
     'remove_from_url',

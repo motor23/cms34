@@ -30,7 +30,7 @@ class BaseEnvironment(web.AppEnvironment):
         self.request = request
         if route_state:
             self._route_state = route_state
-        else:
+        elif request:
             self._route_state = RouteState(request)
 
     @cached_property
