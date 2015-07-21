@@ -101,10 +101,10 @@ class Application(BaseApplication):
     @cached_property
     def private_file_manager(self):
         return FileManager(
-            transient_root=self.cfg.PRIVTE_FORM_TMP_DIR,
+            transient_root=self.cfg.PRIVATE_FORM_TMP_DIR,
             transient_url=None,
-            persistent_root=self.cfg.PRIVTE_MEDIA_DIR,
-            persistent_url=self.cfg.PRIVTE_MEDIA_URL,
+            persistent_root=self.cfg.PRIVATE_MEDIA_DIR,
+            persistent_url=self.cfg.PRIVATE_MEDIA_URL,
         )
 
     preview_enabled = False
