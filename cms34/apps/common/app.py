@@ -32,8 +32,10 @@ class Application(BaseApplication):
         self.__dict__.update(kwargs)
 
     @classmethod
-    def custom(cls, custom_cfg_path):
-        return cls(cls.cfg_class().custom(custom_cfg_path))
+    def custom(cls, custom_cfg_path='', **kwargs):
+        cfg = cls.cfg_class()(**kwargs)
+        cfg.update_from_py(custom_cfg_path)
+        return cls(cfg)
 
     @classmethod
     def cfg_class(cls):

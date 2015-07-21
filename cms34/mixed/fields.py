@@ -122,7 +122,8 @@ class XF_Base(object):
     def filter_form(self, fields_dict, models, factory=None):
         pass
 
-    def filter_defaults(self, fields_dict, models, form, factory=None):
+    def filter_defaults(self, fields_dict, models, form,
+                        item=None, factory=None):
         pass
 
     def item_field(self, fields_dict, models, factory=None):
@@ -178,9 +179,10 @@ class XF_Simple(XF_Base):
         field = self._filter_field(models, factory)
         field.filter_form(fields_dict, models, factory)
 
-    def filter_defaults(self, defaults_dict, models, form, factory=None):
+    def filter_defaults(self, defaults_dict, models, form,
+                        item=None, factory=None):
         field = self._filter_field(models, factory)
-        field.filter_defaults(defaults_dict, models, form, factory)
+        field.filter_defaults(defaults_dict, models, form, item, factory)
 
     def item_field(self, fields_dict, models, factory=None):
         field = self._item_field(models, factory)
@@ -377,13 +379,16 @@ class XF_Type(XF_Select):
     def _filter_field(self, models, factory=None):
         return FF_TabSelect(self.name, label=self.label, choices=self.choices)
 
-    def filter_defaults(self, defaults_dict, models, form, factory=None):
+    def filter_defaults(self, defaults_dict, models, form,
+                        item=None, factory=None):
         filter_value = form.python_data.get(self.name)
         if filter_value:
             defaults_dict[self.name] = filter_value
         else:
             field = self._filter_field(models, factory)
-            defaults_dict[self.name] = field.get_choices(models, factory)[0][0]
+            defaults_dict[self.name] = item and getattr(item, self.name) or \
+                                       field.get_choices(models, factory)[0][0]
+            form.python_data[self.name] = defaults_dict[self.name]
 
 
 class XF_TypeImg(XF_Type):
@@ -510,9 +515,10 @@ class XF_Group(XF_Base):
         for field in self.filter_fields:
             field.filter_form(fields_dict, models, factory)
 
-    def filter_defaults(self, defaults_dict, models, form, factory=None):
+    def filter_defaults(self, defaults_dict, models, form,
+                        item=None, factory=None):
         for field in self.filter_fields:
-            field.filter_defaults(defaults_dict, models, form, factory)
+            field.filter_defaults(defaults_dict, models, form, item, factory)
 
     def item_field(self, fields_dict, models, factory=None):
         for field in self.item_fields:

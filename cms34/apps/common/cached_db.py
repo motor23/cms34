@@ -7,16 +7,12 @@
 #  result = cquery.all()
 #
 
+from sqlalchemy.ext.serializer import dumps, loads
+
 class CachedQuery(object):
 
-    def __init__(self, parent, cls, items=None, with_polymorphic=False):
-        self.parent = parent
-        self.with_polymorphic = with_polymorphic
-        self.cls = cls
-        if items is None:
-            self.items = parent.items(cls, with_polymorphic=with_polymorphic)
-        else:
-            self.items = items
+    def __init__(self, items):
+        self.items = items
 
     def filter_by(self, **kwargs):
         result = []
@@ -26,7 +22,7 @@ class CachedQuery(object):
                     break
             else:
                 result.append(item)
-        return self.__class__(self.parent, self.cls, result)
+        return self.__class__(result)
 
     def __iter__(self):
         return self.items.__iter__()
@@ -45,72 +41,55 @@ class CachedQuery(object):
         result.sort(lambda x, y: cmp(getattr(x, field), getattr(y, field)))
         if direction=='desc':
             result.reverse()
-        return self.__class__(self.parent, self.cls, result)
+        return self.__class__(result)
+
+    def as_dict(self):
+        return dict([(i.id, i) for i in self.items])
 
 
 class CachedDb(object):
 
-    def __init__(self, maker):
-        self.maker = maker
-        self.cached_query = {}
-        self.db_maker = self.maker.db_maker
-        self.cache = self.maker.cache
-        self.clear()
-
-    def query(self, cls, with_polymorphic=False):
-        query = self.cached_query.get(cls.__name__)
-        if query:
-            return query
-        else:
-            query = self.maker.query_cls(self, cls,
-                                         with_polymorphic=with_polymorphic)
-            return self.cached_query.setdefault(cls.__name__, query)
-
-    def items(self, cls, with_polymorphic=False):
-        items = self.items_from_cache(cls)
-        if items is None:
-            items = self.items_from_db(cls, with_polymorphic=with_polymorphic)
-            self.items_to_cache(cls, items)
-        return items
-
-    def items_key(self, cls):
-        return self.maker.cache_prefix + cls.__name__
-
-    def items_from_db(self, cls, with_polymorphic=False):
-        db = self.maker.db_maker() #XXX
-        query = db.query(cls)
-        if with_polymorphic:
-            query = query.with_polymorphic('*')
-        result = query.limit(self.maker.db_limit).all()
-        db.close()
-        return result
-
-    def items_from_cache(self, cls):
-        if self.maker.cache_enabled:
-            return self.cache.get(self.items_key(cls))
-
-    def items_to_cache(self, cls, items):
-        if self.maker.cache_enabled:
-            self.cache.set(self.items_key(cls), items,
-                           time=self.maker.cache_timeout)
-
-    def clear(self):
-        self.cached_query = {}
-
-
-class CachedDbMaker(object):
-    db_limit = 100
-    cache_prefix = 'cached-db-'
-    cache_enabled = True
-    cache_timeout = 60
-    query_cls = CachedQuery
-    cached_db_cls = CachedDb
-
-    def __init__(self, db_maker, cache, **kwargs):
-        self.db_maker = db_maker
+    def __init__(self, cache, cache_enabled=True, cache_prefix='cached-db-',
+                 cache_timeout=60, query_cls=CachedQuery, bind_to_session=True):
         self.cache = cache
-        self.__dict__.update(kwargs)
+        self.cache_enabled = cache_enabled
+        self.cache_prefix = cache_prefix
+        self.cache_timeout = cache_timeout
+        self.query_cls = query_cls
+        self.queries = {}
+        self.bind_to_session = bind_to_session
 
-    def __call__(self):
-        return self.cached_db_cls(self)
+    def query(self, query_id, _query, reload=False):
+        if not isinstance(query_id, basestring):
+            query_id = query_id.__name__
+        if not reload and self.queries.has_key(query_id):
+            return self.queries[query_id]
+
+        items = self.items_from_cache(query_id)
+        if items is None:
+            items = _query.all()
+            self.items_to_cache(query_id, items)
+        elif self.bind_to_session:
+            items = map(lambda x: _query.session.merge(x, load=False), items)
+
+        query = self.query_cls(items)
+        self.queries[query_id] = query
+        return query
+
+    def items_key(self, query_id):
+        return self.cache_prefix + query_id
+
+    def items_from_cache(self, query_id):
+        if self.cache_enabled:
+            objs = self.cache.get(self.items_key(query_id))
+            if objs is not None:
+                return loads(objs)
+
+    def items_to_cache(self, query_id, items):
+        if self.cache_enabled:
+            self.cache.set(self.items_key(query_id), dumps(items),
+                           time=self.cache_timeout)
+
+    def close(self):
+        self.queries = {}
 

@@ -85,13 +85,14 @@ class FilterFormFactory(FormFactory):
         form_dict['fields_dict'] = fields_dict
         form_dict['fields'] = fields_dict.values()
 
-        def defaults(form):
+        def defaults(form, item=None):
             defaults_dict = {}
             for field in self.fields:
                 field.filter_defaults(
                     defaults_dict,
                     models,
                     form,
+                    item,
                     self.stream_factory)
             return defaults_dict
         form_dict['defaults'] = defaults

@@ -34,7 +34,7 @@ class FF_Base(object):
     def filter_form(self, form_dict, models, factory=None):
         pass
 
-    def filter_defaults(self, defaults_dict, models, form, factory=None):
+    def filter_defaults(self, defaults_dict, models, form, item=None, factory=None):
         pass
 
     def create_field(self, models, factory=None):

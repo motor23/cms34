@@ -34,10 +34,3 @@ class Environment(EnvironmentBase):
     def menu(storage):
         return Menu(storage, storage.models.Menu)
 
-
-    @storage_cached_property
-    def _sections(storage):
-        return {
-            'ru': storage.app.sections_maker('ru'),
-            'en': storage.app.sections_maker('en'),
-        }

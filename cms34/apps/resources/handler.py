@@ -10,8 +10,8 @@ __all__ = ['create_handler']
 
 def create_handler(app):
     h_caching = Caching(app.cache, duration=app.cfg.CACHE_TIME)
-    h_sections_ru = app.sections_maker('ru').handler()
-    h_sections_en = app.sections_maker('en').handler()
+    h_sections_ru = app.sections['ru'].handler()
+    h_sections_en = app.sections['en'].handler()
 
     return cases(
         static_files(app.cfg.STATIC_DIR, app.cfg.STATIC_URL),

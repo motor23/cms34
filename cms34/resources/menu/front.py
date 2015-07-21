@@ -6,8 +6,10 @@ class Menu(object):
 
     def get_items(self, **kwargs):
         result = []
-        items = self.env.cached_db.query(self.model).filter_by(**kwargs)\
-                                                   .order_by('order').all()
+        _query = self.env.db.query(self.model)
+        items = self.env.cached_db.query(self.model, _query)\
+                                  .filter_by(**kwargs)\
+                                  .order_by('order').all()
         for item in items:
             if item.section_id:
                 section = self.env.sections.get_section(id=item.section_id)

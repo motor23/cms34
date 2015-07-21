@@ -117,7 +117,7 @@ class VP_Filter(ViewPlugin):
     def accept(self, data=None):
         if data is None:
             data = self.env.request.GET
-        self.get_form().accept(data)
+        return self.get_form().accept(data)
 
     def filter(self, query):
         return self.get_form().filter(query)

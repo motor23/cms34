@@ -18,7 +18,7 @@ from cms34.mixed import (
 class XB_Main(XF_Block):
     name = 'media_block'
     label = u'Медия'
-    initial_sort = 'order'
+    sort_initial_field = 'order'
     list_fields = [
         xf_title,
         xf_order,

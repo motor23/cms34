@@ -10,6 +10,8 @@ from ..common.cfg import (
 class Cfg(CfgBase):
     DOMAINS = []
 
+    app_cfg_kwargs = {}
+
     @property
     def DEFAULT_CUSTOM_CFG(self):
         return path.join(self.CFG_DIR, 'dispatcher.py')
@@ -24,12 +26,14 @@ class DispatcherApp(object):
         self.cfg = cfg or self.cfg_class()
         for reg, cfg_path in self.cfg.DOMAINS:
             compiled_reg = re.compile(reg)
-            app = App.custom(cfg_path)
+            app = App.custom(cfg_path, ROOT=cfg.ROOT)
             self.apps.append((compiled_reg, app))
 
     @classmethod
-    def custom(cls, App, custom_cfg_path):
-        return cls(App, cls.cfg_class().custom(custom_cfg_path))
+    def custom(cls, App, custom_cfg_path='', **kwargs):
+        cfg = cls.cfg_class()(**kwargs)
+        cfg.update_from_py(custom_cfg_path)
+        return cls(App, cfg)
 
     @classmethod
     def cfg_class(cls):

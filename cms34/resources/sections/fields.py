@@ -25,6 +25,14 @@ class XF_Section(XF_StreamSelect):
     stream_name = 'sections'
 
 
+class XF_Sections(XF_Section):
+    name = 'sections'
+    label = u'Разделы'
+    model = 'Section'
+    stream_name = 'sections'
+    multiple = True
+
+
 class XF_SectionTreeTitle(XF_TreeTitle):
     img_url_template = '/cms34-static/img/sections/%(value)s.png'
     def container_list_fields(self):
@@ -40,6 +48,7 @@ class XF_SectionTreeTitle(XF_TreeTitle):
 class XF_SectionParent(XF_Parent):
     stream_name = 'sections'
     model = 'Section'
+
 
 xf_section_parent = XF_SectionParent()
 
@@ -61,6 +70,7 @@ class XB_SectionObject(XB_Object):
 
 
 xf_section = XF_Section()
+xf_sections = XF_Sections()
 xf_section_tree_title  = XF_SectionTreeTitle()
 xb_section_object = XB_SectionObject()
 
@@ -72,5 +82,14 @@ class XB_Section(XF_Block):
         xf_section,
     ]
 
+class XB_Sections(XF_Block):
+    label = u'Разделы'
+    name = 'sections_block'
+    fields = [
+        xf_sections,
+    ]
+
+
 xb_section = XB_Section()
+xb_sections = XB_Sections()
 

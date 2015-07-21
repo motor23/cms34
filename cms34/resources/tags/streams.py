@@ -15,7 +15,7 @@ class SFY_Tags(StreamFactory):
     model = 'Tag'
     title = u'Теги'
     limit = 40
-    initial_sort = 'title'
+    sort_initial_field = 'title'
 
     fields = [xf_id, xf_title]
     item_fields = list_fields = filter_fields = sort_fields = fields
@@ -26,7 +26,7 @@ class SFY_Regions(StreamFactory):
     model = 'Region'
     title = u'Регионы'
     limit = 40
-    initial_sort = 'title'
+    sort_initial_field = 'title'
 
     permissions = {
         'wheel':'x',

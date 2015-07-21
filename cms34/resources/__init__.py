@@ -1,12 +1,17 @@
-from iktomi.web import WebHandler, cases, prefix
+import logging
+from webob.exc import HTTPNotFound
+from iktomi.web import WebHandler, cases, prefix, UrlBuildingError
 from ..front.view import BaseView, HView
 
+logger = logging.getLogger()
 
 class V_Sections(object):
-    def __init__(self, cached_db, model, resources):
+    def __init__(self, db, cached_db, model, resources):
+        self.db = db
         self.cached_db = cached_db
         self.model = model
         self.resources = resources
+        self.sections_query = None
 
     def handler(self):
         return H_Sections(self)
@@ -23,11 +28,19 @@ class V_Sections(object):
             handlers.append(handler)
         return cases(*handlers)
 
+    def load_sections(self):
+        _query = self.db.query(self.model)\
+                        .with_polymorphic('*')\
+                        .order_by(self.model.order)
+        self.sections_query = self.cached_db.query(self.model, _query,
+                                                   reload=True)
 
-    def get_sections(self, **kwargs):
+
+    def get_sections(self, reload=False, **kwargs):
         result = []
-        sections = self.cached_db.query(self.model)\
-                                 .filter_by(**kwargs).order_by('order').all()
+        if self.sections_query is None or reload:
+            self.load_sections()
+        sections = self.sections_query.filter_by(**kwargs).all()
         #remove sections with double (slugs, parant_id) pairs 
         # filter not published sections
         pairs = []
@@ -39,13 +52,16 @@ class V_Sections(object):
                     result.append(section)
         return result
 
-    def retrieve_sections(self, env, **kwargs):
+    def retrieve_sections(self, **kwargs):
         ids = map(lambda x: x.id, self.get_sections(**kwargs))
-        return env.db.query(self.model).filter(self.model.id.in_(ids)).all()
+        return self.db.query(self.model).filter(self.model.id.in_(ids)).all()
 
     def get_section(self, **kwargs):
         sections = self.get_sections(**kwargs)
         return sections and sections[0] or None
+
+    def get(self, id, default=None):
+        return self.get_section(id=id) or default
 
     def get_section_parents(self, section):
         result = []
@@ -60,18 +76,18 @@ class V_Sections(object):
             parent_id = parent.parent_id
         return result
 
-    def url_for_obj(self, root, obj):
+    def url_for_obj(self, root, obj, default=None):
         if isinstance(obj, self.model):
             return self.url_for_section(root, obj)
         if hasattr(obj, 'section') and obj.section:
             section_root = self.root_for_section(root, obj.section)
             if not section_root:
-                return None
+                return default
             url = self.resources.get_resource(obj.section.type).view_cls\
                                 ._url_for_obj(section_root, obj)
             if url:
                 return url
-        return None
+        return default
 
     def root_for_section(self, root, section):
         parents = self.get_section_parents(section)
@@ -79,7 +95,10 @@ class V_Sections(object):
             return None
         slugs = [section.slug] + [p.slug for p in parents]
         slugs.reverse()
-        return root.build_subreverse('.'.join(slugs))
+        try:
+            return root.build_subreverse('.'.join(slugs))
+        except UrlBuildingError:
+            return None
 
     def url_for_section(self, root, section):
         section_root = self.root_for_section(root, section)
@@ -96,8 +115,8 @@ class V_Sections(object):
             else:
                 return None
 
-    def clear(self):
-        self.cached_db.clear()
+    def __del__(self):
+        logger.debug('__del__: %s' % self)
 
 
 class H_Sections(WebHandler):
@@ -112,7 +131,7 @@ class H_Sections(WebHandler):
         return self.handler()._locations()
 
     def __call__(self, env, data):
-        env.sections = self.sections
+        #env.sections = self.sections
         return self.handler().__call__(env, data)
 
     @property
@@ -128,8 +147,8 @@ class H_Sections(WebHandler):
         return self._handler
 
     def rebuild_sections_dict(self):
-        self.sections.clear()
-        section_items = self.sections.get_sections()
+        section_items = self.sections.get_sections(reload=True)
+        self.sections.db.close()
         sections = [(section.id, self.tree_path(section)) \
                                               for section in section_items]
         sections = dict(filter(lambda x: x[1], sections))
@@ -154,9 +173,11 @@ class H_Sections(WebHandler):
 class ResourceView(BaseView):
 
     def __init__(self, env, cls, section=None):
-        self.section = section
-        if section:
-            env.section = section
+        self.section = env.sections.get(section.id)
+        if self.section:
+            env.section = self.section
+        else:
+            raise HTTPNotFound
         BaseView.__init__(self, env, cls)
 
     @classmethod

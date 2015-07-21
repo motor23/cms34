@@ -12,3 +12,5 @@ class Cfg(CfgBase):
 
     CMS34_DIR = path.dirname(path.abspath(__file__))
 
+    QUERY_CACHE_ENABLED = None
+

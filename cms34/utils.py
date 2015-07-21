@@ -33,8 +33,7 @@ class cached_property(object):
             result = self.method(inst)
         except AttributeError, exc:
             import traceback
-            print traceback.format_exc(100)
-            raise CachedPropertyAttributeError(exc)
+            raise CachedPropertyAttributeError(traceback.format_exc(100))
         setattr(inst, self.name, result)
         return result
 

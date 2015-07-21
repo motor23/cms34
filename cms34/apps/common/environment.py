@@ -5,7 +5,7 @@ from webob.exc import HTTPSeeOther
 from jinja2 import Markup
 from iktomi.templates import BoundTemplate
 from iktomi import web
-from iktomi.utils import cached_property, quote_js
+from iktomi.utils import quote_js
 from iktomi.utils.storage import (
     StorageFrame,
     storage_cached_property,
@@ -13,6 +13,8 @@ from iktomi.utils.storage import (
     storage_property,)
 
 from iktomi.web.route_state import RouteState
+
+from cms34.utils import cached_property
 
 
 class Context(object):
@@ -34,15 +36,10 @@ class BaseEnvironment(web.AppEnvironment):
 
     @cached_property
     def root(self):
-        try:
-            if self.request:
-                return self.app.root.bind_to_env(self._root_storage)
-            else:
-                return self.app.root
-        except Exception, exc:
-            import traceback
-            traceback.print_exc()
-            raise Exception(exc)
+        if self.request:
+            return self.app.root.bind_to_env(self._root_storage)
+        else:
+            return self.app.root
 
     def finalize(self):
         pass

@@ -26,27 +26,34 @@ class Cli(BaseCli):
     def __init__(self, App):
         self.App = App
 
-    def create_cfg(self, custom_cfg_path=None):
-        return self.App.cfg_class().custom(custom_cfg_path)
+    def create_cfg(self, custom_cfg_path=None, **kwargs):
+        cfg = self.App.cfg_class()(**kwargs)
+        return cfg.update_from_py(custom_cfg_path)
 
-    def create_app(self, custom_cfg_path=None):
-        return self.App(self.create_cfg(custom_cfg_path))
+    def create_app(self, cls, level=None,  **kwargs):
+        app = cls.custom(**kwargs)
+        if level:
+            app.cfg.LOG_LEVEL = level
+        app.cfg.config_uid()
+        app.cfg.config_logging()
+        return app
 
 
 class AppCli(Cli):
 
     name = 'app'
 
-    def command_serve(self, host='', port='8000', level='debug', cfg=''):
-        app = self.App.custom(cfg)
-        return self.cli(app).command_serve(host, port, level)
+    def command_serve(self, host='', port='8000', level=None, cfg=''):
+        app = self.create_app(self.App, level=level, custom_cfg_path=cfg)
+        return self.cli(app).command_serve(host, port)
 
-    def command_dispatch(self, host='', port='8000', level='debug', cfg=''):
-        app = self.App.Dispatcher.custom(self.App, cfg)
-        return self.cli(app).command_serve(host, port, level)
+    def command_dispatch(self, host='', port='8000', level=None, cfg=''):
+        app = self.create_app(self.App.Dispatcher,
+                              App=self.App, level=level, custom_cfg_path=cfg)
+        return self.cli(app).command_serve(host, port)
 
-    def command_shell(self, cfg=''):
-        app = self.App.custom(cfg)
+    def command_shell(self, level=None, cfg=''):
+        app = self.create_app(self.App, level=level, custom_cfg_path=cfg)
         return self.cli(app).command_shell()
 
     def shell_namespace(self, app):
@@ -63,16 +70,17 @@ class FcgiCli(Cli):
 
     name = 'fcgi'
 
-    def command_start(self, daemonize=False, cfg=''):
-        app = self.App.custom(cfg)
+    def command_start(self, daemonize=False, level=None, cfg=''):
+        app = self.create_app(self.App, level=level, custom_cfg_path=cfg)
         return self.cli(app, **app.cfg.FLUP_ARGS).command_start(daemonize)
 
-    def command_start_dispatcher(self, daemonize=False, cfg=''):
-        app = self.App.Dispatcher.custom(self.App, cfg)
+    def command_start_dispatcher(self, daemonize=False, level=None, cfg=''):
+        app = self.create_app(self.App.Dispatcher,
+                              App=self.App, level=level, custom_cfg_path=cfg)
         return self.cli(app, **app.cfg.FLUP_ARGS).command_start(daemonize)
 
-    def command_stop(self, cfg=''):
-        app = self.App.custom(cfg)
+    def command_stop(self, level=None, cfg=''):
+        app = self.create_app(self.App, level=level, custom_cfg_path=cfg)
         return self.cli(app, **app.cfg.FLUP_ARGS).command_stop()
 
     def cli(self, app, **kwargs):
@@ -83,24 +91,25 @@ class DbCli(Cli):
 
     name = 'db'
 
-    def command_create_tables(self, meta_name=None, verbose=False, cfg=''):
-        app = self.App.custom(cfg)
+    def command_create_tables(self, meta_name=None, verbose=False,
+                              level=None, cfg=''):
+        app = self.create_app(self.App, level=level, custom_cfg_path=cfg)
         return self.cli(app).command_create_tables(meta_name, verbose)
 
-    def command_drop_tables(self, meta_name=None, cfg=''):
-        app = self.App.custom(cfg)
+    def command_drop_tables(self, meta_name=None, level=None, cfg=''):
+        app = self.create_app(self.App, level=level, custom_cfg_path=cfg)
         return self.cli(app).command_drop_tables(meta_name)
 
-    def command_init(self, cfg=''):
-        app = self.App.custom(cfg)
+    def command_init(self, level=None, cfg=''):
+        app = self.create_app(self.App, level=level, custom_cfg_path=cfg)
         return self.cli(app).command_init()
 
-    def command_reset(self, cfg=''):
-        app = self.App.custom(cfg)
+    def command_reset(self, level=None, cfg=''):
+        app = self.create_app(self.App, level=level, custom_cfg_path=cfg)
         return self.cli(app).command_reset()
 
-    def command_schema(self, name=None, cfg=''):
-        app = self.App.custom(cfg)
+    def command_schema(self, name=None, level=None, cfg=''):
+        app = self.create_app(self.App, level=level, custom_cfg_path=cfg)
         return self.cli(app).command_schema(name)
 
     def command_gen(self, *names): #XXX
@@ -133,14 +142,17 @@ class WatchCli(Cli):
             raise
 
     def command_css(self, cfg=''):
-        cfg = self.App.cfg_class().custom(cfg)
-        self.grunt(self.css_watch_command, cfg, wait=True)
+        app_cfg = self.App.cfg_class()()
+        app_cfg.update_from_py(cfg)
+        self.grunt(self.css_watch_command, app_cfg, wait=True)
 
     def command_js(self, cfg=''):
-        cfg = self.App.cfg_class().custom(cfg)
-        self.grunt(self.js_watch_command, cfg, wait=True)
+        app_cfg = self.App.cfg_class()()
+        app_cfg.update_from_py(cfg)
+        self.grunt(self.js_watch_command, app_cfg, wait=True)
 
     def command_all(self, cfg=''):
-        cfg = self.App.cfg_class().custom(cfg)
-        self.grunt(self.all_watch_command, cfg, wait=True)
+        app_cfg = self.App.cfg_class()()
+        app_cfg.update_from_py(cfg)
+        self.grunt(self.all_watch_command, app_cfg, wait=True)
 

@@ -76,11 +76,11 @@ class BaseView(object):
 
     @classmethod
     def _url_for_index(cls, root):
-        raise NotImplementedError()
+        return None
 
     @classmethod
     def _url_for_obj(cls, root, obj):
-        raise NotImplementedError()
+        return None
 
 
 class ViewHandler(WebHandler):

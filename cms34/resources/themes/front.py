@@ -37,7 +37,7 @@ class V_ThemesList(ResourceView):
 
     @view_handler
     def h_index(self, env, data):
-        themes = env.sections.retrieve_sections(env,
+        themes = env.sections.get_sections(
                                          parent_id=self.section.id,
                                          type='theme')
 
@@ -46,7 +46,7 @@ class V_ThemesList(ResourceView):
                                          type='dir')
         groups = []
         for group in dirs:
-            themes = env.sections.retrieve_sections(env,
+            themes = env.sections.get_sections(
                                         parent_id=group.id,
                                         type='theme')
             groups.append((group, themes))

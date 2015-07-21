@@ -1,7 +1,6 @@
 # -*- coding: utf8 -*-
 import os
 import sys
-import logging
 import logging.config
 
 from cms34.utils import cached_property
@@ -31,13 +30,16 @@ FASTCGI_THREADED_DEFAULTS = dict(
 
 class BaseCfg(object):
 
+    DEFAULT_CUSTOM_CFG = None
+
     def __init__(self, **kwargs):
         self.update_cfg(kwargs)
 
     def update_cfg(self, kwargs):
         self.__dict__.update(kwargs)
 
-    def update_from_py(self, filepath, silent=True):
+    def update_from_py(self, filepath=None, silent=True):
+        filepath = filepath or self.DEFAULT_CUSTOM_CFG
         if silent and not os.path.isfile(filepath):
             return
         l = {}
@@ -45,22 +47,10 @@ class BaseCfg(object):
         self.update_cfg(l)
         for key, value in l.items():
             setattr(self, key, value)
-
-    @classmethod
-    def custom(cls, cfg_path=None):
-        cfg = cls()
-        silent = not bool(cfg_path)
-        cfg_path = cfg_path or cfg.DEFAULT_CUSTOM_CFG
-        cfg.update_from_py(cfg_path, silent=silent)
-        return cfg
+        return self
 
 
 class Cfg(BaseCfg):
-
-    def __init__(self, **kwargs):
-        BaseCfg.__init__(self, **kwargs)
-        self.config_path()
-        self.config_uid()
 
     @cached_property
     def ROOT(self):
@@ -69,10 +59,6 @@ class Cfg(BaseCfg):
     @cached_property
     def SITE_DIR(self):
         raise NotImplementedError
-
-    @cached_property
-    def THIRD_PARTY_DIR(self):
-        return os.path.join(self.ROOT, 'third-party')
 
     @cached_property
     def CFG_DIR(self):
@@ -108,6 +94,12 @@ class Cfg(BaseCfg):
 
     UID = 'someuid'
 
+    LOG_LEVEL = 'INFO'
+    LOG_FORMAT = '%(asctime)s: %(levelname)-5s: %(name)-15s: %(message)s'
+    SQLALCHEMY_LOG_LEVEL = 'WARNING'
+    SQLALCHEMY_ENGINE_LOG_LEVEL = 'WARNING'
+    SQLALCHEMY_POOL_LOG_LEVEL = 'WARNING'
+
     DEV_STATIC = False
 
     @cached_property
@@ -117,6 +109,12 @@ class Cfg(BaseCfg):
     @cached_property
     def DEV_STATIC_DIR(self):
         return os.path.join(self.SITE_DIR, 'dev_static')
+
+    SMTP_PORT = 25
+    SMTP_HOST = "localhost"
+    SMTP_CHARSET = "utf-8"
+    SMTP_FROM = "noreply@gov.ru"
+
 
     STATIC_URL = '/static/'
     DEV_STATIC_URL = '/dev_static/'
@@ -138,18 +136,12 @@ class Cfg(BaseCfg):
             logfile = path.join(self.LOG_DIR, 'app.log'),
         )
 
-    def config_path(self):
-        for path in [self.THIRD_PARTY_DIR]:
-            if path not in sys.path:
-                sys.path.insert(0, path)
-
-
-    def config_uid(uid):
+    def config_uid(self):
         if os.getuid():
             return
         try:
             os.setgroups([])
-            p = pwd.getpwnam(uid)
+            p = pwd.getpwnam(self.UID)
             uid = p[2]
             gid = p[3]
             os.setgid(gid)
@@ -160,23 +152,16 @@ class Cfg(BaseCfg):
             sys.exit('UID and GID configuration variables are required '\
                      'when is launched as root')
 
+    def config_logging(self):
+        lvl_names = logging._levelNames
+        logging.basicConfig(
+            level=lvl_names[self.LOG_LEVEL],
+            format=self.LOG_FORMAT)
 
-
-logging.config.dictConfig({
-    'version': 1.0,
-    'handlers': {
-        'default': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-        }
-    },
-    'loggers': {
-        'iktomi.templates': {
-            'handlers': ['default'],
-            'level': 'ERROR',
-            'propagate': False,
-        }
-    },
-})
-
+        logging.getLogger('sqlalchemy')\
+               .setLevel(lvl_names[self.SQLALCHEMY_LOG_LEVEL])
+        logging.getLogger('sqlalchemy.engine')\
+               .setLevel(lvl_names[self.SQLALCHEMY_ENGINE_LOG_LEVEL])
+        logging.getLogger('sqlalchemy.pool')\
+               .setLevel(lvl_names[self.SQLALCHEMY_POOL_LOG_LEVEL])
 

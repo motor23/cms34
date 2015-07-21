@@ -26,7 +26,7 @@ class SFY_Sections(StreamFactory):
     name = 'sections'
     model = 'Section'
     title = u'Разделы'
-    initial_sort = 'order'
+    sort_initial_field = 'order'
     plugins = [SFP_Tree, SFP_FileUpload, SFP_ImageUpload]
     item_form_factory = TypedItemFormFactory
     sort_initial_field='order'

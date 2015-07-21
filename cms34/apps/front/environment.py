@@ -13,7 +13,7 @@ import models
 
 class Context(EnvironmentBase.Context):
 
-    def css_tag(self, filename, media='screen, projection'):
+    def css_tag(self, filename, media='all'):
         url = self.env.url_for_static('css/{}'.format(filename))
         return Markup('<link rel="stylesheet" type="text/css" '\
                       'media="{}" href="{}"/>'.format(media, url))
