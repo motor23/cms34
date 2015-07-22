@@ -2,9 +2,6 @@ from os import path
 
 from iktomi.cms.publishing.model import AdminPublicQuery
 from iktomi.utils import cached_property
-from cms34.resources import V_Sections
-
-from ..common.app import Application
 
 
 def from_admin_cfg(name):

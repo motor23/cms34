@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 from os import path
-import sys
 from collections import OrderedDict
 
 import iktomi.templates, iktomi.cms
-import memcache
 
 from cms34.utils import cached_property
 from ..common.cfg import Cfg as CfgBase

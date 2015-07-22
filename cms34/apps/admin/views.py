@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from iktomi.cms.ajax_file_upload import FileUploadHandler
 from iktomi.cms.packer import StaticPacker
 from iktomi.cms.stream_handlers import insure_is_xhr

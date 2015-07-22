@@ -1,6 +1,5 @@
 # -*- coding:utf8 -*-
 from iktomi.utils import cached_property
-from iktomi.cms.menu import (Menu, DashStream)
 from iktomi.unstable.db.files import FileManager
 
 from ..common.app import Application as BaseApplication

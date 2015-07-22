@@ -1,4 +1,4 @@
-import sys, os, logging.config
+import sys
 
 def add_paths(paths):
     for path in paths:

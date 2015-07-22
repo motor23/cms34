@@ -1,13 +1,7 @@
 # -*- coding: utf-8 -*-
-#import inspect
-
 from functools import partial
 from jinja2 import Markup
-
-from iktomi.cms.views import AdminAuth
-from iktomi.utils.storage import (storage_cached_property,
-                                  storage_method,
-                                  storage_property)
+from iktomi.utils.storage import storage_cached_property, storage_method
 from iktomi.utils import cached_property
 from iktomi.cms.item_lock import ItemLock
 
