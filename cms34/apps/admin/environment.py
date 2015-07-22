@@ -67,10 +67,6 @@ class Environment(EnvironmentBase):
     def item_lock(storage):
         return ItemLock(storage)
 
-    @storage_method
-    def get_edit_url(storage, x):
-        return streams.get_edit_url(storage, x)
-
     def get_template_globals(self, env):
         vars = EnvironmentBase.get_template_globals(self, env)
         vars.update(dict(
