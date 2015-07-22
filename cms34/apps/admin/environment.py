@@ -20,7 +20,8 @@ class Context(EnvironmentBase.Context):
 
     @cached_property
     def users(self):
-        return self.env.db.query(AdminUser).filter_by(active=True).all()
+        auth_model = self.env.auth_model
+        return self.env.db.query(auth_model).filter_by(active=True).all()
 
     def preview_buttons(self, item, buttons=['edit'],
                         where='bottom', position='absolute', hidden=False):
