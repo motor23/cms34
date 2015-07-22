@@ -44,7 +44,7 @@ class BaseCfg(object):
             return
         l = {}
         execfile(filepath, dict(cfg=self), l)
-        self.update_cfg(l)
+        self.update_cfg(**l)
         for key, value in l.items():
             setattr(self, key, value)
         return self
