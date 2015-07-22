@@ -33,9 +33,9 @@ class BaseCfg(object):
     DEFAULT_CUSTOM_CFG = None
 
     def __init__(self, **kwargs):
-        self.update_cfg(kwargs)
+        self.update_cfg(**kwargs)
 
-    def update_cfg(self, kwargs):
+    def update_cfg(self, **kwargs):
         self.__dict__.update(kwargs)
 
     def update_from_py(self, filepath=None, silent=True):
