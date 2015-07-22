@@ -1,17 +1,9 @@
 # -*- coding: utf-8 -*-
-#import inspect
-
 from functools import partial
 from jinja2 import Markup
-
-from iktomi.cms.views import AdminAuth
-from iktomi.utils.storage import (storage_cached_property,
-                                  storage_method,
-                                  storage_property)
+from iktomi.utils.storage import storage_cached_property, storage_method
 from iktomi.utils import cached_property
 from iktomi.cms.item_lock import ItemLock
-
-import models
 
 from ..common.environment import Environment as EnvironmentBase
 
@@ -28,7 +20,8 @@ class Context(EnvironmentBase.Context):
 
     @cached_property
     def users(self):
-        return self.env.db.query(AdminUser).filter_by(active=True).all()
+        auth_model = self.env.auth_model
+        return self.env.db.query(auth_model).filter_by(active=True).all()
 
     def preview_buttons(self, item, buttons=['edit'],
                         where='bottom', position='absolute', hidden=False):
@@ -50,8 +43,6 @@ class Context(EnvironmentBase.Context):
 
 class Environment(EnvironmentBase):
     Context = Context
-    auth_model = models.admin.AdminUser
-    object_tray_model = models.admin.ObjectTray #XXX tmp huck
 
     def __init__(self, app, **kwargs):
         EnvironmentBase.__init__(self, app, **kwargs)
@@ -61,16 +52,20 @@ class Environment(EnvironmentBase):
         self.models_ = app.models
 
     @property
+    def object_tray_model(self):
+        return self.models.admin.ObjectTray
+
+    @property
+    def auth_model(self):
+        return self.models.admin.AdminUser
+
+    @property
     def edit_log_model(self):
         return self.models.admin.EditLog
 
     @storage_cached_property
     def item_lock(storage):
         return ItemLock(storage)
-
-    @storage_method
-    def get_edit_url(storage, x):
-        return streams.get_edit_url(storage, x)
 
     def get_template_globals(self, env):
         vars = EnvironmentBase.get_template_globals(self, env)
