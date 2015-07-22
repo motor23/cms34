@@ -5,8 +5,6 @@ from iktomi.utils.storage import storage_cached_property, storage_method
 from iktomi.utils import cached_property
 from iktomi.cms.item_lock import ItemLock
 
-import models
-
 from ..common.environment import Environment as EnvironmentBase
 
 from .views import packer
@@ -44,8 +42,6 @@ class Context(EnvironmentBase.Context):
 
 class Environment(EnvironmentBase):
     Context = Context
-    auth_model = models.admin.AdminUser
-    object_tray_model = models.admin.ObjectTray #XXX tmp huck
 
     def __init__(self, app, **kwargs):
         EnvironmentBase.__init__(self, app, **kwargs)
@@ -53,6 +49,14 @@ class Environment(EnvironmentBase):
         self.dashboard = app.dashboard
         self.top_menu = app.top_menu
         self.models_ = app.models
+
+    @property
+    def object_tray_model(self):
+        return self.models.admin.ObjectTray
+
+    @property
+    def auth_model(self):
+        return self.models.admin.AdminUser
 
     @property
     def edit_log_model(self):

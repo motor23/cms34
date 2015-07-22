@@ -59,14 +59,13 @@ class Application(BaseApplication):
 
     @cached_property
     def db_maker(self):
-        import models
         return binded_filesessionmaker(self.cfg.DATABASES,
                         engine_params=self.cfg.DATABASE_PARAMS,
                         default_file_manager=self.admin_file_manager,
                         file_managers={
-                            models.admin.metadata: self.admin_file_manager,
-                            models.front.metadata: self.front_file_manager,
-                            models.shared.metadata: self.shared_file_manager,
+                            self.models.admin.metadata: self.admin_file_manager,
+                            self.models.front.metadata: self.front_file_manager,
+                            self.models.shared.metadata: self.shared_file_manager,
                         })
 
 
