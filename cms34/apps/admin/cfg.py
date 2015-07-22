@@ -21,7 +21,7 @@ class Cfg(CfgBase):
     def SITE_DIR(self):
         return path.join(self.ROOT, 'admin')
 
-    IKTOMI_TMPLATE_DIR = path.dirname(path.abspath(iktomi.templates.__file__))
+    IKTOMI_TEMPLATE_DIR = path.dirname(path.abspath(iktomi.templates.__file__))
     IKTOMI_CMS_DIR = path.dirname(path.abspath(iktomi.cms.__file__))
     CMS34_DIR = path.dirname(path.abspath(__file__))
 
@@ -30,7 +30,7 @@ class Cfg(CfgBase):
         return [
             path.join(self.CMS34_DIR, 'templates'),
             path.join(self.IKTOMI_CMS_DIR, 'templates'),
-            path.join(self.IKTOMI_TMPLATE_DIR, 'jinja2', 'templates'),
+            path.join(self.IKTOMI_TEMPLATE_DIR, 'jinja2', 'templates'),
         ]
 
     @cached_property
