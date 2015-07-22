@@ -18,9 +18,10 @@ class PreviewAction(GetAction):
         preview_app = env.app.preview_app
         preview_env = preview_app.create_environment(request=env.request)
         preview_app.i18n.set_active_lang(preview_env, env.lang)
-        result = preview_env.url_for_obj(item)
-        preview_env.finalize()
-        return result
+        try:
+            return preview_env.url_for_obj(item)
+        finally:
+            preview_env.finalize()
 
     def external_url(self, env, data, item):
         return '#'

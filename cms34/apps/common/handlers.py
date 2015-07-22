@@ -12,9 +12,10 @@ class H_App(web.WebHandler):
             route_state=env._route_state,
             parent_env=env,
         )
-        result = self.app.handle(app_env, data)
-        app_env.finalize()
-        return result
+        try:
+            return self.app.handle(app_env, data)
+        finally:
+            app_env.finalize()
 
 
 def h_app(prefix, name, app):
