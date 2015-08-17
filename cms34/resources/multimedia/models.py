@@ -11,6 +11,8 @@ from cms34.mixed.fields import (
     xf_title,
     xf_file,
 )
+from cms34.resources.sections.fields import xf_section
+from cms34.resources.tags.fields import xf_tags
 from .fields import (
     xf_img_orig,
     xf_photos_select,
@@ -33,6 +35,7 @@ class MFY_Photo(ModelFactory):
         xf_img_orig,
     ]
 
+
 class MFY_PhotoSet(ModelFactory):
     model = 'PhotoSet'
     title = u'Фотолента'
@@ -40,6 +43,7 @@ class MFY_PhotoSet(ModelFactory):
         xf_id,
         xf_photos_select,
     ]
+
 
 class MFY_Video(ModelFactory):
     model = 'Video'
@@ -55,6 +59,7 @@ class MFY_Video(ModelFactory):
         xf_poster_16_9,
     ]
 
+
 class MFY_File(ModelFactory):
     model = 'File'
     title = u'Файл'
@@ -64,8 +69,8 @@ class MFY_File(ModelFactory):
         xf_file,
     ]
 
-class MFY_Media(ModelFactory):
 
+class MFY_Media(ModelFactory):
     model = 'Media'
     title = u'Медиа'
     plugins = [MFP_Types]
@@ -81,6 +86,8 @@ class MFY_Media(ModelFactory):
         xf_dt,
         xf_publish_dt,
         xf_title,
+        xf_section,
+        xf_tags,
     ]
 
     @hybrid_factory_method.model
@@ -92,3 +99,20 @@ class MFY_Media(ModelFactory):
         else:
             return None
 
+    @hybrid_factory_method.model
+    @property
+    def index_preview(obj):
+        prop = getattr(obj.factory, 'index_preview_property', None)
+        if prop:
+            return getattr(obj, prop)
+        else:
+            return None
+
+
+class MFY_MediaListSection(ModelFactory):
+    title = u'Список медиа'
+    model = 'MediaListSection'
+
+    fields = [
+        xf_id,
+    ]

@@ -101,7 +101,7 @@ class FF_Select(FF_Base):
 
     def get_choices(self, models, factory=None):
         if self.choices is not None:
-            return choices
+            return self.choices
         assert factory is not None
         model = getattr(models, factory.model)
         return getattr(model, '%s_choices' % self.name)

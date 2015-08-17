@@ -1,4 +1,7 @@
 # -*- coding: utf8 -*-
+from cms34.mixed import XF_Block
+from cms34.resources.tags.fields import xf_tags
+from cms34.resources.sections.fields import xf_section
 from iktomi.unstable.utils.image_resizers import (
     ResizeCrop,
 )
@@ -12,11 +15,13 @@ from ...mixed.fields import (
     xf_file,
 )
 
+
 class XF_MediaSelect(XF_StreamSelect):
     name = 'media'
     label = u'Главный медиа объект'
     model = 'Media'
     stream_name = 'multimedia'
+
 
 class XF_PhotoSelect(XF_StreamSelect):
     name = 'photo'
@@ -24,6 +29,7 @@ class XF_PhotoSelect(XF_StreamSelect):
     model = 'Photo'
     stream_name = 'multimedia'
     default_filters = {'type': 'photo'}
+
 
 class XF_PhotosSelect(XF_StreamSelect):
     name = 'photos'
@@ -33,12 +39,14 @@ class XF_PhotosSelect(XF_StreamSelect):
     multiple = True
     default_filters = {'type': 'photo'}
 
+
 class XF_VideoSelect(XF_StreamSelect):
     name = 'video'
     label = u'Видео'
     model = 'Video'
     stream_name = 'multimedia'
     default_filters = {'type': 'vide'}
+
 
 class XF_PhotoSetSelect(XF_StreamSelect):
     name = 'photoset'
@@ -47,6 +55,7 @@ class XF_PhotoSetSelect(XF_StreamSelect):
     stream_name = 'multimedia'
     default_filters = {'type': 'photoset'}
 
+
 class XF_FileSelect(XF_StreamSelect):
     name = 'file'
     label = u'Фаил'
@@ -54,9 +63,10 @@ class XF_FileSelect(XF_StreamSelect):
     stream_name = 'multimedia'
     default_filters = {'type': 'file'}
 
+
 class XF_MediasSelect(XF_StreamSelect):
     name = 'medias'
-    label = u'Медия'
+    label = u'Медиа'
     model = 'Media'
     stream_name = 'multimedia'
     multiple = True
@@ -81,19 +91,21 @@ class XF_ImgOrig(XF_Img):
 
 class XF_Sd(XF_File):
     name = 'sd'
-    label=u'Видео sd'
+    label = u'Видео sd'
+
 
 class XF_Hd(XF_File):
     name = 'hd'
-    label=u'Видео hd'
+    label = u'Видео hd'
 
 
 class XF_PosterOrig(XF_Img):
-    name='poster_orig'
-    label=u'Постер в исходном разрешении'
+    name = 'poster_orig'
+    label = u'Постер в исходном разрешении'
+
 
 class XF_Poster4_3(XF_Img):
-    label=u'Постер 4:3'
+    label = u'Постер 4:3'
     name = 'poster_4_3'
     image_sizes = (640, 480)
     resize = ResizeCrop()
@@ -103,8 +115,9 @@ class XF_Poster4_3(XF_Img):
     show_size = True
     crop = True
 
+
 class XF_Poster16_9(XF_Img):
-    label=u'Постер 16:9'
+    label = u'Постер 16:9'
     name = 'poster_16_9'
     image_sizes = (640, 360)
     resize = ResizeCrop()
@@ -133,10 +146,11 @@ xf_poster_16_9 = XF_Poster16_9()
 
 class XB_Media(XF_Block):
     name = 'media_block'
-    label = u'Мультимедия'
+    label = u'Мультимедиа'
     item_fields = [
         xf_medias_select,
     ]
+
 
 class XB_Photos(XF_Block):
     name = 'photos_block'
@@ -145,12 +159,14 @@ class XB_Photos(XF_Block):
         xf_photos_select,
     ]
 
+
 class XB_PhotoUpload(XF_Block):
     name = 'photo_upload_block'
     label = u'Изображения'
     item_fields = [
         xf_img_orig,
     ]
+
 
 class XB_FileUpload(XF_Block):
     name = 'file_upload_block'
@@ -159,6 +175,7 @@ class XB_FileUpload(XF_Block):
         xf_file,
     ]
 
+
 class XB_VideoUpload(XF_Block):
     name = 'video_block'
     label = u'Видео'
@@ -166,6 +183,7 @@ class XB_VideoUpload(XF_Block):
         xf_sd,
         xf_hd,
     ]
+
 
 class XB_PosterUpload(XF_Block):
     name = 'poster_upload_block'
@@ -176,10 +194,27 @@ class XB_PosterUpload(XF_Block):
         xf_poster_16_9,
     ]
 
+
+class XB_MediaSectionTags(XF_Block):
+    name = 'tags_block'
+    label = u'Классификаторы'
+    fields = [
+        xf_tags,
+    ]
+
+
+class XB_MediaItemTags(XB_MediaSectionTags):
+    fields = [
+        xf_section,
+        xf_tags,
+    ]
+
+
 xb_media = XB_Media()
 xb_photos = XB_Photos()
 xb_photo_upload = XB_PhotoUpload()
 xb_file_upload = XB_FileUpload()
 xb_video_upload = XB_VideoUpload()
 xb_poster_upload = XB_PosterUpload()
-
+xb_media_section_tags = XB_MediaSectionTags()
+xb_media_item_tags = XB_MediaItemTags()

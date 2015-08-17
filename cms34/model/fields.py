@@ -230,7 +230,9 @@ class MF_M2ORelation(MF_Base):
                           ForeignKey(remote_cls.id, ondelete=self.ondelete),
                           primary_key=self.primary_key,
                           nullable=self.nullable)
-        field = relation(remote_cls, remote_side=remote_cls.id)
+        field = relation(remote_cls,
+                         remote_side=remote_cls.id,
+                         foreign_keys=[field_id])
 
         @property
         def field_title(_self):
@@ -295,6 +297,7 @@ class MF_O2MRelation(MF_Base):
     cascade = 'all, delete-orphan'
     remote_cls_name = None
     get_remote_cls_name = prop_getter('remote_cls_name')
+    remote_foreign_key = None
 
     def get_dict(self, models, factory=None):
         remote_cls_name = self.get_remote_cls_name(factory)
@@ -305,10 +308,25 @@ class MF_O2MRelation(MF_Base):
             kwargs['order_by'] = [remote_cls.order]
         if self.cascade:
             kwargs['cascade'] = self.cascade
+        if self.remote_foreign_key:
+            kwargs['foreign_keys'] = self.get_foreign_keys(models, factory)
         field = relation(remote_cls, **kwargs)
         return {
             self.name: field,
         }
+
+    def get_foreign_keys(self, models, factory=None):
+        cls_name = self.get_cls_name(factory)
+        remote_cls_name = self.get_remote_cls_name(factory)
+        if self.remote_foreign_key is True:
+            remote_field_name = '%s_id' % cls_name.lower()
+        else:
+            remote_field_name = '%s_id' % self.remote_foreign_key
+
+        def fk():
+            remote_cls = getattr(models, remote_cls_name)
+            return getattr(remote_cls, remote_field_name)
+        return fk
 
 
 class MF_M2MRelation(MF_Base):

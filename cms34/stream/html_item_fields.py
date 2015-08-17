@@ -79,7 +79,7 @@ class EnhancedCleaner(Cleaner):
         super(EnhancedCleaner, self).extra_clean(doc)
         wrap_inlines(
             doc,
-            blocks=['iktomi_doclink', 'iktomi_media', 'table', 'p',
+            blocks=['iktomi_doclink', 'iktomi_media', 'iktomi_files', 'table', 'p',
                     'blockquote'],
         )
 
@@ -153,8 +153,8 @@ class IF_ExpHtml(IF_Html):
                         'table', 'tr', 'td',
                         'iktomi_doclink', 'iktomi_media', 'iktomi_files',
                         'table', 'td', 'tr')
-    allowed_attributes = ('data-align', 'item_id', 'id', 'class')
-    allowed_protocols = ('model',)
+    allowed_attributes = ('data-align', 'item_id', 'id', 'class', 'href')
+    allowed_protocols = ('model', 'http')
     allowed_classes = dict(convs.Html.allowed_classes,
                            p=_p_cls_test,
                            hr=('block-links', 'block-media', 'block-files'))

@@ -47,5 +47,6 @@ class V_PersonsList(ResourceView):
                                                     groups=groups))
 
     def breadcrumbs(self, children=[]):
-        children = filter(lambda x: x[0].type=='person', children)
+        if children and children[0][0].type=='dir':
+            children = children[1:]
         return ResourceView.breadcrumbs(self, children)

@@ -46,6 +46,7 @@ class BaseView(object):
 
     def __init__(self, env, data):
         self.env = env
+        self.data = data
         self.namespace = env.namespace
         subreverse = env.root.build_subreverse(self.namespace,
                                                **data.as_dict())
@@ -54,11 +55,19 @@ class BaseView(object):
         self.root = subreverse
         self.parent = getattr(env, 'view', None)
         self.c = Context(env, 'view_context_%s' % self.namespace)
+        plugins = []
         for plugin in self.plugins:
             assert not hasattr(self, plugin.name), \
                    'property %s already exists' % plugin.name
             p = plugin(self)
+            plugins.append(p)
             setattr(self, plugin.name, p)
+        self.plugins = plugins
+
+    def result(self, env, data, result):
+        for plugin in self.plugins:
+            result = plugin(result)
+        return result
 
     @classmethod
     def cases(cls):

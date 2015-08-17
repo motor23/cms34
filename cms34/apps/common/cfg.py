@@ -29,13 +29,13 @@ FASTCGI_THREADED_DEFAULTS = dict(
 
 
 class BaseCfg(object):
-
     DEFAULT_CUSTOM_CFG = None
 
     def __init__(self, **kwargs):
-        self.update_cfg(**kwargs)
+        self._init_kwargs = kwargs
+        self.update_cfg(kwargs)
 
-    def update_cfg(self, **kwargs):
+    def update_cfg(self, kwargs):
         self.__dict__.update(kwargs)
 
     def update_from_py(self, filepath=None, silent=True):
@@ -44,16 +44,19 @@ class BaseCfg(object):
             return
         l = {}
         execfile(filepath, dict(cfg=self), l)
-        self.update_cfg(**l)
+        self.update_cfg(l)
         for key, value in l.items():
             setattr(self, key, value)
         return self
 
 
 class Cfg(BaseCfg):
+    APP_ID = 'cms34_app'
 
     @cached_property
     def ROOT(self):
+        # May cause problems when running app with uWSGI,
+        # need to pass ROOT explicitly (see `uwsgi_admin.py`).
         return os.path.dirname(os.path.abspath(__main__.__file__))
 
     @cached_property
@@ -92,6 +95,9 @@ class Cfg(BaseCfg):
     def SHARED_MEDIA_DIR(self):
         return os.path.join(self.MEDIA_DIR, 'shared')
 
+    EMAIL_ERRORS_TO = []
+    EMAIL_LETTERS_TO = []
+
     UID = 'someuid'
 
     LOG_LEVEL = 'INFO'
@@ -115,7 +121,6 @@ class Cfg(BaseCfg):
     SMTP_CHARSET = "utf-8"
     SMTP_FROM = "noreply@gov.ru"
 
-
     STATIC_URL = '/static/'
     DEV_STATIC_URL = '/dev_static/'
 
@@ -129,11 +134,11 @@ class Cfg(BaseCfg):
     @cached_property
     def FLUP_ARGS(self):
         return dict(
-            fastcgi_params = self.FASTCGI_PARAMS,
-            umask = 0,
-            bind = path.join(self.RUN_DIR, 'app.sock'),
-            pidfile = path.join(self.RUN_DIR, 'app.pid'),
-            logfile = path.join(self.LOG_DIR, 'app.log'),
+            fastcgi_params=self.FASTCGI_PARAMS,
+            umask=0,
+            bind=path.join(self.RUN_DIR, 'app.sock'),
+            pidfile=path.join(self.RUN_DIR, 'app.pid'),
+            logfile=path.join(self.LOG_DIR, 'app.log'),
         )
 
     def config_uid(self):
@@ -149,7 +154,7 @@ class Cfg(BaseCfg):
             os.setuid(uid)
             os.seteuid(uid)
         except AttributeError:
-            sys.exit('UID and GID configuration variables are required '\
+            sys.exit('UID and GID configuration variables are required ' \
                      'when is launched as root')
 
     def config_logging(self):
@@ -158,10 +163,9 @@ class Cfg(BaseCfg):
             level=lvl_names[self.LOG_LEVEL],
             format=self.LOG_FORMAT)
 
-        logging.getLogger('sqlalchemy')\
-               .setLevel(lvl_names[self.SQLALCHEMY_LOG_LEVEL])
-        logging.getLogger('sqlalchemy.engine')\
-               .setLevel(lvl_names[self.SQLALCHEMY_ENGINE_LOG_LEVEL])
-        logging.getLogger('sqlalchemy.pool')\
-               .setLevel(lvl_names[self.SQLALCHEMY_POOL_LOG_LEVEL])
-
+        logging.getLogger('sqlalchemy') \
+            .setLevel(lvl_names[self.SQLALCHEMY_LOG_LEVEL])
+        logging.getLogger('sqlalchemy.engine') \
+            .setLevel(lvl_names[self.SQLALCHEMY_ENGINE_LOG_LEVEL])
+        logging.getLogger('sqlalchemy.pool') \
+            .setLevel(lvl_names[self.SQLALCHEMY_POOL_LOG_LEVEL])

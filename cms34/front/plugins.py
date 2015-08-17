@@ -83,15 +83,25 @@ class VP_Response(ViewPlugin):
         return '%s/%s' % ('/'.join(folders), template)
 
     def template(self, template, kwargs):
-        kwargs.setdefault('view', self.view)
-        return self.view.env.render_to_response(self.template_name(template),
+        if isinstance(template, basestring):
+            kwargs.setdefault('view', self.view)
+            return self.view.env.render_to_response(
+                                                self.template_name(template),
                                                 kwargs)
+        else:
+            return template.render(self.view, kwargs)
 
     def redirect_to(self, reverse, qs, **kwargs):
         url = reverse.as_url
         if qs:
             url = url.qs_set(qs)
         return HTTPSeeOther(location=str(url))
+
+    def string(self, template, kwargs):
+        kwargs.setdefault('view', self.view)
+        return self.view.env.render_to_string(self.template_name(template),
+                                              kwargs)
+
 
 
 class VP_Filter(ViewPlugin):

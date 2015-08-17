@@ -128,6 +128,9 @@ class Application(BaseApplication):
         preview_cfg = type('Cfg',
                            (self.preview_cfg_overload(), front_cfg_class),
                            {})(self.cfg)
+        # Update new config with values passed manually to current config.
+        # This fixes error with ROOT variable when running app with uWSGI.
+        preview_cfg.update_cfg(self.cfg._init_kwargs)
         preview_app = type('Application',
                            (self.preview_app_overload, self.front_app_class),
                            {})(preview_cfg, self)

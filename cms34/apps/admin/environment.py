@@ -2,9 +2,9 @@
 from functools import partial
 from jinja2 import Markup
 from iktomi.utils.storage import storage_cached_property, storage_method
-from iktomi.utils import cached_property
 from iktomi.cms.item_lock import ItemLock
 
+from cms34.utils import cached_property
 from ..common.environment import Environment as EnvironmentBase
 
 from .views import packer
@@ -66,6 +66,10 @@ class Environment(EnvironmentBase):
     @storage_cached_property
     def item_lock(storage):
         return ItemLock(storage)
+
+    @storage_method
+    def get_edit_url(storage, x):
+        return streams.get_edit_url(storage, x)
 
     def get_template_globals(self, env):
         vars = EnvironmentBase.get_template_globals(self, env)

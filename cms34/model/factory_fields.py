@@ -20,6 +20,7 @@ class MF_List(MF_O2MRelation):
                                            'rel_cls_bases')
     remote_factory_plugins = []
     fields = []
+    remote_foreign_key=True
 
     def register(self, factory, register):
         cls_name = self.get_cls_name(factory)
@@ -37,5 +38,4 @@ class MF_List(MF_O2MRelation):
                 plugins=self.remote_factory_plugins,
                 fields=fields,
         ))(register, main_factory=factory)
-
 

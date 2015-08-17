@@ -172,7 +172,7 @@ class H_Sections(WebHandler):
 
 class ResourceView(BaseView):
 
-    def __init__(self, env, cls, section=None):
+    def __init__(self, env, cls, section):
         self.section = env.sections.get(section.id)
         if self.section:
             env.section = self.section
