@@ -46,7 +46,6 @@ class BaseEnvironment(web.AppEnvironment):
 
     @storage_cached_property
     def url_for(self):
-        raise Exception()
         return self.root.build_url
 
     def url_for_static(self, path):

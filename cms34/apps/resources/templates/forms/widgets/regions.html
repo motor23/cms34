@@ -1,0 +1,28 @@
+{% if options|length > 1 %}
+    <div class="hidden_narrow right_block block_border">
+        <h3 class="title_thin title_border">По регионам</h3>
+        <ul class="list_small filter_list" data-close="true">
+            {% for option in options %}
+                <li class="list_small_item{% if option.selected %} selected{% endif %}{% if loop.first %} all{% endif %}">
+                    <a href="{{ context.current_url.qs_set(**{widget.input_name: option.value}) }}">
+                        {%- if option.value -%}
+                            <img src="{{ url_for_static('img/flags/%s.svg' % option.value) }}"
+                                 width="25"
+                                 height="16"/>
+                        {%- endif -%}
+                        {{- option.title -}}</a>
+                    {% if option.selected %}<a href="{{ context.current_url.qs_delete(widget.input_name) }}" class="close"><i></i></a>{% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="hidden_wide">
+        <div class="select">
+            <select name="{{ widget.input_name|escape }}" class="js-example-placeholder-single js-example-responsive" style="width: 100%">
+                {% for option in options %}
+                    <option value="{{ option.value|escape }}"{% if option.selected %} selected{% endif %}>{{- option.title -}}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+{% endif %}

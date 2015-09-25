@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="content_in content_in_high">
+        <form method="GET" class="form_search_result">
+            {{ form.render(paginator=paginator) }}
+        </form>
+        <div class="search_results col_wide">
+            
+            {% if paginator.count %}
+                {% for obj in paginator.items %}
+                    <a class="hentry{% if loop.first %} hentry_first{% endif %}"
+                       href="{{ url_for_obj(obj) }}">
+                        <h2 class="hentry_title">{{ obj.title or obj.full_name }}</h2>
+                        {% if obj.dt %}
+                            <div class="hentry_date">{{ env.context.datetime(obj.dt) }}</div>
+                        {% endif %}
+                    </a>
+                {% endfor %}
+
+                {% if paginator.next %}
+                    <a href="{{ paginator.next.url }}"
+                       class="hentry">Показать еще</a>
+                {% endif %}
+            {% else %}
+                Не найдено
+            {% endif %}
+        </div>
+
+    </div>
+{% endblock %}

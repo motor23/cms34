@@ -1,0 +1,21 @@
+{% if options|length > 1 %}
+    <div class="hidden_narrow right_block read_tags">
+        <h3 class="title_thin">По типу:</h3>
+        <ul class="tags filter_list">
+            {% for option in options %}
+                <li class="tag{% if option.selected %} selected{% endif %}">
+                    <a href="{{ context.current_url.qs_set(**{widget.input_name: option.value}) }}">{{ option.title }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="hidden_wide">
+        <div class="select">
+            <select name="{{ widget.input_name|escape }}" class="js-example-placeholder-single js-example-responsive" style="width: 100%">
+                {% for option in options %}
+                    <option value="{{ option.value|escape }}"{% if option.selected %} selected{% endif %}>{{- option.title -}}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+{% endif %}

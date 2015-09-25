@@ -1,0 +1,7 @@
+<h2 class="title_thin">{{ field.title }}</h2>
+
+<div class="form_block">
+    {% for subfield in field.fields %}
+        {{ subfield.widget.render() }}
+    {% endfor %}
+</div>

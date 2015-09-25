@@ -89,11 +89,13 @@ class Environment(EnvironmentBase):
 
     @storage_method
     def url_for_obj(storage, obj, name='item', **kwargs):
-        streams = filter(lambda x: getattr(x.config, 'obj_endpoint', None), \
+        assert obj, "obj should be an instance of SQLAlchemy model." \
+                    "Obj has type {}.".format(type(obj))
+        streams = filter(lambda x: getattr(x.config, 'obj_endpoint', None),
                          storage.streams.values())
         for stream in streams:
             model = stream.get_model(storage)
             if isinstance(obj, model):
                 return stream.url_for(storage, name, item=obj.id, **kwargs)
         else:
-            raise Exception('Add url_for_model to stream')
+            raise Exception('Add obj_endpoint to stream')

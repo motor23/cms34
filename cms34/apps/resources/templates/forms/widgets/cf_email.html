@@ -1,0 +1,10 @@
+<div class="form_field form_field_{{ field.field_obj.size or 'large' }}">
+<input class="input"
+       type="email" data-label="{{ field.label }}"
+       placeholder="{{ field.label }}{% if field.required %} *{% endif %}"
+       name="{{ field.name }}"
+       {% if field.required %} required{% endif %}/>
+{% if field.error %}
+    <span class="error">{{ field.error }}</span>
+{% endif %}
+</div>

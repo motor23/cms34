@@ -1,0 +1,16 @@
+<div class="input_wrapper">
+    {% set query_field = form.get_field('q') %}
+    {{ query_field.widget.render() }}
+</div>
+
+<button type="submit"
+        class="button search_button search_button_small">Найти
+</button>
+
+<p class="count_result">Найдено результатов: {{ paginator.count }}</p>
+<ul class="search_filter">
+
+    {% set filter_field = form.get_field('filter') %}
+    {{ filter_field.widget.render() }}
+
+</ul>

@@ -17,12 +17,12 @@ class V_Theme(ResourceView):
 
     @classmethod
     def cases(cls, sections, section):
-        return [match('/', name='index') | cls.h_index]
+        return [match('/', name='index') | cls.h_index,
+                sections.h_section(section)]
 
     @view_handler
     def h_index(self, env, data):
-        theme = self.query.get_or_404(id=self.section.id)
-        return self.response.template('index', dict(theme=theme))
+        return self.response.template('index', dict())
 
 
 class V_ThemesList(ResourceView):

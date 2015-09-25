@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="content_in content_in_read content_in_high"
+         xmlns="http://www.w3.org/1999/html">
+        <div class="col col_wide">
+
+            {{ macros.breadcrumbs(view.breadcrumbs()) }}
+            <h1 class="title_big title_big_special">{{ letter.title }}</h1>
+            <div class="read_content letter_content">
+
+                {% if form.fields %}
+                    <form action="{{ view.root.form.as_url }}" name="form_letter" class="form_letter"
+                          enctype="multipart/form-data"
+                          method="POST">
+                        {{ form.render() }}
+                        <button type="submit"
+                                class="button button_blue button_narrow button_right">
+                            Отправить
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

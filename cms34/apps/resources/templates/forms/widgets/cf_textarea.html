@@ -1,0 +1,14 @@
+<div class="form_field form_field_{{ field.field_obj and field.field_obj.size or 'large' }}">
+<textarea class="textarea"
+          name="{{ field.name }}"
+          cols="30"
+          rows="2"
+          data-label="{{ field.label }}"
+          placeholder="{{ field.label }}{% if field.required %} *{% endif %}"
+        {% if field.required %} required {% endif %}>
+          {{- value|forceescape -}}
+</textarea>
+    {% if field.error %}
+        <span class="error">{{ field.error }}</span>
+    {% endif %}
+</div>

@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block breadcrumbs %}
+{{ macros.breadcrumbs(view.breadcrumbs([(env.view.section, env.view.section.title)])) }}
+{% endblock %}
+
+{% block content %}
+<p>Type: {{ view.section.type }}</p>
+
+<h1>{{ item.title }}</h1>
+
+{{ replace_tags(env, item, item.body) }}
+{% endblock %}

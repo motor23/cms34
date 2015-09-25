@@ -5,7 +5,7 @@ from .. import ResourceView
 
 
 class V_RegionSection(ResourceView):
-    name='dir'
+    name = 'dir'
 
     @classmethod
     def cases(cls, resources, section):
@@ -15,4 +15,3 @@ class V_RegionSection(ResourceView):
     @classmethod
     def _url_for_index(cls, root):
         return None
-

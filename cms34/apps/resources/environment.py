@@ -12,16 +12,13 @@ class Context(EnvironmentBase.Context): pass
 
 
 class Environment(EnvironmentBase):
-
     @cached_property
     def cached_db(self):
         return self.app.cached_db_maker()
 
     def get_template_globals(self, env):
         result = EnvironmentBase.get_template_globals(self, env)
-        return dict(result,
-            url_for_obj=self.url_for_obj,
-        )
+        return dict(result, url_for_obj=self.url_for_obj)
 
     @storage_method
     def url_for_obj(storage, obj, default=None):
@@ -33,4 +30,3 @@ class Environment(EnvironmentBase):
     @storage_cached_property
     def menu(storage):
         return Menu(storage, storage.models.Menu)
-

@@ -46,7 +46,7 @@ class EnhancedMemcachedBackend(object):
 
     def unpack(self, content):
         if content.startswith('EXTRACT_HEADERS\r\n'):
-            head, body = content.split('\r\n\r\n')
+            head, body = content.split('\r\n\r\n', 1)
             headers = head.split('\r\n')[1:]
             headers = dict([header.split(': ') for header in headers])
             return headers, body

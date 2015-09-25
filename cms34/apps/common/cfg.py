@@ -95,6 +95,8 @@ class Cfg(BaseCfg):
     def SHARED_MEDIA_DIR(self):
         return os.path.join(self.MEDIA_DIR, 'shared')
 
+    DOMAINS = []
+
     EMAIL_ERRORS_TO = []
     EMAIL_LETTERS_TO = []
 

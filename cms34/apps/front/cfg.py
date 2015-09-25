@@ -10,7 +10,6 @@ from ..common.dispatcher import Cfg as DispatcherCfgBase
 
 
 class Cfg(CfgBase):
-
     @cached_property
     def DEFAULT_CUSTOM_CFG(self):
         return path.join(self.CFG_DIR, 'front.py')
@@ -34,17 +33,17 @@ class Cfg(CfgBase):
     def SHARED_FORM_TMP_DIR(self):
         return path.join(self.TMP_DIR, 'shared')
 
-    MODEL_LOCK_TIMEOUT = 5*60
+    MODEL_LOCK_TIMEOUT = 5 * 60
     MODEL_LOCK_RENEW = 60
 
     @cached_property
     def FLUP_ARGS(self):
         return dict(
-            fastcgi_params = self.FASTCGI_PARAMS,
-            umask = 0,
-            bind = path.join(self.RUN_DIR, 'front.sock'),
-            pidfile = path.join(self.RUN_DIR, 'front.pid'),
-            logfile = path.join(self.LOG_DIR, 'front.log'),
+            fastcgi_params=self.FASTCGI_PARAMS,
+            umask=0,
+            bind=path.join(self.RUN_DIR, 'front.sock'),
+            pidfile=path.join(self.RUN_DIR, 'front.pid'),
+            logfile=path.join(self.LOG_DIR, 'front.log'),
         )
 
     @cached_property
@@ -76,22 +75,25 @@ class Cfg(CfgBase):
     }
 
     FLOOD_PROTECTION = {
-        'default': (5, 60, 2, 12 * 60 * 60),
+        # activity: (freeTries, initValue, multiplier, timeout)
+        'default': (0, 60, 2, 12 * 60 * 60),
+        'letters': (3, 60, 2, 12 * 60 * 60),
+        'subscribe': (10, 60, 1, 10 * 60),
     }
 
     FLOOD_PROTECTION_ENABLED = True
 
     @cached_property
     def I18N_DIR(self):
-        return os.path.join(CFG_DIR, 'i18n') #XXX
+        return path.join(self.CFG_DIR, 'i18n')  # XXX
 
     @cached_property
     def I18N_MAPPING_FILE(self):
-        return os.path.join(I18N_DIR, 'mapping.ini')
+        return path.join(self.I18N_DIR, 'mapping.ini')
 
     @cached_property
     def I18N_TRANSLATIONS_DIR(self):
-        os.path.join(I18N_DIR, 'translations')
+        return path.join(self.I18N_DIR, 'translations')
 
     @cached_property
     def GRUNT_FILE(self):
@@ -99,7 +101,6 @@ class Cfg(CfgBase):
 
 
 class DispatcherCfg(DispatcherCfgBase):
-
     @cached_property
     def DEFAULT_CUSTOM_CFG(self):
         return path.join(self.CFG_DIR, 'dispatcher_front.py')
@@ -107,10 +108,9 @@ class DispatcherCfg(DispatcherCfgBase):
     @cached_property
     def FLUP_ARGS(self):
         return dict(
-            fastcgi_params = self.FASTCGI_PARAMS,
-            umask = 0,
-            bind = path.join(self.RUN_DIR, 'front.sock'),
-            pidfile = path.join(self.RUN_DIR, 'front.pid'),
-            logfile = path.join(self.LOG_DIR, 'front.log'),
+            fastcgi_params=self.FASTCGI_PARAMS,
+            umask=0,
+            bind=path.join(self.RUN_DIR, 'front.sock'),
+            pidfile=path.join(self.RUN_DIR, 'front.pid'),
+            logfile=path.join(self.LOG_DIR, 'front.log'),
         )
-

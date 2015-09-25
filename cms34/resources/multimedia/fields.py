@@ -75,6 +75,8 @@ class XF_MediasSelect(XF_StreamSelect):
 
 class XF_Aspect(XF_Select):
     name = 'aspect'
+    label = u'Соотношение сторон'
+    required = True
     choices = (('4_3', u'4:3'),
                ('16_9', u'16:9'),)
 
@@ -180,6 +182,7 @@ class XB_VideoUpload(XF_Block):
     name = 'video_block'
     label = u'Видео'
     item_fields = [
+        xf_aspect,
         xf_sd,
         xf_hd,
     ]

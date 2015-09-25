@@ -5,6 +5,7 @@ from ..front.view import BaseView, HView
 
 logger = logging.getLogger()
 
+
 class V_Sections(object):
     def __init__(self, db, cached_db, model, resources):
         self.db = db
@@ -29,19 +30,18 @@ class V_Sections(object):
         return cases(*handlers)
 
     def load_sections(self):
-        _query = self.db.query(self.model)\
-                        .with_polymorphic('*')\
-                        .order_by(self.model.order)
+        _query = self.db.query(self.model) \
+            .with_polymorphic('*') \
+            .order_by(self.model.order)
         self.sections_query = self.cached_db.query(self.model, _query,
                                                    reload=True)
-
 
     def get_sections(self, reload=False, **kwargs):
         result = []
         if self.sections_query is None or reload:
             self.load_sections()
         sections = self.sections_query.filter_by(**kwargs).all()
-        #remove sections with double (slugs, parant_id) pairs 
+        # remove sections with double (slugs, parant_id) pairs 
         # filter not published sections
         pairs = []
         for section in sections:
@@ -70,7 +70,7 @@ class V_Sections(object):
         parent_id = section.parent_id
         while parent_id:
             parent = self.get_section(id=parent_id)
-            if not parent: # parent not published
+            if not parent:  # parent not published
                 return None
             result.append(parent)
             parent_id = parent.parent_id
@@ -83,8 +83,8 @@ class V_Sections(object):
             section_root = self.root_for_section(root, obj.section)
             if not section_root:
                 return default
-            url = self.resources.get_resource(obj.section.type).view_cls\
-                                ._url_for_obj(section_root, obj)
+            url = self.resources.get_resource(obj.section.type).view_cls \
+                ._url_for_obj(section_root, obj)
             if url:
                 return url
         return default
@@ -104,8 +104,8 @@ class V_Sections(object):
         section_root = self.root_for_section(root, section)
         if not section_root:
             return None
-        url = self.resources.get_resource(section.type).view_cls\
-                            ._url_for_index(section_root)
+        url = self.resources.get_resource(section.type).view_cls \
+            ._url_for_index(section_root)
         if url:
             return url
         else:
@@ -120,7 +120,6 @@ class V_Sections(object):
 
 
 class H_Sections(WebHandler):
-
     _sections = {}
     _handler = cases()
 
@@ -131,7 +130,7 @@ class H_Sections(WebHandler):
         return self.handler()._locations()
 
     def __call__(self, env, data):
-        #env.sections = self.sections
+        # env.sections = self.sections
         return self.handler().__call__(env, data)
 
     @property
@@ -150,7 +149,7 @@ class H_Sections(WebHandler):
         section_items = self.sections.get_sections(reload=True)
         self.sections.db.close()
         sections = [(section.id, self.tree_path(section)) \
-                                              for section in section_items]
+                    for section in section_items]
         sections = dict(filter(lambda x: x[1], sections))
         if sections == self._sections:
             return False
@@ -169,9 +168,7 @@ class H_Sections(WebHandler):
         return '/' + '/'.join(slugs) + '/'
 
 
-
 class ResourceView(BaseView):
-
     def __init__(self, env, cls, section):
         self.section = env.sections.get(section.id)
         if self.section:
@@ -201,7 +198,6 @@ class ResourceView(BaseView):
 
 
 class ResourceBase(object):
-
     name = None
     view_cls = None
     section_model_factory = None
@@ -218,7 +214,6 @@ class ResourceBase(object):
 
 
 class ResourcesBase(object):
-
     model_factories = []
     stream_factories = []
     sections_model_factory = None
@@ -254,4 +249,3 @@ class ResourcesBase(object):
                 f(register, **kwargs)
         if not names or self.sections_model_factory.name in names:
             self.sections_model_factory(register, self.resources, **kwargs)
-

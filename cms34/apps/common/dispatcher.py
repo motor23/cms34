@@ -1,11 +1,15 @@
 import re
 from os import path
+import logging
+
 from webob.exc import HTTPNotFound
 
 from ..common.cfg import (
     Cfg as CfgBase,
     FASTCGI_PREFORKED_DEFAULTS,
 )
+
+logger = logging.getLogger()
 
 
 class Cfg(CfgBase):
@@ -43,11 +47,15 @@ class DispatcherApp(object):
         return Cfg
 
     def __call__(self, environ, start_response):
-        for reg, app in self.apps:
-            if reg.match(environ['HTTP_HOST']):
-                return app.__call__(environ, start_response)
-        else:
-            return HTTPNotFound()(environ, start_response)
+        try:
+            for reg, app in self.apps:
+                if reg.match(environ['HTTP_HOST']):
+                    return app.__call__(environ, start_response)
+            else:
+                return HTTPNotFound()(environ, start_response)
+        except Exception as e:
+            logger.exception(e)
+            raise
 
     def db_maker(self):  # XXX Hack for app:shell
         return None

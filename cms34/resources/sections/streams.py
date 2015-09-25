@@ -29,12 +29,11 @@ class SFY_Sections(StreamFactory):
     sort_initial_field = 'order'
     plugins = [SFP_Tree, SFP_FileUpload, SFP_ImageUpload]
     item_form_factory = TypedItemFormFactory
-    sort_initial_field='order'
     obj_endpoint = True
 
     permissions = {
-        'wheel':'rwxdcp',
-        'editor':'rwxdcp',
+        'wheel': 'rwxdcp',
+        'editor': 'rwxdcp',
     }
 
     list_fields = [
@@ -52,9 +51,11 @@ class SFY_Sections(StreamFactory):
 
     resources = []
 
-    def __init__(self, register, resources=[], name=None, **kwargs):
+    def __init__(self, register, resources=None, name=None, **kwargs):
         # Create child factories
         # XXX It's must be after plugins?
+        if resources is None:
+            resources = []
         self.resources = resources
         item_fields = dict(self.item_fields)
         for r in self.resources:

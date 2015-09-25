@@ -87,6 +87,7 @@ class Tag(object):
             pass
         else:
             collection = getattr(item, self.collection)
+            collection = filter(None, collection)
             target = next((b for b in collection if b.id == id), None)
             if target:
                 if callable(self.template):

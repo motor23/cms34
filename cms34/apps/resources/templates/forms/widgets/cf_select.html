@@ -1,0 +1,20 @@
+{% if field.options %}
+    <div class="form_field form_field_{{ field.field_obj.size or 'large' }}">
+        <div class="select">
+            {% if field.error %}
+                <span class="error">{{ field.error }}</span>
+            {% endif %}
+            <select name="{{ field.name }}" data-placeholder="{{ field.label }}{% if field.required %} *{% endif %}" data-label="{{ field.label }}"
+                    class="js-example-placeholder-single js-example-responsive" style="width: 100%"
+                    {% if field.required %} required{% endif %}>
+                <option value="">{{ field.label }}</option>
+                {% for title in field.options %}
+                    <option value="{{ title }}"
+                            {% if title == value %} selected {% endif %}>
+                        {{- title -}}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+{% endif %} 

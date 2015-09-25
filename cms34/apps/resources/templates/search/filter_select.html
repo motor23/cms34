@@ -1,0 +1,11 @@
+<ul>
+    {% for option in options %}
+        <li>
+            {% set url = context.current_url.qs_set(filter=option.value) %}
+            <a href="{{ url }}"
+               {%- if option.selected %} class="selected" {% endif %}>
+                {{- option.title|escape -}}
+            </a>
+        </li>
+    {% endfor %}
+</ul>

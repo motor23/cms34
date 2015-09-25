@@ -31,7 +31,8 @@ __all__ = (
     'if_hidden_id',
 )
 
-PermissionsGetter=str #XXX
+PermissionsGetter = str  # XXX
+
 
 class IF_Base(object):
     label = None
@@ -71,26 +72,30 @@ class IF_Simple(IF_Base):
         )
 
     def create_conv(self, models, factory=None):
-        return conv.Char(required=self.required)
+        return convs.Char(required=self.required)
 
-    def create_widget(self, model,factory=None):
+    def create_widget(self, model, factory=None):
         return widgets.TextInput()
 
 
 class IF_String(IF_Simple):
-    min_length=0
-    max_length=250
+    min_length = 0
+    max_length = 250
     regex = None
+    error_regex = None
 
     def create_conv(self, models, factory=None):
+        if self.error_regex is None:
+            self.error_regex = convs.Char.error_regex
         return convs.Char(convs.length(self.min_length, self.max_length),
                           required=self.required,
-                          regex=self.regex)
+                          regex=self.regex,
+                          error_regex=self.error_regex)
 
 
 class IF_Text(IF_String):
-    min_length=0
-    max_length=2000
+    min_length = 0
+    max_length = 2000
 
     def create_widget(self, models, factory=None):
         return widgets.Textarea()
@@ -107,11 +112,10 @@ class IF_Title(IF_Text):
         return convs.Char(convs.length(0, max_length),
                           NoUpperConv,
                           StripTrailingDotConv,
-                          required=self.required,)
+                          required=self.required, )
 
 
 class IF_Int(IF_Simple):
-
     def create_conv(self, models, factory=None):
         return convs.Int(required=self.required)
 
@@ -124,12 +128,12 @@ class IF_Id(IF_Int):
 
 class IF_HiddenId(IF_Id):
     permissions = 'rw'
+
     def create_widget(self, factory, models):
         return widgets.HiddenInput
 
 
 class IF_Bool(IF_Simple):
-
     def create_conv(self, models, factory=None):
         return convs.Bool(required=self.required)
 
@@ -139,14 +143,15 @@ class IF_Bool(IF_Simple):
 
 class IF_Select(IF_Simple):
     choices = None
+    null_label = None
 
     def create_conv(self, models, factory=None):
         if self.choices:
             choices = self.choices
         else:
             assert factory and hasattr(factory, 'model'), \
-               'Field name=%s: You must specify choices or factory.model' % \
-                                                                     self.name
+                'Field name=%s: You must specify choices or factory.model' % \
+                self.name
             model = getattr(models, factory.model)
             choices = getattr(model, '%s_choices' % self.name)
         return convs.EnumChoice(conv=convs.Char(required=self.required),
@@ -154,11 +159,14 @@ class IF_Select(IF_Simple):
                                 required=self.required)
 
     def create_widget(self, models, factory=None):
-        if 'w' in self.permissions:
-            return widgets.Select()
-        else:
-            return widgets.Select(template="widgets/readonly_select",
-                                  classname="small")
+        kwargs = {}
+        if self.null_label:
+            kwargs['null_label'] = self.null_label
+        if 'w' not in self.permissions:
+            kwargs['template'] = "widgets/readonly_select"
+            kwargs['classname'] = "small"
+
+        return widgets.Select(**kwargs)
 
 
 class IF_StreamSelect(IF_Simple):
@@ -177,10 +185,10 @@ class IF_StreamSelect(IF_Simple):
 
     def create_conv(self, models, factory=None):
         model_conv = convs.ModelChoice(
-                                model=getattr(models, self.model),
-                                conv=self.conv(required=self.required),
-                                condition=self.condition,
-                                required=self.required)
+            model=getattr(models, self.model),
+            conv=self.conv(required=self.required),
+            condition=self.condition,
+            required=self.required)
         if self.multiple:
             return convs.ListOf(model_conv, required=self.required)
         else:
@@ -200,12 +208,11 @@ class IF_StreamSelect(IF_Simple):
 
 
 class IF_File(IF_Simple):
-
     def create_field(self, models, factory=None):
         return fields.AjaxFileField(self.name,
-                             conv=self.create_conv(models, factory),
-                             widget=self.create_widget(models, factory),
-                             label=self.label,)
+                                    conv=self.create_conv(models, factory),
+                                    widget=self.create_widget(models, factory),
+                                    label=self.label, )
 
     def create_conv(self, models, factory=None):
         return fields.AjaxFileField.conv(required=self.required)
@@ -221,13 +228,13 @@ class IF_Img(IF_Simple):
 
     def create_field(self, models, factory=None):
         return fields.AjaxImageField(self.name,
-                             conv=self.create_conv(models, factory),
-                             widget=self.create_widget(models, factory),
-                             label=self.label,
-                             show_thumbnail=self.show_thumbnail,
-                             show_size=self.show_size,
-                             crop=self.crop,
-                             )
+                                     conv=self.create_conv(models, factory),
+                                     widget=self.create_widget(models, factory),
+                                     label=self.label,
+                                     show_thumbnail=self.show_thumbnail,
+                                     show_size=self.show_size,
+                                     crop=self.crop,
+                                     )
 
     def create_conv(self, models, factory=None):
         return fields.AjaxImageField.conv(required=self.required)
@@ -244,31 +251,33 @@ class IF_Block(IF_Base):
         for field in self.fields:
             field.item_field(block_fields_dict, models, factory)
         fields_dict[self.name] = fields.FieldBlock(self.label,
-                                            fields=block_fields_dict.values())
+                                                   fields=block_fields_dict.values())
 
 
 class IF_DateTime(IF_Base):
-
     def item_field(self, fields_dict, models, factory=None):
         fields_dict[self.name] = fields.SplitDateTimeField(self.name,
                                                            label=self.label)
 
+
 class IF_List(IF_Base):
     model = None
-    fields = [IF_Id(), IF_Title(required=False),]
+    fields = [IF_Id(), IF_Title(required=False), ]
 
     def item_field(self, fields_dict, models, factory=None):
         list_fields_dict = OrderedDict()
         for field in [if_hidden_id] + self.fields:
             field.item_field(list_fields_dict, models, factory)
         fieldset = fields.FieldSet(None,
-            conv=convs.ModelDictConv(model=getattr(models, self.model)),
-            fields=list_fields_dict.values(),
-        )
+                                   conv=convs.ModelDictConv(
+                                       model=getattr(models, self.model)),
+                                   fields=list_fields_dict.values(),
+                                   )
         fields_dict[self.name] = fields.FieldList(self.name,
                                                   order=True,
                                                   label=self.label,
-                                                  field=fieldset,)
+                                                  field=fieldset, )
+
 
 if_title = IF_Title('title')
 if_id = IF_Id()

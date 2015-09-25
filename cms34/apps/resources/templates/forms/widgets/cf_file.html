@@ -1,0 +1,10 @@
+<div class="form_field form_field_large">
+    <div class="file_input">{% for field in field.fields %}
+        {{ field.widget.render() }}
+    {% endfor %}
+    </div>
+    {% if field.error %}
+        <span class="error">{{ field.error }}</span>
+    {% endif %}
+</div>
+

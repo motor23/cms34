@@ -28,6 +28,5 @@ class V_Page(ResourceView):
 
     @view_handler
     def h_index(self, env, data):
-        page = self.query.get_or_404(id=self.section.id)
-        return self.response.template('index', dict(page=page))
+        return self.response.template('index', dict())
 

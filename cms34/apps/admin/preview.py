@@ -51,7 +51,7 @@ class PreviewCfgOverload(object):
     def DEV_STATIC_URL(self):
         return self.PREFIX + '/dev_static/'
 
-    CMS34_DIR = path.dirname(path.abspath(__file__))
+    #CMS34_DIR = path.dirname(path.abspath(__file__))
 
     CACHE_ENABLED = False
     MEMCACHE = from_admin_cfg('MEMCACHE')

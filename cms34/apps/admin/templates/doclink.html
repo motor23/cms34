@@ -22,7 +22,7 @@
     <h1>{{ doclink_block.title }}</h1>
     <ul>
     {% for item in doclink_block.items %}
-      {% set obj = item.event or item.page or item.person %}
+      {% set obj = item.event or item.page or item.person or item.url %}
       {% if obj %}
       <li><a href="javascript:void(0)">{{ item.title or obj.title}}</a></li>
       {% endif %}

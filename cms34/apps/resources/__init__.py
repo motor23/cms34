@@ -10,11 +10,6 @@ class Application(BaseApplication):
 
     resources = []
 
-    @property
-    def root(self):\
-        # XXX Is it is fast? 
-        return Reverse.from_handler(self.handler)
-
     def cached_db_maker(self):
         if self.cfg.QUERY_CACHE_ENABLED is None:
             cache_enabled = self.cfg.CACHE_ENABLED

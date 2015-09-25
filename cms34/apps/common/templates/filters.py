@@ -31,9 +31,13 @@ def filesizeformat(value, binary=False):
 
 
 def nl2br(value):
+    if not value:
+        return ""
     return jinja2.Markup(value.replace('\n', '<br/>'))
 
 def make_breaks(value):
+    if not value:
+        return ""
     return jinja2.Markup(jinja2.Markup("<br/>").join(value.split('\n')))
 
 

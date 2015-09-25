@@ -1,0 +1,24 @@
+{# Checkbox for constructed form #}
+{% if field.options %}
+    <div class="form_field form_field_large checkbox_list">
+        <h2 class="title_small">{{- field.label -}}</h2>
+        {% if field.error %}
+            <span class="error">{{ field.error }}</span>
+        {% endif %}
+        <ul class="checkbox_list">
+            {% for title in field.options %}
+                {% set field_id = "%s_%s" % (field.name, loop.index) %}
+                <li class="checkbox_item">
+                    <input type="checkbox" class="checkbox"
+                           id="{{ field_id }}"
+                           name="{{ field.name }}"
+                           value="{{ title }}"
+                            {% if field.required %} required{% endif %}
+                            {% if title in value %} checked{% endif %}/>
+                    <label hidden="hidden" for="{{ field_id }}" class="checkbox_tick"></label>
+                    <label for="{{ field_id }}" class="checkbox_caption">{{ title }}</label>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}

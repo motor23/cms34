@@ -26,6 +26,7 @@ class Cfg(CfgBase):
     @cached_property
     def TEMPLATES(self):
         return [
+            path.join(self.SITE_DIR, 'templates'),
             path.join(self.CMS34_DIR, 'templates'),
             path.join(self.IKTOMI_CMS_DIR, 'templates'),
             path.join(self.IKTOMI_TEMPLATE_DIR, 'jinja2', 'templates'),

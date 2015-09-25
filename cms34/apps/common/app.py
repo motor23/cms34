@@ -55,7 +55,8 @@ class Application(BaseApplication):
 
     @property
     def root(self):
-        return Reverse.from_handler(self.handler)
+        host = self.cfg.DOMAINS[0] if self.cfg.DOMAINS else ''
+        return Reverse(self.handler._locations(), host=host)
 
     @cached_property
     def env_class(self):

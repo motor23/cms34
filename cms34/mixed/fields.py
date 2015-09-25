@@ -201,6 +201,7 @@ class XF_String(XF_Simple):
     max_length = 255
     min_length = 0
     regex = None
+    error_regex = None
     sortable = True
 
     def _model_field(self, factory=None):
@@ -219,16 +220,22 @@ class XF_String(XF_Simple):
                          initial=self.initial,
                          required=self.required,
                          permissions=self.permissions,
-                         regexp=self.regex)
+                         regex=self.regex,
+                         error_regex=self.error_regex)
 
     def _list_field(self):
         return LF_String(self.name, label=self.label)
 
 
 class XF_Slug(XF_String):
+    name = 'slug'
+    label = u'Слаг'
     required = True
     min_length = 2
     regex = r'^[A-Za-z][A-Za-z0-9_-]+$'
+    error_regex = u'Слаг может состоять из латинских букв и цифр,' \
+                  u'а также символов `_` или `-`. ' \
+                  u'Первый символ должен быть буквой.'
     sortable = True
 
 
@@ -278,12 +285,6 @@ class XF_TreeTitle(XF_Title):
 class XF_Lead(XF_Text):
     name = 'lead'
     label = u'Лид'
-
-
-class XF_Slug(XF_String):
-    name = 'slug'
-    label = u'Слаг'
-    required = True
 
 
 class XF_Int(XF_Simple):
@@ -351,6 +352,7 @@ class XF_Id(XF_Simple):
 
 class XF_Select(XF_Simple):
     choices = None
+    null_label = None
 
     def _model_field(self, factory=None):
         return MF_Enum(self.name, choices=self.choices)
@@ -368,7 +370,8 @@ class XF_Select(XF_Simple):
                          label=self.label,
                          choices=self.choices,
                          permissions=self.permissions,
-                         required=self.required)
+                         required=self.required,
+                         null_label=self.null_label)
 
 
 class XF_Type(XF_Select):
@@ -579,6 +582,7 @@ class XF_Img(XF_Simple):
                       label=self.label,
                       show_thumbnail=self.show_thumbnail,
                       crop=self.crop,
+                      show_size=self.show_size,
                       )
 
 
