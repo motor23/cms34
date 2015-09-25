@@ -95,6 +95,29 @@ class Cfg(BaseCfg):
     def SHARED_MEDIA_DIR(self):
         return os.path.join(self.MEDIA_DIR, 'shared')
 
+    @cached_property
+    def PRIVATE_MEDIA_DIR(self):
+        return os.path.join(self.MEDIA_DIR, 'private')
+
+    @cached_property
+    def ADMIN_FORM_TMP_DIR(self):
+        return os.path.join(self.TMP_DIR, 'admin')
+
+    @cached_property
+    def SHARED_FORM_TMP_DIR(self):
+        return os.path.join(self.TMP_DIR, 'shared')
+
+    @cached_property
+    def PRIVATE_FORM_TMP_DIR(self):
+        return os.path.join(self.TMP_DIR, 'private')
+
+    ADMIN_MEDIA_URL = '/media/'
+    SHARED_MEDIA_URL = '/shared/'
+    PRIVATE_MEDIA_URL = '/private/'
+    ADMIN_FORM_TMP_URL = '/admin-form-temp/'
+    SHARED_FORM_TMP_URL = '/shared-form-temp/'
+    PRIVATE_FORM_TMP_URL = '/private-form-temp/'
+
     DOMAINS = []
 
     EMAIL_ERRORS_TO = []
@@ -138,9 +161,9 @@ class Cfg(BaseCfg):
         return dict(
             fastcgi_params=self.FASTCGI_PARAMS,
             umask=0,
-            bind=path.join(self.RUN_DIR, 'app.sock'),
-            pidfile=path.join(self.RUN_DIR, 'app.pid'),
-            logfile=path.join(self.LOG_DIR, 'app.log'),
+            bind=os.path.join(self.RUN_DIR, 'app.sock'),
+            pidfile=os.path.join(self.RUN_DIR, 'app.pid'),
+            logfile=os.path.join(self.LOG_DIR, 'app.log'),
         )
 
     def config_uid(self):

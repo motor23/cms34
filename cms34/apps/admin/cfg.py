@@ -45,21 +45,6 @@ class Cfg(CfgBase):
     CMS34_STATIC_URL = '/cms34-static/'
     STATIC_URL = '/static/'
 
-    @cached_property
-    def ADMIN_FORM_TMP_DIR(self):
-        return path.join(self.TMP_DIR, 'admin')
-    PRIVATE_FORM_TMP_DIR = ADMIN_FORM_TMP_DIR
-    SHARED_FORM_TMP_DIR = ADMIN_FORM_TMP_DIR
-
-    @cached_property
-    def PRIVATE_MEDIA_DIR(self):
-        return path.join(self.MEDIA_DIR, 'private')
-
-    ADMIN_MEDIA_URL = '/media/'
-    SHARED_MEDIA_URL = '/shared/'
-    PRIVATE_MEDIA_URL = '/private/'
-    ADMIN_FORM_TMP_URL = '/form-temp/'
-
     MODEL_LOCK_TIMEOUT = 5*60
     MODEL_LOCK_RENEW = 60
 
