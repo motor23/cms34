@@ -4,7 +4,7 @@
         <ul class="list_small filter_list" data-close="true">
             {% for option in options %}
                 <li class="list_small_item{% if option.selected %} selected{% endif %}{% if loop.first %} all{% endif %}">
-                    <a href="{{ context.current_url.qs_set(**{widget.input_name: option.value}) }}">
+                    <a href="{{ context.current_url.qs_set(**{widget.input_name: option.value}).qs_set(page=1) }}">
                         {%- if option.value -%}
                             <img src="{{ url_for_static('img/flags/%s.svg' % option.value) }}"
                                  width="25"

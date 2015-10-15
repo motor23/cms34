@@ -3,7 +3,7 @@
         <ul class="tags filter_list">
             {% for option in options %}
                 <li class="tag{% if option.selected %} selected{% endif %}">
-                    <a href="{{ context.current_url.qs_set(**{widget.input_name: option.value}) }}">{{ option.title }}</a>
+                    <a href="{{ context.current_url.qs_set(**{widget.input_name: option.value}).qs_set(page=1) }}">{{ option.title }}</a>
                 </li>
             {% endfor %}
         </ul>
