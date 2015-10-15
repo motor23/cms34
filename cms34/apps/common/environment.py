@@ -1,16 +1,14 @@
 # -*- coding:utf8 -*-
-import os, json
+import json
 
 from webob.exc import HTTPSeeOther
-from jinja2 import Markup
-from iktomi.templates import BoundTemplate
 from iktomi import web
-from iktomi.utils import quote_js
 from iktomi.utils.storage import (
     StorageFrame,
     storage_cached_property,
     storage_method,
-    storage_property,)
+    storage_property,
+)
 
 from iktomi.web.route_state import RouteState
 
@@ -23,7 +21,6 @@ class Context(object):
 
 
 class BaseEnvironment(web.AppEnvironment):
-
     def __init__(self, app, request=None, route_state=None, **kwargs):
         StorageFrame.__init__(self, **kwargs)
         self.app = app
@@ -49,10 +46,7 @@ class BaseEnvironment(web.AppEnvironment):
         return self.root.build_url
 
     def url_for_static(self, path):
-        if self.cfg.DEV_STATIC:
-            return self.cfg.DEV_STATIC_URL + path
-        else:
-            return self.cfg.STATIC_URL + path
+        return self.cfg.STATIC_URL + path
 
 
 class Environment(BaseEnvironment):
@@ -91,10 +85,10 @@ class Environment(BaseEnvironment):
 
     def get_template_globals(self, env):
         return dict(
-            env = env,
-            url_for = self.url_for,
-            url_for_static = self.url_for_static,
-            context = self.context,
+            env=env,
+            url_for=self.url_for,
+            url_for_static=self.url_for_static,
+            context=self.context,
         )
 
     @storage_property
@@ -121,4 +115,3 @@ class Environment(BaseEnvironment):
 
     def finalize(self):
         self.db.close()
-

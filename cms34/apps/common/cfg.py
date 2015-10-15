@@ -116,11 +116,11 @@ class Cfg(BaseCfg):
 
     @cached_property
     def STATIC_DIR(self):
-        return os.path.join(self.SITE_DIR, 'static')
+        if self.DEV_STATIC:
+            return os.path.join(self.SITE_DIR, 'dev_static')
+        else:
+            return os.path.join(self.SITE_DIR, 'static')
 
-    @cached_property
-    def DEV_STATIC_DIR(self):
-        return os.path.join(self.SITE_DIR, 'dev_static')
 
     SMTP_PORT = 25
     SMTP_HOST = "localhost"
