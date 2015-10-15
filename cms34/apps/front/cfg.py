@@ -96,8 +96,8 @@ class Cfg(CfgBase):
         return path.join(self.I18N_DIR, 'translations')
 
     @cached_property
-    def GRUNT_FILE(self):
-        return path.join(self.ROOT, './Gruntfile.js')
+    def GULP_FILE(self):
+        return path.join(self.FRONT_BUILD_DIR, 'gulpfile.js')
 
 
 class DispatcherCfg(DispatcherCfgBase):

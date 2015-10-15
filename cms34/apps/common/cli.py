@@ -1,5 +1,6 @@
+import sys
 from subprocess import Popen
-import re
+import os.path
 
 from iktomi.cli.base import Cli as BaseCli
 from iktomi.cli.app import App as BaseApp
@@ -10,17 +11,15 @@ from .dispatcher import DispatcherApp
 
 
 class AppCliDict(object):
-
     def __init__(self, cli_classes):
         self.cli_classes = cli_classes
 
     def __get__(self, app, app_cls):
         return dict([(cli_cls.name, cli_cls(app_cls)) \
-                                    for cli_cls in self.cli_classes])
+                     for cli_cls in self.cli_classes])
 
 
 class Cli(BaseCli):
-
     name = None
 
     def __init__(self, App):
@@ -30,7 +29,7 @@ class Cli(BaseCli):
         cfg = self.App.cfg_class()(**kwargs)
         return cfg.update_from_py(custom_cfg_path)
 
-    def create_app(self, cls, level=None,  **kwargs):
+    def create_app(self, cls, level=None, **kwargs):
         app = cls.custom(**kwargs)
         if level:
             app.cfg.LOG_LEVEL = level
@@ -40,7 +39,6 @@ class Cli(BaseCli):
 
 
 class AppCli(Cli):
-
     name = 'app'
 
     def command_serve(self, host='', port='8000', level=None, cfg=''):
@@ -67,7 +65,6 @@ class AppCli(Cli):
 
 
 class FcgiCli(Cli):
-
     name = 'fcgi'
 
     def command_start(self, daemonize=False, level=None, cfg=''):
@@ -88,7 +85,6 @@ class FcgiCli(Cli):
 
 
 class DbCli(Cli):
-
     name = 'db'
 
     def command_create_tables(self, meta_name=None, verbose=False,
@@ -112,7 +108,7 @@ class DbCli(Cli):
         app = self.create_app(self.App, level=level, custom_cfg_path=cfg)
         return self.cli(app).command_schema(name)
 
-    def command_gen(self, *names): #XXX
+    def command_gen(self, *names):  # XXX
         app = self.create_app()
         return self.cli(app).command_gen()
 
@@ -124,35 +120,44 @@ class DbCli(Cli):
 
 
 class WatchCli(Cli):
-
     name = 'watch'
 
-    css_watch_command = 'watch_css'
-    js_watch_command = 'watch_js'
-    all_watch_command = 'watch_all'
+    css_watch_command = 'watch-css'
+    js_watch_command = 'watch-js'
+    all_watch_command = 'watch-all'
 
-    def grunt(self, task, cfg, wait=False):
+    def gulp(self, task, cfg, wait=False):
+        gulp_executable = '{}/node_modules/.bin/gulp'.format(
+            cfg.FRONT_BUILD_DIR)
+        if not os.path.isfile(gulp_executable):
+            print "Gulp executable not found. Install Gulp with `npm install`."
+            sys.exit(0)
+
+        command = '{gulp} --gulpfile={gulpfile} {task}'.format(
+            gulp=gulp_executable, gulpfile=cfg.GULP_FILE, task=task)
+
         try:
-            p = Popen('grunt %s --gruntfile %s' % (task, cfg.GRUNT_FILE),
-                      shell=True)
+            p = Popen(command, shell=True)
             if wait:
+                print "To stop watching, use CTRL-C"
                 p.wait()
-        except (KeyboardInterrupt, SystemExit):
+        except Exception:
             p.kill()
             raise
+        except (KeyboardInterrupt, SystemExit):
+            print "Stop watching"
 
     def command_css(self, cfg=''):
         app_cfg = self.App.cfg_class()()
         app_cfg.update_from_py(cfg)
-        self.grunt(self.css_watch_command, app_cfg, wait=True)
+        self.gulp(self.css_watch_command, app_cfg, wait=True)
 
     def command_js(self, cfg=''):
         app_cfg = self.App.cfg_class()()
         app_cfg.update_from_py(cfg)
-        self.grunt(self.js_watch_command, app_cfg, wait=True)
+        self.gulp(self.js_watch_command, app_cfg, wait=True)
 
     def command_all(self, cfg=''):
         app_cfg = self.App.cfg_class()()
         app_cfg.update_from_py(cfg)
-        self.grunt(self.all_watch_command, app_cfg, wait=True)
-
+        self.gulp(self.all_watch_command, app_cfg, wait=True)

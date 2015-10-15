@@ -95,6 +95,10 @@ class Cfg(BaseCfg):
     def SHARED_MEDIA_DIR(self):
         return os.path.join(self.MEDIA_DIR, 'shared')
 
+    @cached_property
+    def FRONT_BUILD_DIR(self):
+        return os.path.join(self.ROOT, 'build')
+
     DOMAINS = []
 
     EMAIL_ERRORS_TO = []
@@ -121,7 +125,7 @@ class Cfg(BaseCfg):
     SMTP_PORT = 25
     SMTP_HOST = "localhost"
     SMTP_CHARSET = "utf-8"
-    SMTP_FROM = "noreply@gov.ru"
+    SMTP_FROM = "noreply@mail.gov.ru"
 
     STATIC_URL = '/static/'
     DEV_STATIC_URL = '/dev_static/'
