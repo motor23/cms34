@@ -14,16 +14,16 @@ __all__ = (
     'IF_ExpHtml',
 )
 
-class IF_Html(IF_Simple):
 
+class IF_Html(IF_Simple):
     name = 'html'
     label = u'Текст'
     allowed_elements = ('a', 'p', 'li', 'ul', 'ol', 'i', 'b',
                         'blockquote', 'hr', 'h1', 'h2', 'h3', 'br',
                         'table', 'tr', 'td')
     allowed_protocols = ('http', 'https', 'ftp')
-    allowed_attributes = ('href', 'src', 'alt',
-                         'title', 'class', 'rel')
+    allowed_attributes = ('href', 'src', 'alt', 'colspan',
+                          'title', 'class', 'rel')
     button_blocks = widgets.WysiHtml5.button_blocks
     stylesheets = ()
 
@@ -54,11 +54,10 @@ class ExpandableHtmlConv(convs.Html):
         return ExpandableMarkup(value)
 
     def from_python(self, value):
-        #if isinstance(value, ExpandableMarkup):
-        if value.__class__.__name__=='ExpandableMarkup':
+        # if isinstance(value, ExpandableMarkup):
+        if value.__class__.__name__ == 'ExpandableMarkup':
             value = value.markup
         return convs.Html.from_python(self, value)
-
 
 
 # XXX assignment is here since the form is common
@@ -79,8 +78,8 @@ class EnhancedCleaner(Cleaner):
         super(EnhancedCleaner, self).extra_clean(doc)
         wrap_inlines(
             doc,
-            blocks=['iktomi_doclink', 'iktomi_media', 'iktomi_files', 'table', 'p',
-                    'blockquote'],
+            blocks=['iktomi_doclink', 'iktomi_media', 'iktomi_files', 'table',
+                    'p', 'blockquote'],
         )
 
         for tag in doc.xpath('//p[not(text())]/br[1]'):
@@ -140,7 +139,7 @@ def wrap_inlines(doc, tag='p', blocks=()):
         children = list(doc)
         while i < len(children):
             if children[i].tag in blocks:
-                if fold_block(children[i], children[i+1:]):
+                if fold_block(children[i], children[i + 1:]):
                     break
             i += 1
         if i >= len(children):
@@ -150,10 +149,10 @@ def wrap_inlines(doc, tag='p', blocks=()):
 class IF_ExpHtml(IF_Html):
     allowed_elements = ('a', 'p', 'li', 'ul', 'ol', 'i', 'b',
                         'blockquote', 'hr', 'h1', 'h2', 'h3', 'h4', 'br',
-                        'table', 'tr', 'td',
-                        'iktomi_doclink', 'iktomi_media', 'iktomi_files',
-                        'table', 'td', 'tr')
-    allowed_attributes = ('data-align', 'item_id', 'id', 'class', 'href')
+                        'table', 'tr', 'td', 'iktomi_doclink', 'iktomi_media',
+                        'iktomi_files', 'table', 'td', 'tr')
+    allowed_attributes = ('data-align', 'item_id', 'id',
+                          'class', 'href', 'colspan')
     allowed_protocols = ('model', 'http')
     allowed_classes = dict(convs.Html.allowed_classes,
                            p=_p_cls_test,
@@ -181,4 +180,3 @@ class IF_ExpHtml(IF_Html):
             button_blocks=self.button_blocks,
             stylesheets=self.stylesheets,
             required=self.required)
-

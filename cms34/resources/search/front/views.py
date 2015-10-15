@@ -65,7 +65,6 @@ class V_Search(ResourceView):
         Material = env.indices.Material
         sphinx_query = env.sphinx.query(Material)
         frm.accept(env.request.GET)
-        print frm, frm.is_valid, frm.errors
         if frm.is_valid:
             if data.form.python_data['q']:
                 sphinx_query = data.form.filter(sphinx_query)
