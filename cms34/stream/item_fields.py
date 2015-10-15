@@ -182,9 +182,11 @@ class IF_StreamSelect(IF_Simple):
     ordered = True
     rel = None
     conv = convs.Int
+    validators = []
 
     def create_conv(self, models, factory=None):
         model_conv = convs.ModelChoice(
+            *self.validators,
             model=getattr(models, self.model),
             conv=self.conv(required=self.required),
             condition=self.condition,

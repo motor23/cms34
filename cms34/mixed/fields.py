@@ -1,4 +1,5 @@
 # -*- coding: utf8 -*-
+from iktomi.forms.convs import ValidationError
 from datetime import datetime
 
 from ..utils import prop_getter
@@ -466,6 +467,31 @@ class XF_StreamSelect(XF_Simple):
                            multiple=self.multiple, )
 
 
+def check_circular_dependency(converter, value):
+    """
+    To avoid circular dependencies, item cannot be chosen as it's parent.
+    Also item should not be presented in the path to the root of it's new
+    parent.
+    """
+    current_item = converter.field.form.item
+
+    # Nothing to check here
+    if value is None:
+        return value
+
+    if current_item.id == value.id:
+        raise ValidationError(u'Раздел не может быть собственным родителем')
+
+    # Check if current item is not present in value's path to the root
+    parent_candidate = value
+    while parent_candidate.parent_id:
+        if parent_candidate.parent_id == current_item.id:
+            raise ValidationError(u'Обнаружена циклическая зависимость')
+        parent_candidate = parent_candidate.parent
+
+    return value
+
+
 class XF_Parent(XF_Simple):
     name = 'parent'
     label = u'Родитель'
@@ -475,6 +501,7 @@ class XF_Parent(XF_Simple):
     get_stream_name = prop_getter('stream_name', 'name')
     default_filters = {}
     rel = None
+    validators = [check_circular_dependency]
 
     def _model_field(self, factory=None):
         return MF_Parent(self.name)
@@ -487,6 +514,7 @@ class XF_Parent(XF_Simple):
             stream_name=self.get_stream_name(factory),
             default_filters=self.default_filters,
             rel=self.rel,
+            validators=self.validators,
         )
 
 
