@@ -148,16 +148,13 @@ class WatchCli(Cli):
             print "Stop watching"
 
     def command_css(self, cfg=''):
-        app_cfg = self.App.cfg_class()()
-        app_cfg.update_from_py(cfg)
+        app_cfg = self.create_cfg(custom_cfg_path=cfg)
         self.gulp(self.css_watch_command, app_cfg, wait=True)
 
     def command_js(self, cfg=''):
-        app_cfg = self.App.cfg_class()()
-        app_cfg.update_from_py(cfg)
+        app_cfg = self.create_cfg(custom_cfg_path=cfg)
         self.gulp(self.js_watch_command, app_cfg, wait=True)
 
     def command_all(self, cfg=''):
-        app_cfg = self.App.cfg_class()()
-        app_cfg.update_from_py(cfg)
+        app_cfg = self.create_cfg(custom_cfg_path=cfg)
         self.gulp(self.all_watch_command, app_cfg, wait=True)
