@@ -1,30 +1,28 @@
 # -*- coding: utf-8 -*-
 
-__all__ = ['Application', 'AppEnvironment']
-
 import logging
 
-from webob.exc import HTTPException, HTTPInternalServerError, \
-                      HTTPNotFound
-from webob import Request
-import memcache
-from .templates import AppTemplateEngine
+from cms34.utils import cached_property
 from iktomi.utils.storage import VersionedStorage
 from iktomi.web import (
     Application as BaseApplication,
     Reverse,
 )
-
-from cms34.utils import cached_property
-from .cli import AppCliDict, AppCli
+from webob import Request
+from webob.exc import (
+    HTTPException,
+    HTTPInternalServerError,
+    HTTPNotFound,
+)
 from .caching import MemcacheClient
+from .cli import AppCliDict, AppCli
+from .templates import AppTemplateEngine
 
-
+__all__ = ['Application', 'AppEnvironment']
 logger = logging.getLogger()
 
 
 class Application(BaseApplication):
-
     cli_dict = AppCliDict([AppCli])
 
     def __init__(self, cfg=None, **kwargs):
@@ -109,13 +107,12 @@ class Application(BaseApplication):
     @cached_property
     def db_maker(self):
         return binded_filesessionmaker(self.cfg.DATABASES,
-                                   engine_params=self.cfg.DATABASE_PARAMS,
-                                   )
+                                       engine_params=self.cfg.DATABASE_PARAMS,
+                                       )
 
     @cached_property
     def cache(self):
         return MemcacheClient(self.cfg.MEMCACHE, self.cfg.CACHE_PREFIX)
-
 
     def template_engine(self):
         return AppTemplateEngine(self.cfg.TEMPLATES)

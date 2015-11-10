@@ -92,7 +92,7 @@ class Application(BaseApplication):
         return FileManager(
             transient_root=self.cfg.SHARED_FORM_TMP_DIR,
             persistent_root=self.cfg.SHARED_MEDIA_DIR,
-            transient_url=self.cfg.SHARED_FORM_TMP_URL,
+            transient_url=None,
             persistent_url=self.cfg.SHARED_MEDIA_URL,
         )
 
@@ -100,7 +100,7 @@ class Application(BaseApplication):
     def private_file_manager(self):
         return FileManager(
             transient_root=self.cfg.PRIVATE_FORM_TMP_DIR,
-            transient_url=self.cfg.PRIVATE_FORM_TMP_URL,
+            transient_url=None,
             persistent_root=self.cfg.PRIVATE_MEDIA_DIR,
             persistent_url=self.cfg.PRIVATE_MEDIA_URL,
         )
