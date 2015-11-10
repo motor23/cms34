@@ -3,7 +3,6 @@ from os import path
 import sys
 import memcache
 from collections import OrderedDict
-
 from cms34.utils import cached_property
 from ..common.cfg import Cfg as CfgBase
 from ..common.dispatcher import Cfg as DispatcherCfgBase
@@ -82,18 +81,6 @@ class Cfg(CfgBase):
     }
 
     FLOOD_PROTECTION_ENABLED = True
-
-    @cached_property
-    def I18N_DIR(self):
-        return path.join(self.CFG_DIR, 'i18n')  # XXX
-
-    @cached_property
-    def I18N_MAPPING_FILE(self):
-        return path.join(self.I18N_DIR, 'mapping.ini')
-
-    @cached_property
-    def I18N_TRANSLATIONS_DIR(self):
-        return path.join(self.I18N_DIR, 'translations')
 
     @cached_property
     def GULP_FILE(self):

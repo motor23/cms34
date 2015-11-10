@@ -6,7 +6,7 @@ from iktomi.cms.item_lock import ItemLock
 
 from cms34.utils import cached_property
 from ..common.environment import Environment as EnvironmentBase
-
+from ..common.i18n.translation import get_translations
 from .views import packer
 
 
@@ -99,3 +99,26 @@ class Environment(EnvironmentBase):
                 return stream.url_for(storage, name, item=obj.id, **kwargs)
         else:
             raise Exception('Add obj_endpoint to stream')
+
+    def get_translations(self, lang):
+        return get_translations(self.cfg.I18N_TRANSLATIONS_DIR, lang,
+                                ['admin', 'iktomi-forms'])
+
+    @cached_property
+    def _translations(self):
+        return self.get_translations(self.site_lang)
+
+    @storage_method
+    def gettext(self, msgid):
+        message = self._translations.gettext(unicode(msgid))
+        if isinstance(msgid, Markup):
+            message = Markup(message)
+        return message
+
+    @storage_method
+    def ngettext(self, msgid1, msgid2, n):
+        message = self._translations.ngettext(unicode(msgid1),
+                                              unicode(msgid2), n)
+        if isinstance(msgid1, Markup):
+            message = Markup(message)
+        return message

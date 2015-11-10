@@ -2,9 +2,7 @@
 import os
 import sys
 import logging.config
-
 from cms34.utils import cached_property
-
 import __main__
 
 FASTCGI_PREFORKED_DEFAULTS = dict(
@@ -95,32 +93,44 @@ class Cfg(BaseCfg):
     def SHARED_MEDIA_DIR(self):
         return os.path.join(self.MEDIA_DIR, 'shared')
 
-	@cached_property
+    @cached_property
     def FRONT_BUILD_DIR(self):
         return os.path.join(self.ROOT, 'build')
 
     @cached_property
-    def PRIVATE_MEDIA_DIR(self):
-        return os.path.join(self.MEDIA_DIR, 'private')
+    def I18N_DIR(self):
+        return os.path.join(self.CFG_DIR, 'i18n')  # XXX
 
     @cached_property
-    def ADMIN_FORM_TMP_DIR(self):
-        return os.path.join(self.TMP_DIR, 'admin')
+    def I18N_MAPPING_FILE(self):
+        return os.path.join(self.I18N_DIR, 'mapping.ini')
 
     @cached_property
-    def SHARED_FORM_TMP_DIR(self):
-        return os.path.join(self.TMP_DIR, 'shared')
+    def I18N_TRANSLATIONS_DIR(self):
+        return os.path.join(self.I18N_DIR, 'translations')
 
     @cached_property
-    def PRIVATE_FORM_TMP_DIR(self):
-        return os.path.join(self.TMP_DIR, 'private')
+    def I18N_INPUT_DIRS(self):
+        import iktomi
+        IKTOMI_DIR = os.path.dirname(os.path.normpath(iktomi.__file__))
+        return {
+            'front': os.path.join(self.ROOT, 'front'),
+            'admin': os.path.join(self.ROOT, 'admin'),
+            'iktomi-forms': [
+                os.path.join(IKTOMI_DIR, 'forms'),
+                os.path.join(IKTOMI_DIR, 'templates/jinja2/templates'),
+            ],
+            'iktomi-cms': os.path.join(IKTOMI_DIR, 'cms'),
+        }
 
-    ADMIN_MEDIA_URL = '/media/'
-    SHARED_MEDIA_URL = '/shared/'
-    PRIVATE_MEDIA_URL = '/private/'
-    ADMIN_FORM_TMP_URL = '/admin-form-temp/'
-    SHARED_FORM_TMP_URL = '/shared-form-temp/'
-    PRIVATE_FORM_TMP_URL = '/private-form-temp/'
+    @cached_property
+    def I18N_LANGUAGES(self):
+        return {
+            'front': ['ru', 'en'],
+            'admin': 'ru',
+            'iktomi-forms': ['ru', 'en'],
+            'iktomi-cms': 'ru',
+        }
 
     DOMAINS = []
 
@@ -144,7 +154,6 @@ class Cfg(BaseCfg):
         else:
             return os.path.join(self.SITE_DIR, 'static')
 
-
     SMTP_PORT = 25
     SMTP_HOST = "localhost"
     SMTP_CHARSET = "utf-8"
@@ -165,9 +174,9 @@ class Cfg(BaseCfg):
         return dict(
             fastcgi_params=self.FASTCGI_PARAMS,
             umask=0,
-            bind=os.path.join(self.RUN_DIR, 'app.sock'),
-            pidfile=os.path.join(self.RUN_DIR, 'app.pid'),
-            logfile=os.path.join(self.LOG_DIR, 'app.log'),
+            bind=path.join(self.RUN_DIR, 'app.sock'),
+            pidfile=path.join(self.RUN_DIR, 'app.pid'),
+            logfile=path.join(self.LOG_DIR, 'app.log'),
         )
 
     def config_uid(self):

@@ -3,6 +3,7 @@ import json
 
 from webob.exc import HTTPSeeOther
 from iktomi import web
+from iktomi.cms.app import AdminEnvironment
 from iktomi.utils.storage import (
     StorageFrame,
     storage_cached_property,
@@ -20,7 +21,7 @@ class Context(object):
         self.env = env
 
 
-class BaseEnvironment(web.AppEnvironment):
+class BaseEnvironment(AdminEnvironment):
     def __init__(self, app, request=None, route_state=None, **kwargs):
         StorageFrame.__init__(self, **kwargs)
         self.app = app
@@ -89,6 +90,8 @@ class Environment(BaseEnvironment):
             url_for=self.url_for,
             url_for_static=self.url_for_static,
             context=self.context,
+            gettext=self.gettext,
+            ngettext=self.ngettext,
         )
 
     @storage_property
