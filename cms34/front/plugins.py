@@ -2,8 +2,8 @@ from webob.exc import HTTPNotFound, HTTPSeeOther
 from cms34.stream import FilterFormFactory
 from .view import Context
 
-class ViewPlugin(object):
 
+class ViewPlugin(object):
     def __init__(self, view):
         self.env = view.env
         self.view = view
@@ -11,7 +11,6 @@ class ViewPlugin(object):
 
 
 class VP_Query(ViewPlugin):
-
     model = None
     name = 'query'
     order_field = 'id'
@@ -67,7 +66,6 @@ class VP_Query(ViewPlugin):
 
 
 class VP_Response(ViewPlugin):
-
     name = 'response'
 
     @property
@@ -76,8 +74,8 @@ class VP_Response(ViewPlugin):
 
     def template_name(self, template):
         folders = [self.templates_folder]
-        #parent = self.view.parent
-        #while parent:
+        # parent = self.view.parent
+        # while parent:
         #    folders.insert(0, parent.response.templates_folder)
         #    parent = parent.parent
         return '%s/%s' % ('/'.join(folders), template)
@@ -86,8 +84,8 @@ class VP_Response(ViewPlugin):
         if isinstance(template, basestring):
             kwargs.setdefault('view', self.view)
             return self.view.env.render_to_response(
-                                                self.template_name(template),
-                                                kwargs)
+                self.template_name(template),
+                kwargs)
         else:
             return template.render(self.view, kwargs)
 
@@ -103,9 +101,7 @@ class VP_Response(ViewPlugin):
                                               kwargs)
 
 
-
 class VP_Filter(ViewPlugin):
-
     name = 'filter'
     Factory = FilterFormFactory
     initials = {}
@@ -138,3 +134,6 @@ class VP_Filter(ViewPlugin):
     def render(self):
         return self.get_form().render()
 
+    @property
+    def is_valid(self):
+        return self.get_form().is_valid
