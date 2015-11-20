@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 from iktomi.web import match
-from iktomi.utils import cached_property
 from cms34.front.view import view_handler
 from cms34.resources import ResourceView
 from cms34.front.plugins import VP_Response, VP_Query
 from cms34.resources.forms.front import ConstructedForm
-
+from cms34.apps.common.handlers import no_preview
 from cms34.apps.common.flood import check_flood
 
 
@@ -67,7 +66,7 @@ class V_LettersSection(ResourceView):
     def cases(cls, sections, section):
         return [
             match('/', name='rules') | cls.h_rules,
-            match('/form/', name='form') | cls.h_form,
+            match('/form/', name='form') | no_preview | cls.h_form,
             sections.h_section(section),
         ]
 

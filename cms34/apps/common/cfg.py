@@ -147,6 +147,9 @@ class Cfg(BaseCfg):
 
     DEV_STATIC = False
 
+    # This should be redefined in both local configs - admin and front
+    SPHINX_COLLECTION_NAME = 'change_this_name_in_local_config'
+
     @cached_property
     def STATIC_DIR(self):
         if self.DEV_STATIC:

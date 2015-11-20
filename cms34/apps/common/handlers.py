@@ -1,7 +1,7 @@
 from iktomi import web
 
-class H_App(web.WebHandler):
 
+class H_App(web.WebHandler):
     def __init__(self, app):
         self.app = app
         self._next_handler = self.app.handler
@@ -20,3 +20,15 @@ class H_App(web.WebHandler):
 
 def h_app(prefix, name, app):
     return web.prefix(prefix, name=name) | H_App(app)
+
+
+@web.request_filter
+def no_preview(env, data, next_handler):
+    """
+    Forbid access to next handler in preview mode. It can be used for search
+    section, for example.
+    """
+    preview = getattr(env.app.cfg, 'PREVIEW', None)
+    if preview:
+        return env.render_to_response('nopreview', {})
+    return next_handler(env, data)
