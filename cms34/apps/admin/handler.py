@@ -1,11 +1,11 @@
 # -*- coding: utf8 -*-
 from webob.exc import HTTPNotFound
-from iktomi.cms.views import auth_required
 from iktomi import web
 from iktomi.web.filters import static_files, method
 from iktomi.web.shortcuts import Rule
 from iktomi.cms.flashmessages import flash_message_handler
-from iktomi.cms.views import AdminAuth
+from iktomi.cms.auth.views import AdminAuth, auth_required
+from iktomi.cms.item_lock.views import ItemLockView
 from ..common.handlers import h_app
 
 import models
@@ -15,6 +15,7 @@ from . import views as h
 
 def create_handler(app):
     h_auth = AdminAuth(models.admin.AdminUser, storage=app.cache)
+    item_lock = ItemLockView()
     ext_handlers = []
     if app.preview_enabled:
         h_preview = h_app('/preview', name='preview', app=app.preview_app)
@@ -38,14 +39,7 @@ def create_handler(app):
         h_auth | auth_required |
         web.cases(
             Rule('/', h.index, method='GET'),
-            method('POST') | web.cases(
-                Rule('/_update_lock/<string:item_id>/<string:edit_session>',
-                     h.update_lock),
-                Rule('/_force_lock/<string:item_id>',
-                     h.force_lock),
-                Rule('/_release_lock/<string:item_id>/<string:edit_session>',
-                     h.release_lock),
-            ),
+            item_lock.app,
             app.streams.to_app(),
             web.cases(*ext_handlers),
         ),
