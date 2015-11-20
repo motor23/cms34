@@ -7,7 +7,7 @@ from iktomi.cms.ajax_file_upload import (
     StreamFileUploadHandler,
     StreamImageUploadHandler,
 )
-from iktomi.cms.edit_log import EditLogHandler
+from iktomi.cms.edit_log.views import EditLogHandler
 
 from .html_body_handlers import (
     HtmlBodyHandler,
