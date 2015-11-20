@@ -11,7 +11,10 @@ class V_Person(ResourceView):
 
     @classmethod
     def cases(cls, sections, section):
-        return [match('/', name='index') | cls.h_index]
+        return [
+            match('/', name='index') | cls.h_index,
+            sections.h_section(section)
+        ]
 
     @view_handler
     def h_index(self, env, data):
