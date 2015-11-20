@@ -88,12 +88,18 @@ class Menu(object):
             selected_items = []
         return self._get_menu_tree(level, selected_items, item)
 
-    def _get_menu_tree(self, level=1, selected_items=[], item=None):
+    def _get_menu_tree(self, level=1, selected_items=None, item=None):
+        if selected_items is None:
+            selected_items = []
         result = []
         if level:
             for subitem in self.get_child_menu(item):
                 submenu = self._get_menu_tree(level-1, selected_items, subitem)
-                selected =  subitem in selected_items
+                # Sometimes multiple menu items can point to the same place
+                if any(item for item in selected_items
+                       if subitem.section_id == item.section_id):
+                    selected_items.append(subitem)
+                selected = subitem in selected_items
                 result.append((subitem, selected, submenu))
         return result
 
