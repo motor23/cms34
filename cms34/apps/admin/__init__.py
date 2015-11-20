@@ -131,6 +131,7 @@ class Application(BaseApplication):
         # Update new config with values passed manually to current config.
         # This fixes error with ROOT variable when running app with uWSGI.
         preview_cfg.update_cfg(self.cfg._init_kwargs)
+        preview_cfg.update_from_py()
         preview_app = type('Application',
                            (self.preview_app_overload, self.front_app_class),
                            {})(preview_cfg, self)

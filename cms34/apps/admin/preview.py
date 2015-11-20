@@ -1,15 +1,24 @@
 from os import path
-
 from iktomi.cms.publishing.model import AdminPublicQuery
 from iktomi.utils import cached_property
 
 
 def from_admin_cfg(name):
-    return property(lambda self: getattr(self._admin, name))
+    """
+    Define property with given name which will get the value from admin config
+    and set new value to self.
+    """
+
+    def getter(self):
+        return getattr(self._admin, name)
+
+    def setter(self, value):
+        self.__dict__[name] = value
+
+    return property(getter, setter)
 
 
 class PreviewAppOverload(object):
-
     def __init__(self, cfg, admin_app, **kwargs):
         self._admin = admin_app
         super(PreviewAppOverload, self).__init__(cfg, **kwargs)
@@ -29,7 +38,6 @@ class PreviewAppOverload(object):
 
 
 class PreviewCfgOverload(object):
-
     def __init__(self, admin_cfg):
         self._admin = admin_cfg
 
@@ -51,7 +59,7 @@ class PreviewCfgOverload(object):
     def DEV_STATIC_URL(self):
         return self.PREFIX + '/dev_static/'
 
-    #CMS34_DIR = path.dirname(path.abspath(__file__))
+    # CMS34_DIR = path.dirname(path.abspath(__file__))
 
     CACHE_ENABLED = False
     MEMCACHE = from_admin_cfg('MEMCACHE')
@@ -60,6 +68,6 @@ class PreviewCfgOverload(object):
     DATABASES = from_admin_cfg('DATABASES')
     DATABASE_PARAMS = from_admin_cfg('DATABASE_PARAMS')
 
+    SPHINX_COLLECTION_NAME = from_admin_cfg('SPHINX_COLLECTION_NAME')
+
     FLOOD_PROTECTION_ENABLED = False
-
-
