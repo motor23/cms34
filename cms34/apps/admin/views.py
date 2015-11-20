@@ -2,11 +2,8 @@
 from iktomi.cms.ajax_file_upload import FileUploadHandler
 from iktomi.cms.packer import StaticPacker
 from iktomi.cms.stream_handlers import insure_is_xhr
-from iktomi.cms.views import (update_lock, PostNote,
-                              force_lock, release_lock)
 
-__all__ = ['index', 'tinymce_compressor', 'update_lock', 'force_lock',
-           'release_lock']
+__all__ = ['index', 'tinymce_compressor']
 
 packer = StaticPacker()
 
@@ -19,4 +16,3 @@ def index(env, data):
         menu='index',
         dashboard=env.dashboard(env),
     ))
-
