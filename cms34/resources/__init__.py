@@ -13,6 +13,7 @@ class V_Sections(object):
         self.model = model
         self.resources = resources
         self.sections_query = None
+        self.get_sections_cache = {}
 
     def handler(self):
         return H_Sections(self)
@@ -35,9 +36,13 @@ class V_Sections(object):
             .order_by(self.model.order)
         self.sections_query = self.cached_db.query(self.model, _query,
                                                    reload=True)
+        self.get_sections_cache = {}
 
     def get_sections(self, reload=False, **kwargs):
         result = []
+        key = str(kwargs)
+        if not reload and self.get_sections_cache.has_key(key):
+            return self.get_sections_cache[key]
         if self.sections_query is None or reload:
             self.load_sections()
         sections = self.sections_query.filter_by(**kwargs).all()
@@ -50,6 +55,7 @@ class V_Sections(object):
                 pairs.append(pair)
                 if self.get_section_parents(section) is not None:
                     result.append(section)
+        self.get_sections_cache[key] = result
         return result
 
     def retrieve_sections(self, **kwargs):
