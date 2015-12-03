@@ -14,6 +14,9 @@ class LetterForm(ConstructedForm):
     def _init_fields(cls, form_tree):
         fields = []
         for field in form_tree:
+            if field is None:
+                # field is unpublished
+                continue
             front_view_cls = field.front_view_cls
             if hasattr(field, 'fields'):
                 subfields = cls._init_fields(field.fields)
@@ -32,7 +35,6 @@ class LetterForm(ConstructedForm):
     def init(cls, env, form_tree):
         cls.fields = cls._init_fields(form_tree)
         return cls(env)
-
 
 
 class VP_LetterSectionQuery(VP_Query):
@@ -94,13 +96,13 @@ class V_LettersSection(ResourceView):
         if env.request.method == 'POST':
             response_data = {'valid': None, 'errors': None, 'message': None}
 
-            flood_msg = self._check_flood(env, self.name)
-            if flood_msg:
-                response_data['message'] = flood_msg
-                response_data['valid'] = True
-                return env.json(response_data)
-
             if form.accept(env.request.POST):
+                flood_msg = self._check_flood(env, self.name)
+                if flood_msg:
+                    response_data['message'] = flood_msg
+                    response_data['valid'] = True
+                    return env.json(response_data)
+
                 letter = letter_model(dt=datetime.now(),
                                       section_id=self.section.id,
                                       letter_json=form.json_prepared)

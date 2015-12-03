@@ -1,10 +1,27 @@
 # -*- coding: utf-8 -*-
-from common.fields import MF_Json
-from cms34.model.fields import MF_Int
-from cms34.model.fields import MF_DateTime
-from cms34.mixed.fields import (
-    XF_Body,
-)
+import json
+from sqlalchemy import PickleType, Text, Column
+from cms34.model.fields import MF_Int, MF_Base, MF_DateTime
+from cms34.mixed.fields import XF_Body, XF_Simple
+
+
+class TextPickleType(PickleType):
+    impl = Text
+
+
+class MF_Json(MF_Base):
+    default = {}
+
+    def get_dict(self, models, factory=None):
+        field = Column(TextPickleType(pickler=json))
+        return {self.name: field}
+
+
+class XF_Json(XF_Simple):
+    initial = {}
+
+    def _model_field(self, factory=None):
+        return MF_Json(self.name, default=self.initial)
 
 
 class MF_LetterJson(MF_Json):
