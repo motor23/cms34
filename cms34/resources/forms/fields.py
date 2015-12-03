@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import random
 from cms34.model import hybrid_factory_method
 from iktomi.utils import cached_property
 from cms34.mixed.fields import (
@@ -18,10 +19,15 @@ from .front.fields import (
 )
 
 
+def random_field_name(field):
+    name_tpl = 'field{}'
+    return name_tpl.format(random.randrange(10 ** 8))
+
+
 class XF_FieldName(XF_String):
     name = 'name'
     label = u'Имя поля (на латинице)'
-    required = True
+    initial = random_field_name
 
 
 class XF_FieldSize(XF_Select):

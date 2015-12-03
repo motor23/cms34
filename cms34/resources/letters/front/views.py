@@ -109,6 +109,7 @@ class V_LettersSection(ResourceView):
                 env.db.add(letter)
                 env.db.commit()
                 letter_id = '{}_{}'.format(self.env.cfg.APP_ID, letter.id)
+                response_data['success'] = True
                 response_data['message'] = self.SUCCESS_TPL.format(
                     id=letter_id)
 

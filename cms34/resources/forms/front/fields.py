@@ -33,10 +33,12 @@ class CF_FormField(Field):
         super(CF_FormField, self).__init__(*args, **kwargs)
 
     size_classnames = {}
+    validator_lengths = {}
 
     def set_size(self):
         if self.field_obj is not None:
             size = self.field_obj.size
+            # Update widget
             classname = self.size_classnames.get(size)
             self.widget.add_css_class(classname)
 
@@ -50,7 +52,7 @@ class CF_FormField(Field):
 
     def __call__(self, **kwargs):
         """
-        Need to adjust field size after field is binded to form.
+        Need to adjust field size after field is bound to form.
         """
         _field = super(CF_FormField, self).__call__(**kwargs)
         _field.set_size()
@@ -77,14 +79,30 @@ class CF_TextField(CF_FormField):
         'large': 'input_large'
     }
 
+    validator_lengths = {
+        'small': 50,
+        'medium': 100,
+        'large': 250,
+    }
+
+    def set_size(self):
+        super(CF_TextField, self).set_size()
+        # Update converter
+        if self.field_obj is not None:
+            size = self.field_obj.size
+            max_length = self.validator_lengths.get(size, max(
+                self.validator_lengths.values()))
+            self.conv = self.conv(convs.length(1, max_length))
+
 
 class CF_EmailTextField(CF_TextField):
     widget = CF_EmailWidget()
-    conv = EmailConv
+    conv = EmailConv(convs.length(3, 100))
 
 
 class CF_TextareaField(CF_FormField):
     widget = CF_TextAreaWidget()
+    conv = convs.Char(convs.length(1, 2000))
 
     size_classnames = {
         'small': 'textarea_small',

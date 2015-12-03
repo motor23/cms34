@@ -6,7 +6,6 @@ from .fields import (
     XF_Block,
     xf_field_type,
     xf_required,
-    xf_field_name,
     xf_title,
     xf_field_size,
     xf_options_list,
@@ -20,7 +19,6 @@ class XB_FieldOptions(XF_Block):
     item_fields = [
         xf_field_type,
         xf_required,
-        xf_field_name,
         xf_title,
         xf_field_size,
         xf_options_list,
