@@ -1,6 +1,6 @@
 # -*- coding:utf8 -*-
 import json
-
+from jinja2 import Markup
 from webob.exc import HTTPSeeOther
 from iktomi import web
 from iktomi.cms.app import AdminEnvironment
@@ -10,9 +10,8 @@ from iktomi.utils.storage import (
     storage_method,
     storage_property,
 )
-
 from iktomi.web.route_state import RouteState
-
+from ..common.i18n.translation import get_translations
 from cms34.utils import cached_property
 
 
@@ -118,3 +117,25 @@ class Environment(BaseEnvironment):
 
     def finalize(self):
         self.db.close()
+
+    def get_translations(self, lang):
+        return get_translations(self.cfg.I18N_TRANSLATIONS_DIR, lang)
+
+    @cached_property
+    def _translations(self):
+        return self.get_translations(self.site_lang)
+
+    @storage_method
+    def gettext(self, msgid):
+        message = self._translations.gettext(unicode(msgid))
+        if isinstance(msgid, Markup):
+            message = Markup(message)
+        return message
+
+    @storage_method
+    def ngettext(self, msgid1, msgid2, n):
+        message = self._translations.ngettext(unicode(msgid1),
+                                              unicode(msgid2), n)
+        if isinstance(msgid1, Markup):
+            message = Markup(message)
+        return message

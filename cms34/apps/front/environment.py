@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from iktomi.utils import cached_property
 from jinja2 import Markup
-
+from ..common.i18n.translation import get_translations
 from ..common.environment import Environment as EnvironmentBase
 from ..common.replace_tags import replace_tags
 from cms34.resources.search.models import search_index_dispatcher
+
 
 class Context(EnvironmentBase.Context):
     def css_tag(self, filename, media='all'):
@@ -62,3 +63,10 @@ class Environment(EnvironmentBase):
     @cached_property
     def cached_db(self):
         return self.app.cached_db_maker()
+
+    def get_translations(self, lang):
+        return get_translations(
+            self.cfg.I18N_TRANSLATIONS_DIR,
+            lang,
+            ['front', 'admin', 'iktomi-forms', 'iktomi-cms']
+        )

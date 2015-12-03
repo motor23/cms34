@@ -3,7 +3,6 @@ from functools import partial
 from jinja2 import Markup
 from iktomi.utils.storage import storage_cached_property, storage_method
 from iktomi.cms.item_lock import ItemLock
-
 from cms34.utils import cached_property
 from ..common.environment import Environment as EnvironmentBase
 from ..common.i18n.translation import get_translations
@@ -11,7 +10,6 @@ from .views import packer
 
 
 class Context(EnvironmentBase.Context):
-
     import json
 
     @cached_property
@@ -32,7 +30,7 @@ class Context(EnvironmentBase.Context):
         if hidden:
             result['data-preview-hidden'] = 1
         for button in buttons:
-            if button=='edit':
+            if button == 'edit':
                 result['data-preview-edit'] = self.env.url_for_obj(item)
         result = ['%s="%s"' % (key, value) for key, value in result.items()]
         return Markup(' '.join(result))
@@ -69,16 +67,16 @@ class Environment(EnvironmentBase):
 
     @storage_method
     def get_edit_url(storage, x):
-        return streams.get_edit_url(storage, x)
+        return storage.streams.get_edit_url(storage, x)
 
     def get_template_globals(self, env):
         vars = EnvironmentBase.get_template_globals(self, env)
         vars.update(dict(
-            user = getattr(env, 'user', None),
-            packed_js_tag = partial(packer.js_tag, env),
-            packed_css_tag = partial(packer.css_tag, env),
-            CMS34_STATIC_URL = env.cfg.CMS34_STATIC_URL,
-            CMS_STATIC_URL = env.cfg.CMS_STATIC_URL,
+            user=getattr(env, 'user', None),
+            packed_js_tag=partial(packer.js_tag, env),
+            packed_css_tag=partial(packer.css_tag, env),
+            CMS34_STATIC_URL=env.cfg.CMS34_STATIC_URL,
+            CMS_STATIC_URL=env.cfg.CMS_STATIC_URL,
         ))
         return vars
 
@@ -103,22 +101,3 @@ class Environment(EnvironmentBase):
     def get_translations(self, lang):
         return get_translations(self.cfg.I18N_TRANSLATIONS_DIR, lang,
                                 ['admin', 'iktomi-forms'])
-
-    @cached_property
-    def _translations(self):
-        return self.get_translations(self.site_lang)
-
-    @storage_method
-    def gettext(self, msgid):
-        message = self._translations.gettext(unicode(msgid))
-        if isinstance(msgid, Markup):
-            message = Markup(message)
-        return message
-
-    @storage_method
-    def ngettext(self, msgid1, msgid2, n):
-        message = self._translations.ngettext(unicode(msgid1),
-                                              unicode(msgid2), n)
-        if isinstance(msgid1, Markup):
-            message = Markup(message)
-        return message

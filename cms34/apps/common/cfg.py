@@ -118,6 +118,7 @@ class Cfg(BaseCfg):
             'admin': os.path.join(self.ROOT, 'admin'),
             'iktomi-forms': [
                 os.path.join(IKTOMI_DIR, 'forms'),
+                os.path.join(IKTOMI_DIR, 'unstable/forms'),
                 os.path.join(IKTOMI_DIR, 'templates/jinja2/templates'),
             ],
             'iktomi-cms': os.path.join(IKTOMI_DIR, 'cms'),
