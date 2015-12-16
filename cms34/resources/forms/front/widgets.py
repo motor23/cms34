@@ -2,6 +2,7 @@
 
 from iktomi.forms import widgets
 
+
 class CF_FormWidget(widgets.Widget):
     def add_css_class(self, classname):
         if classname:
@@ -20,6 +21,14 @@ class CF_TextInputWidget(CF_FormWidget):
 
 class CF_EmailWidget(CF_TextInputWidget):
     template = 'forms/widgets/cf_email'
+
+
+class CF_PhoneWidget(CF_TextInputWidget):
+    template = 'forms/widgets/cf_phone'
+
+
+class CF_ZipcodeWidget(CF_TextInputWidget):
+    template = 'forms/widgets/cf_zipcode'
 
 
 class CF_RadioWidget(CF_FormWidget):

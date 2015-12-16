@@ -11,8 +11,11 @@ from iktomi.utils.storage import (
     storage_property,
 )
 from iktomi.web.route_state import RouteState
-from ..common.i18n.translation import get_translations
+
 from cms34.utils import cached_property
+from ..common.templates.macros import MacrosLib
+from ..common.i18n.translation import get_translations
+from .templates import BoundTemplate
 
 
 class Context(object):
@@ -31,12 +34,10 @@ class BaseEnvironment(AdminEnvironment):
         elif request:
             self._route_state = RouteState(request)
 
-    @cached_property
-    def root(self):
         if self.request:
-            return self.app.root.bind_to_env(self._root_storage)
+            self.root = app.root.bind_to_env(self._root_storage)
         else:
-            return self.app.root
+            self.root = app.root
 
     def finalize(self):
         pass
@@ -51,10 +52,6 @@ class BaseEnvironment(AdminEnvironment):
 
 class Environment(BaseEnvironment):
     Context = Context
-
-    def __init__(self, app, **kwargs):
-        self.cfg = app.cfg
-        BaseEnvironment.__init__(self, app, **kwargs)
 
     @cached_property
     def models(self):
@@ -74,28 +71,26 @@ class Environment(BaseEnvironment):
 
     @storage_cached_property
     def template(storage):
-        import traceback
-        template = storage.app.template_engine()
         try:
-            template.env.globals.update(storage.get_template_globals(storage))
+            return BoundTemplate(storage, storage.app.template_engine)
         except Exception, exc:
-            traceback.print_exc(100)
             raise Exception(exc)
-        return template
 
-    def get_template_globals(self, env):
-        return dict(
-            env=env,
+    def get_template_vars(self):
+        vars = dict(
+            env=self._root_storage,
             url_for=self.url_for,
             url_for_static=self.url_for_static,
             context=self.context,
             gettext=self.gettext,
             ngettext=self.ngettext,
         )
+        vars['macros'] = MacrosLib(self.app.template_engine, vars)
+        return vars
 
     @storage_property
     def render_to_string(storage):
-        return storage.template.render_to_string
+        return storage.template.render
 
     @storage_property
     def render_to_response(storage):

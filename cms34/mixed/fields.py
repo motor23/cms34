@@ -1,7 +1,6 @@
 # -*- coding: utf8 -*-
 from iktomi.forms.convs import ValidationError
 from datetime import datetime
-
 from ..utils import prop_getter
 from ..model import (
     MF_String,
@@ -83,6 +82,7 @@ __all__ = (
     'XB_Content',
     'xf_slug',
     'xf_title',
+    'xf_optional_title',
     'xf_tree_title',
     'xf_lead',
     'xf_id',
@@ -263,6 +263,11 @@ class XF_Title(XF_Text):
     label = u'Заголовок'
     required = True
     sortable = True
+
+
+class XF_OptionalTitle(XF_Title):
+    label = u'Заголовок (опционально)'
+    required = False
 
 
 class XF_TreeTitle(XF_Title):
@@ -727,6 +732,7 @@ class XF_List(XF_Simple):
 
 xf_slug = XF_Slug()
 xf_title = XF_Title()
+xf_optional_title = XF_OptionalTitle()
 xf_tree_title = XF_TreeTitle()
 xf_lead = XF_Lead()
 xf_id = XF_Id()

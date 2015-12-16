@@ -1,22 +1,203 @@
 import logging
+import copy
 from webob.exc import HTTPNotFound
 from iktomi.web import WebHandler, cases, prefix, UrlBuildingError
+from sqlalchemy.ext.serializer import dumps, loads
+from sqlalchemy.sql import func
+
 from ..front.view import BaseView, HView
 
 logger = logging.getLogger()
 
 
-class V_Sections(object):
-    def __init__(self, db, cached_db, model, resources):
+class BindedSections(object):
+
+    def __init__(self, sections, db, cache=None, cache_timeout=60):
+        self.sections = sections
         self.db = db
-        self.cached_db = cached_db
+        self.cache = cache
+        self.cache_timeout = cache_timeout
+
+    def update(self):
+        version = self.get_version_from_cache()
+        if version is not None:
+            if version==self.sections.version:
+                return False
+            else:
+                items = self.get_from_cache()
+        else:
+            items = None
+
+        if items is None:
+            version = self.get_version_from_db()
+            if version==self.sections.version:
+                return False
+            else:
+                items = self.get_from_db()
+            self.set_to_cache(version, items)
+        self.sections.set_sections(version, items)
+        return True
+
+    def get_from_db(self):
+        items = self.db.query(self.sections.model) \
+            .with_polymorphic('*') \
+            .order_by(self.sections.model.order).all()
+        items = self.filter_items_from_db(items)
+        map(lambda x: self.db.expunge(x), items)
+        return items
+
+    def get_version_from_db(self):
+        model = self.sections.model
+        cnt = self.db.query(model.id).count()
+        updated_dt = self.db.query(func.max(model.updated_dt)).first()
+        return (updated_dt, cnt)
+
+    def filter_items_from_db(self, items):
+        # remove items with unpublished parents
+        parents = dict([(item.parent_id, item) for item in items])
+        parent_ids = [None]
+        result = []
+        while parent_ids:
+            new_parent_ids = []
+            for item in items:
+                if item.parent_id in parent_ids:
+                    result.append(item)
+                    new_parent_ids.append(item.id)
+            parent_ids = new_parent_ids
+        items = result
+
+        # remove sections with double (slugs, parant_id) pairs 
+        # filter not published sections
+        result = []
+        pairs = []
+        for item in items:
+            pair = (item.slug, item.parent_id)
+            if pair not in pairs:
+                pairs.append(pair)
+                result.append(item)
+        return result
+
+    def get_from_cache(self):
+        if self.cache:
+            items = self.cache.get(self.sections.data_cache_key)
+            if items is not None:
+                return loads(items)
+
+    def get_version_from_cache(self):
+        if self.cache:
+            return self.cache.get(self.sections.version_cache_key)
+        else:
+            return None
+
+    def set_to_cache(self, version, items):
+        if self.cache:
+            self.cache.set(self.sections.data_cache_key, dumps(items),
+                           time=self.cache_timeout)
+            self.cache.set(self.sections.version_cache_key, version,
+                           time=self.cache_timeout)
+
+    def merge_item(self, item):
+        return self.db.merge(item, load=False)
+
+    def get_sections(self, **kwargs):
+        items = self.sections.get_sections(**kwargs)
+        return map(lambda x: self.merge_item(x), items)
+
+    def get_section(self, **kwargs):
+        section = self.sections.get_section(**kwargs)
+        if section is not None:
+            return self.merge_item(section)
+        else:
+            return None
+
+    def get(self, id, default=None):
+        section = self.sections.get(id, default)
+        if section is not None:
+            return self.merge_item(section)
+        else:
+            return None
+
+    def url_for_obj(self, root, obj, default=None):
+        return self.sections.url_for_obj(root, obj, default=default)
+
+    def url_for_section(self, root, section):
+        return self.sections.url_for_section(root, section)
+
+    def root_for_section(self, root, section):
+        return self.sections.root_for_section(root, section)
+
+
+class V_Sections(object):
+
+    binded_class = BindedSections
+
+    def __init__(self, model, resources, db=None, cache=None):
         self.model = model
+        self.data_cache_key = "data-%s" % model.__name__
+        self.version_cache_key = "version-%s" % model.__name__
+        self.version = None
         self.resources = resources
-        self.sections_query = None
+        self.db = db
+        self.cache = cache
+        self.get_sections_cache = {}
+        self.sections = []
+        self.sections_dict = {}
+        self.sections_by_parent = {}
+
+    def bind(self, db, cache):
+        return self.binded_class(self, db, cache)
+
+    def set_sections(self, version, sections):
+        self.sections = map(lambda x: copy.copy(x), sections)
+        self.sections_dict = dict([(s.id, s) for s in self.sections])
+        self.sections_by_parent = {}
+        for section in self.sections:
+            self.sections_by_parent.setdefault(section.parent_id, [])\
+                                   .append(section)
+        self.version = version
         self.get_sections_cache = {}
 
+    def get(self, id, default=None):
+        if id in self:
+            return self[id]
+        else:
+            return default
+
+    def __getitem__(self, key):
+        return self.sections_dict[key]
+
+    def __iter__(self):
+        return self.sections_dict.__iter__()
+
+    def get_sections(self, **kwargs):
+        result = []
+        cache_key = str(kwargs)
+        # Try cache
+        if self.get_sections_cache.has_key(cache_key):
+            return self.get_sections_cache[cache_key]
+        # Try indexes
+        if kwargs.has_key('id'):
+            section = self.get(kwargs.pop('id'))
+            sections = section and [section] or []
+        elif kwargs.has_key('parent_id'):
+            sections = self.sections_by_parent.get(kwargs.pop('parent_id'), [])
+        else:
+            sections = self.sections
+        for section in sections:
+            for key, value in kwargs.items():
+                if value != getattr(section, key):
+                    break
+            else:
+                result.append(section)
+        self.get_sections_cache[cache_key] = result
+        return result
+
+    def get_section(self, **kwargs):
+        sections = self.get_sections(**kwargs)
+        return sections and sections[0] or None
+
     def handler(self):
-        return H_Sections(self)
+        return self.h_section()
 
     def h_section(self, section=None):
         parent_id = section and section.id or None
@@ -30,45 +211,7 @@ class V_Sections(object):
             handlers.append(handler)
         return cases(*handlers)
 
-    def load_sections(self):
-        _query = self.db.query(self.model) \
-            .with_polymorphic('*') \
-            .order_by(self.model.order)
-        self.sections_query = self.cached_db.query(self.model, _query,
-                                                   reload=True)
-        self.get_sections_cache = {}
-
-    def get_sections(self, reload=False, **kwargs):
-        result = []
-        key = str(kwargs)
-        if not reload and self.get_sections_cache.has_key(key):
-            return self.get_sections_cache[key]
-        if self.sections_query is None or reload:
-            self.load_sections()
-        sections = self.sections_query.filter_by(**kwargs).all()
-        # remove sections with double (slugs, parant_id) pairs 
-        # filter not published sections
-        pairs = []
-        for section in sections:
-            pair = (section.slug, section.parent_id)
-            if pair not in pairs:
-                pairs.append(pair)
-                if self.get_section_parents(section) is not None:
-                    result.append(section)
-        self.get_sections_cache[key] = result
-        return result
-
-    def retrieve_sections(self, **kwargs):
-        ids = map(lambda x: x.id, self.get_sections(**kwargs))
-        return self.db.query(self.model).filter(self.model.id.in_(ids)).all()
-
-    def get_section(self, **kwargs):
-        sections = self.get_sections(**kwargs)
-        return sections and sections[0] or None
-
-    def get(self, id, default=None):
-        return self.get_section(id=id) or default
-
+    # XXXX
     def get_section_parents(self, section):
         result = []
         if section.parent_id is None:
@@ -123,55 +266,6 @@ class V_Sections(object):
 
     def __del__(self):
         logger.debug('__del__: %s' % self)
-
-
-class H_Sections(WebHandler):
-    _sections = {}
-    _handler = cases()
-
-    def __init__(self, sections):
-        self.sections = sections
-
-    def _locations(self):
-        return self.handler()._locations()
-
-    def __call__(self, env, data):
-        # env.sections = self.sections
-        return self.handler().__call__(env, data)
-
-    @property
-    def _next_handler(self):
-        return self.handler()._next_handler()
-
-    def __or__(self, next_handler):
-        raise AttributeError('__or__ is not allowed for H_resources handler')
-
-    def handler(self):
-        if self.rebuild_sections_dict():
-            self._handler = self.sections.h_section()
-        return self._handler
-
-    def rebuild_sections_dict(self):
-        section_items = self.sections.get_sections(reload=True)
-        self.sections.db.close()
-        sections = [(section.id, self.tree_path(section)) \
-                    for section in section_items]
-        sections = dict(filter(lambda x: x[1], sections))
-        if sections == self._sections:
-            return False
-        else:
-            self._sections = sections
-            return True
-
-    def tree_path(self, section):
-        # default tree_path raise Exception when get relation
-        parents = self.sections.get_section_parents(section)
-        if parents is None:
-            return None
-        slugs = [section.slug] + [item.slug for item in parents]
-        slugs.reverse()
-        slugs = map(lambda x: x or '', slugs)
-        return '/' + '/'.join(slugs) + '/'
 
 
 class ResourceView(BaseView):
@@ -255,3 +349,4 @@ class ResourcesBase(object):
                 f(register, **kwargs)
         if not names or self.sections_model_factory.name in names:
             self.sections_model_factory(register, self.resources, **kwargs)
+

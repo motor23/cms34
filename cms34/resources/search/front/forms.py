@@ -8,20 +8,6 @@ from iktomi.unstable.forms import convs
 from iktomi.utils import cached_property
 
 
-class SearchOptsModelChoice(convs.ModelChoice):
-    def to_python(self, value):
-        """
-        If value is in request, but there are no such option in database 
-        return 404.
-        :param value: Id of search filter object
-        :return: search filter object
-        """
-        filter_obj = super(SearchOptsModelChoice, self).to_python(value)
-        if value and filter_obj is None:
-            raise HTTPNotFound()
-        return filter_obj
-
-
 class SearchForm(FilterForm):
     template = 'forms/search_form.html'
 
@@ -39,7 +25,7 @@ class SearchForm(FilterForm):
             Field('q', conv=convs.Char(),
                   widget=widgets.TextInput(template='search/query.html')),
             Field('filter',
-                  conv=SearchOptsModelChoice(model=self.search_options_model),
+                  conv=convs.ModelChoice(model=self.search_options_model),
                   widget=widgets.Select(template='search/filter_select.html',
                                         null_label=u'Все')),
             # FieldSet('dt', fields=[

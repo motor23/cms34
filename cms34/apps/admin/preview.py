@@ -18,10 +18,19 @@ def from_admin_cfg(name):
     return property(getter, setter)
 
 
+class Deffered(object):
+
+    def __init__(self, func):
+        self.func = func
+
+    def __get__(self, value):
+        self.value
+
+
 class PreviewAppOverload(object):
     def __init__(self, cfg, admin_app, **kwargs):
         self._admin = admin_app
-        super(PreviewAppOverload, self).__init__(cfg, **kwargs)
+        super(PreviewAppOverload, self).__init__(cfg)
 
     @property
     def root(self):
@@ -30,11 +39,11 @@ class PreviewAppOverload(object):
     def create_environment(self, request=None, **kwargs):
         return self.env_class.create(self, request=request, **kwargs)
 
-    @cached_property
-    def front_models(self):
+    def get_front_models(self):
         return self._admin.models.admin
 
-    query_class = AdminPublicQuery
+    def get_query_class(self):
+        return AdminPublicQuery
 
 
 class PreviewCfgOverload(object):
@@ -62,6 +71,7 @@ class PreviewCfgOverload(object):
     # CMS34_DIR = path.dirname(path.abspath(__file__))
 
     CACHE_ENABLED = False
+    QUERY_CACHE_ENABLED = False
     MEMCACHE = from_admin_cfg('MEMCACHE')
     CACHE_PREFIX = from_admin_cfg('CACHE_PREFIX')
 

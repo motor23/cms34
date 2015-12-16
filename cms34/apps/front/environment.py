@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 from iktomi.utils import cached_property
+from iktomi.utils.storage import (storage_cached_property,
+                                  storage_method,
+                                  storage_property)
 from jinja2 import Markup
 from ..common.i18n.translation import get_translations
 from ..common.environment import Environment as EnvironmentBase
@@ -53,9 +56,13 @@ class Environment(EnvironmentBase):
     def indices(self):
         return search_index_dispatcher(self)
 
-    def get_template_globals(self, env):
-        result = EnvironmentBase.get_template_globals(self, env)
-        return dict(result, replace_tags=replace_tags, lang=env.lang)
+    def get_template_vars(self):
+        result = EnvironmentBase.get_template_vars(self)
+        result.update(dict(
+            replace_tags=replace_tags,
+            lang=self._root_storage.lang,
+        ))
+        return result
 
     def url_for_obj(self, obj, default=None):
         raise NotImplementedError

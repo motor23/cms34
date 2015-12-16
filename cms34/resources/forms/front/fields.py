@@ -5,10 +5,18 @@ from iktomi.cms.forms import FieldBlock as FieldBlockBase
 from iktomi.forms import Field, convs
 from iktomi.unstable.forms.convs import Email as EmailConv
 from iktomi.unstable.forms.files import FileFieldSet
-from .convs import FileFieldSetConv, size_validator, extension_validator
+from .convs import (
+    FileFieldSetConv,
+    size_validator,
+    extension_validator,
+    PhoneConv,
+    ZipcodeConv,
+)
 from .widgets import (
     CF_TextInputWidget,
     CF_EmailWidget,
+    CF_PhoneWidget,
+    CF_ZipcodeWidget,
     CF_TextAreaWidget,
     CF_RadioWidget,
     CF_CheckboxWidget,
@@ -80,9 +88,9 @@ class CF_TextField(CF_FormField):
     }
 
     validator_lengths = {
-        'small': 50,
-        'medium': 100,
-        'large': 250,
+        'small': 20,
+        'medium': 50,
+        'large': 100,
     }
 
     def set_size(self):
@@ -98,6 +106,16 @@ class CF_TextField(CF_FormField):
 class CF_EmailTextField(CF_TextField):
     widget = CF_EmailWidget()
     conv = EmailConv(convs.length(3, 100))
+
+
+class CF_PhoneTextField(CF_TextField):
+    widget = CF_PhoneWidget()
+    conv = PhoneConv(convs.length(1, 20))
+
+
+class CF_ZipcodeTextField(CF_TextField):
+    widget = CF_ZipcodeWidget()
+    conv = ZipcodeConv(convs.length(6, 6))
 
 
 class CF_TextareaField(CF_FormField):
@@ -149,6 +167,7 @@ class CF_SelectField(CF_EnumField):
 
 
 class CF_FileField(CF_FileFieldSet, CF_FormField):
+    value_prefix = 'file://'
     _max_file_size = 5 * 1024 * 1024
     _valid_extensions = ['txt', 'doc', 'docx', 'pptx', 'xlsx', 'rtf', 'xls',
                          'pps', 'ppt', 'pdf', 'jpg', 'bmp', 'png', 'tif', 'pcx',
@@ -168,8 +187,19 @@ class CF_FileField(CF_FileFieldSet, CF_FormField):
 
     @cached_property
     def json_prepared(self):
-        return os.path.relpath(self.clean_value.path, self.form.env.cfg.ROOT)
+        value_tpl = '{prefix}{path}'
+        if self.clean_value is None:
+            return ''
+        path = os.path.relpath(self.clean_value.path, self.form.env.cfg.ROOT)
+        return value_tpl.format(prefix=self.value_prefix, path=path)
 
 
 class CF_FieldBlock(FieldBlockBase):
     widget = CF_FieldBlockWidget()
+
+    @cached_property
+    def json_prepared(self):
+        data = []
+        for field in self.fields:
+            data.append((field.label, field.json_prepared))
+        return data

@@ -44,7 +44,7 @@ class XF_FieldSize(XF_Select):
 class XF_FieldType(XF_Type):
     name = 'type'
     label = u'Тип поля'
-    permissions = 'rw'
+    permissions = 'r'
     # Choices are defined in factory
 
 

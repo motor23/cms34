@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 from iktomi.web import match
+from iktomi.utils import cached_property
 from cms34.front.view import view_handler
 from cms34.resources import ResourceView
 from cms34.front.plugins import VP_Response, VP_Query
 from cms34.resources.forms.front import ConstructedForm
 from cms34.apps.common.handlers import no_preview
 from cms34.apps.common.flood import check_flood
+from cms34.apps.common.caching import cache
+from cms34.apps.common.guarded_urls import GuardedMatch
 
 
 class LetterForm(ConstructedForm):
@@ -30,6 +33,16 @@ class LetterForm(ConstructedForm):
 
             fields.append(front_field_view)
         return fields
+
+    @cached_property
+    def json_prepared(self):
+        """
+        Export list of tuples, to save the order.
+        """
+        data = []
+        for block in self.fields:
+            data.append((block.title, block.json_prepared))
+        return data
 
     @classmethod
     def init(cls, env, form_tree):
@@ -67,8 +80,9 @@ class V_LettersSection(ResourceView):
     @classmethod
     def cases(cls, sections, section):
         return [
-            match('/', name='rules') | cls.h_rules,
-            match('/form/', name='form') | no_preview | cls.h_form,
+            match('/', name='rules') | cache(False) | cls.h_rules,
+            GuardedMatch('/form/', name='form', methods=('GET', 'POST')) |
+            cache(False) | no_preview | cls.h_form,
             sections.h_section(section),
         ]
 

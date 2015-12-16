@@ -22,12 +22,23 @@ __all__ = ['Application', 'AppEnvironment']
 logger = logging.getLogger()
 
 
-class Application(BaseApplication):
+class BaseApplication(object):
+
+    properties = [
+        'env_class',
+        'handler',
+        'root',
+    ]
+
     cli_dict = AppCliDict([AppCli])
 
     def __init__(self, cfg=None, **kwargs):
         self.cfg = cfg or self.cfg_class()()
         self.__dict__.update(kwargs)
+        for name in self.properties:
+            if name not in kwargs and name not in dir(self):
+                logging.debug('Application: load "%s" property' % name)
+                setattr(self, name, getattr(self, 'get_%s' % name)())
 
     @classmethod
     def custom(cls, custom_cfg_path='', **kwargs):
@@ -47,22 +58,29 @@ class Application(BaseApplication):
         from .cfg import Cfg
         return Cfg
 
-    @cached_property
-    def handler(self):
+    def get_handler(self):
         raise NotImplementedError()
 
-    @property
-    def root(self):
+    def get_root(self):
         host = self.cfg.DOMAINS[0] if self.cfg.DOMAINS else ''
         return Reverse(self.handler._locations(), host=host)
 
-    @cached_property
-    def env_class(self):
-        from .environment import BaseEnvironment
-        return BaseEnvironment
+    def get_env_class(self):
+        from .environment import Environment
+        return Environment
 
     def create_environment(self, request=None, **kwargs):
         return self.env_class.create(self, request=request, **kwargs)
+
+    def create_request(self, environ):
+        return Request(environ, charset='utf-8')
+
+    def handle_error(self, env):
+        '''
+        Unhandled exception handler.
+        You can put any logging, error warning, etc here.'''
+        logger.exception('Exception for %s %s :',
+                         env.request.method, env.request.url)
 
     def handle(self, env, data):
         '''
@@ -93,7 +111,7 @@ class Application(BaseApplication):
         WSGI interface method.
         Creates webob and iktomi wrappers and calls `handle` method.
         '''
-        request = Request(environ, charset='utf-8')
+        request = self.create_request(environ)
         env = self.create_environment(request)
         data = VersionedStorage()
         response = self.handle(env, data)
@@ -104,20 +122,31 @@ class Application(BaseApplication):
             result = HTTPInternalServerError()(environ, start_response)
         return result
 
-    @cached_property
-    def db_maker(self):
+
+class Application(BaseApplication):
+
+    properties = [
+        'template_engine',
+        'db_maker',
+        'cache',
+        'models',
+        'env_class',
+        'handler',
+        'root',
+    ]
+
+    def get_db_maker(self):
         return binded_filesessionmaker(self.cfg.DATABASES,
                                        engine_params=self.cfg.DATABASE_PARAMS,
                                        )
 
-    @cached_property
-    def cache(self):
+    def get_cache(self):
         return MemcacheClient(self.cfg.MEMCACHE, self.cfg.CACHE_PREFIX)
 
-    def template_engine(self):
-        return AppTemplateEngine(self.cfg.TEMPLATES)
+    def get_template_engine(self):
+        return AppTemplateEngine(self, self.cfg.TEMPLATES)
 
-    @cached_property
-    def models(self):
+    def get_models(self):
         import models
         return models
+

@@ -12,13 +12,15 @@ class Context(EnvironmentBase.Context): pass
 
 
 class Environment(EnvironmentBase):
+
     @cached_property
     def cached_db(self):
         return self.app.cached_db_maker()
 
-    def get_template_globals(self, env):
-        result = EnvironmentBase.get_template_globals(self, env)
-        return dict(result, url_for_obj=self.url_for_obj)
+    def get_template_vars(self):
+        result = EnvironmentBase.get_template_vars(self)
+        result['url_for_obj']=self.url_for_obj
+        return result
 
     @storage_method
     def url_for_obj(storage, obj, default=None):
@@ -30,3 +32,11 @@ class Environment(EnvironmentBase):
     @storage_cached_property
     def menu(storage):
         return Menu(storage, storage.models.Menu)
+
+    @storage_cached_property
+    def sections(storage):
+        result = {}
+        for key, section in storage.app.sections.items():
+            cache = storage.cfg.QUERY_CACHE_ENABLED and storage.cache or None
+            result[key] = section.bind(storage.db, cache)
+        return result

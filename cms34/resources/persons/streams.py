@@ -2,6 +2,7 @@
 from cms34.stream import (
     StreamFactory,
     SFP_ImageUpload,
+    SFP_SectionHtmlBodyHandler,
 )
 from cms34.mixed import (
     XF_Block,
@@ -38,7 +39,7 @@ class XB_Photo(XF_Block):
     label = u'Фото'
     item_fields = [
         XF_Img(name='img_orig',
-               label=u'Фото в исходном разрешении',
+               label=u'Фото в исходном разрешении (Не более 5000×5000)',
                required=True),
     ]
 
@@ -59,7 +60,10 @@ class SFY_Persons(StreamFactory):
         'wheel': 'rwxdcp',
         'editor': 'rwxdcp',
     }
-    plugins = [SFP_ImageUpload]
+    plugins = [
+        SFP_ImageUpload,
+        SFP_SectionHtmlBodyHandler,
+    ]
 
     fields = [
         xb_section_object,

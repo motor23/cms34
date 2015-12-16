@@ -80,6 +80,11 @@ class FcgiCli(Cli):
         app = self.create_app(self.App, level=level, custom_cfg_path=cfg)
         return self.cli(app, **app.cfg.FLUP_ARGS).command_stop()
 
+    def command_stop_dispatcher(self, level=None, cfg=''):
+        app = self.create_app(self.App.Dispatcher,
+                              App=self.App, level=level, custom_cfg_path=cfg)
+        return self.cli(app, **app.cfg.FLUP_ARGS).command_stop()
+
     def cli(self, app, **kwargs):
         return BaseFcgi(app, **kwargs)
 

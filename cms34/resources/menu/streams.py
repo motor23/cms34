@@ -6,12 +6,11 @@ from cms34.stream import (
 from cms34.mixed import (
     XF_Block,
     xf_tree_title,
-    xf_slug,
     xf_parent,
     xf_order,
     xb_object,
 )
-from ..sections.fields import xf_section
+from ..sections.fields import xf_section_required
 
 
 class XB_Main(XF_Block):
@@ -30,7 +29,7 @@ class XB_Main(XF_Block):
         xf_order,
         xf_parent,
         xf_tree_title,
-        xf_section,
+        xf_section_required,
     ]
 
 

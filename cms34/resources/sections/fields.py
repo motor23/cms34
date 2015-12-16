@@ -18,11 +18,16 @@ from cms34.stream import (
     LF_String,
 )
 
+
 class XF_Section(XF_StreamSelect):
     name = 'section'
     label = u'Раздел'
     model = 'Section'
     stream_name = 'sections'
+
+
+class XF_SectionRequired(XF_Section):
+    required = True
 
 
 class XF_Sections(XF_Section):
@@ -35,13 +40,14 @@ class XF_Sections(XF_Section):
 
 class XF_SectionTreeTitle(XF_TreeTitle):
     img_url_template = '/cms34-static/img/sections/%(value)s.png'
+
     def container_list_fields(self):
         return [
             lf_tree_expand,
             XF_TypeImg(img_url_template=self.img_url_template),
             LF_String(self.name,
-                label=self.label,
-            ),
+                      label=self.label,
+                      ),
         ]
 
 
@@ -70,8 +76,9 @@ class XB_SectionObject(XB_Object):
 
 
 xf_section = XF_Section()
+xf_section_required = XF_SectionRequired()
 xf_sections = XF_Sections()
-xf_section_tree_title  = XF_SectionTreeTitle()
+xf_section_tree_title = XF_SectionTreeTitle()
 xb_section_object = XB_SectionObject()
 
 
@@ -81,6 +88,7 @@ class XB_Section(XF_Block):
     fields = [
         xf_section,
     ]
+
 
 class XB_Sections(XF_Block):
     label = u'Разделы'
@@ -92,4 +100,3 @@ class XB_Sections(XF_Block):
 
 xb_section = XB_Section()
 xb_sections = XB_Sections()
-

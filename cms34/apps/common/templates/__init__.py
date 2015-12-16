@@ -4,10 +4,10 @@ import jinja2.filters
 import urlparse
 import urllib
 from webob.response import Response
+from iktomi.templates import BoundTemplate as BoundTemplateBase
 
 from .filters import all_filters
 from .functions import all_functions
-from .macros import MacrosLib
 from .tags import Show, Preview
 from .cache import BlockCacheExtension
 
@@ -20,9 +20,9 @@ class TemplateEngine(object):
     extensions = []
     autoescape=True,
 
-    def __init__(self, paths, **kwargs):
+    def __init__(self, app, paths, **kwargs):
+        self.app = app
         self.__dict__.update(kwargs)
-
         self.env = jinja2.Environment(
             loader=jinja2.FileSystemLoader(paths),
             autoescape=self.autoescape,
@@ -30,6 +30,7 @@ class TemplateEngine(object):
         self.env.filters.update(self.filters)
         self.env.install_null_translations()
         self.env.globals.update(self.globals)
+        self.env.globals['app'] = self.app
 
     def resolve(self, name):
         base, ext = os.path.splitext(name)
@@ -60,9 +61,8 @@ class AppTemplateEngine(TemplateEngine):
     globals = {}
     globals.update(all_functions)
 
-    def __init__(self, paths, **kwargs):
-        TemplateEngine.__init__(self, paths, **kwargs)
-        self.env.globals.update({
-            'macros': MacrosLib(self),
-        })
 
+class BoundTemplate(BoundTemplateBase):
+
+    def get_template_vars(self):
+        return self.env.get_template_vars()

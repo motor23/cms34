@@ -8,7 +8,6 @@ from ...mixed import (
     xf_title,
     xf_body,
 )
-
 from .fields import xf_members
 
 

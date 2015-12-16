@@ -13,7 +13,7 @@ class Menu(object):
         for item in items:
             if item.section_id:
                 section = self.env.sections.get_section(id=item.section_id)
-                if not section:
+                if not (section and self.env.url_for_obj(section)):
                     continue
             result.append(item)
         return result
@@ -95,10 +95,6 @@ class Menu(object):
         if level:
             for subitem in self.get_child_menu(item):
                 submenu = self._get_menu_tree(level-1, selected_items, subitem)
-                # Sometimes multiple menu items can point to the same place
-                if any(item for item in selected_items
-                       if subitem.section_id == item.section_id):
-                    selected_items.append(subitem)
                 selected = subitem in selected_items
                 result.append((subitem, selected, submenu))
         return result

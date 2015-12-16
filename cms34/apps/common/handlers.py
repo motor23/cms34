@@ -4,7 +4,12 @@ from iktomi import web
 class H_App(web.WebHandler):
     def __init__(self, app):
         self.app = app
-        self._next_handler = self.app.handler
+
+    def _locations(self):
+        #XXX
+        self.app.update_sections(self.app.sections.values())
+        self.app.handler = self.app.get_handler()
+        return self.app.handler._locations()
 
     def __call__(self, env, data):
         app_env = self.app.create_environment(

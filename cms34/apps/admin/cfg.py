@@ -72,6 +72,10 @@ class Cfg(CfgBase):
         )
 
     @cached_property
+    def STATIC_DIR(self):
+        return path.join(self.SITE_DIR, 'static')
+
+    @cached_property
     def MANIFESTS(self):
         return OrderedDict([
             ("cms", {
@@ -86,6 +90,12 @@ class Cfg(CfgBase):
                 "css": 'css/Manifest',
                 "js": 'js/Manifest'
             }),
+            ('local', {
+                "path": self.STATIC_DIR,
+                "url": self.STATIC_URL,
+                "css": 'css/Manifest',
+                "js": 'js/Manifest'
+            })
         ])
 
     MEMCACHE = ['127.0.0.1:11211']

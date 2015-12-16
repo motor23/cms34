@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 from iktomi.utils import cached_property
-from iktomi.cms.forms.convs import ValidationError
+from iktomi.cms.forms.convs import ValidationError, Char
 from iktomi.unstable.db.files import TransientFile
 from iktomi.unstable.forms.files import (
     FileFieldSetConv as BaseFileFieldSetConv
@@ -35,3 +35,11 @@ def extension_validator(valid_extensions):
         return value
 
     return _validate
+
+
+class PhoneConv(Char):
+    regex = r'^(\+\d{1,2})?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{2}[\s.-]?\d{2}$'
+
+
+class ZipcodeConv(Char):
+    regex = r'^[0-9]{6}$'

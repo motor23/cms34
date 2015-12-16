@@ -7,6 +7,7 @@ from cms34.front import VP_Response, view_handler
 from cms34.resources import ResourceView
 from cms34.apps.common.guarded_urls import GuardedMatch
 from cms34.apps.common.handlers import no_preview
+from cms34.apps.common.caching import cache
 from .forms import SearchForm
 
 logger = logging.getLogger('')
@@ -49,6 +50,7 @@ class V_Search(ResourceView):
     index_params = {
         'q': unicode,
         'filter': int,
+        'page': int,
     }
 
     plugins = [VP_Response]
@@ -56,8 +58,8 @@ class V_Search(ResourceView):
     @classmethod
     def cases(cls, sections, section):
         return [
-            GuardedMatch('/', name='index',
-                         params=cls.index_params) | no_preview | cls.h_index,
+            GuardedMatch('/', name='index', params=cls.index_params) |
+            cache(False) | no_preview | cls.h_index,
             sections.h_section(section)
         ]
 

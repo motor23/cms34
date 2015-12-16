@@ -87,7 +87,7 @@ class XF_MediaTypeImg(XF_TypeImg):
 
 class XF_ImgOrig(XF_Img):
     name = 'img_orig'
-    label = u'Фото в исходном разрешении'
+    label = u'Фото в исходном разрешении (Не более 5000×5000)'
     required = True
 
 

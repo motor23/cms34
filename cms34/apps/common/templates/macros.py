@@ -18,14 +18,17 @@ class MacrosModuleWrapper(object):
 
 class MacrosLib(object):
 
-    def __init__(self, template):
+    def __init__(self, template, locals={}):
+        self.__locals = locals
         self.__template = weakproxy(template)
 
     def __getattr__(self, name):
         try:
             jinja = self.__template.env
             tmpl = jinja.get_template('macros/%s.html' % name)
-            module = tmpl.make_module(vars=self.__template.env.globals)
+            vars = dict(self.__template.env.globals)
+            vars.update(self.__locals)
+            module = tmpl.make_module(vars=vars)
             result = MacrosModuleWrapper(module)
             setattr(self, name, result)
             return result

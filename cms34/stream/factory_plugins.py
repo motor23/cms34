@@ -8,9 +8,10 @@ from iktomi.cms.ajax_file_upload import (
     StreamImageUploadHandler,
 )
 from iktomi.cms.edit_log.views import EditLogHandler
-
 from .html_body_handlers import (
     HtmlBodyHandler,
+    EventHtmlBodyHandler,
+    SectionHtmlBodyHandler,
 )
 from .stream_actions import PreviewAction
 from .stream_handlers import RecursiveDeleteFlagItemHandler
@@ -91,6 +92,14 @@ class SFP_HtmlBody(SFP_Base):
 
     def create_config(self, factory, cfg):
         cfg.Stream.actions = cfg.Stream.actions + [self.handler_cls()]
+
+
+class SFP_EventHtmlBodyHandler(SFP_HtmlBody):
+    handler_cls = EventHtmlBodyHandler
+
+
+class SFP_SectionHtmlBodyHandler(SFP_HtmlBody):
+    handler_cls = SectionHtmlBodyHandler
 
 
 class SFP_ChildFactories(SFP_Base):

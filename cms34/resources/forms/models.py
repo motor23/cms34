@@ -15,10 +15,11 @@ from .fields import (
     xf_field_type,
     xf_options_list,
 )
-
 from .front.fields import (
     CF_TextField,
     CF_EmailTextField,
+    CF_PhoneTextField,
+    CF_ZipcodeTextField,
     CF_TextareaField,
     CF_RadioField,
     CF_CheckboxField,
@@ -45,6 +46,26 @@ class MFY_EmailTextField(ModelFactory):
     @cached_property
     def front_view_cls(self):
         return CF_EmailTextField
+
+
+class MFY_PhoneTextField(ModelFactory):
+    name = 'FormPhoneTextField'
+    title = u'Телефон'
+
+    @hybrid_factory_method.model
+    @cached_property
+    def front_view_cls(self):
+        return CF_PhoneTextField
+
+
+class MFY_ZipcodeTextField(ModelFactory):
+    name = 'FormZipcodeTextField'
+    title = u'Почтовый индекс'
+
+    @hybrid_factory_method.model
+    @cached_property
+    def front_view_cls(self):
+        return CF_ZipcodeTextField
 
 
 class MFY_ParagraphTextField(ModelFactory):
@@ -105,6 +126,8 @@ class MFY_FormField(ModelFactory):
     types = [
         ('text', MFY_TextField),
         ('email', MFY_EmailTextField),
+        ('phone', MFY_PhoneTextField),
+        ('zipcode', MFY_ZipcodeTextField),
         ('paragraph_text', MFY_ParagraphTextField),
         ('radio', MFY_RadioField),
         ('checkbox', MFY_CheckboxField),

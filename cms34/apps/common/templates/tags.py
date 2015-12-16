@@ -42,7 +42,7 @@ class Preview(Extension):
         return node
 
     def _show_support(self, caller=None):
-        if getattr(self.environment.globals['env'].cfg, 'PREVIEW', False):
+        if getattr(self.environment.globals['app'].cfg, 'PREVIEW', False):
             return caller()
         return u''
 
