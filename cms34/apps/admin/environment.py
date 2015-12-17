@@ -69,14 +69,14 @@ class Environment(EnvironmentBase):
     def get_edit_url(storage, x):
         return storage.streams.get_edit_url(storage, x)
 
-    def get_template_globals(self, env):
-        vars = EnvironmentBase.get_template_globals(self, env)
+    def get_template_vars(self):
+        vars = EnvironmentBase.get_template_vars(self)
         vars.update(dict(
-            user=getattr(env, 'user', None),
-            packed_js_tag=partial(packer.js_tag, env),
-            packed_css_tag=partial(packer.css_tag, env),
-            CMS34_STATIC_URL=env.cfg.CMS34_STATIC_URL,
-            CMS_STATIC_URL=env.cfg.CMS_STATIC_URL,
+            user=getattr(self._root_storage, 'user', None),
+            packed_js_tag=partial(packer.js_tag, self._root_storage),
+            packed_css_tag=partial(packer.css_tag, self._root_storage),
+            CMS34_STATIC_URL=self._root_storage.cfg.CMS34_STATIC_URL,
+            CMS_STATIC_URL=self._root_storage.cfg.CMS_STATIC_URL,
         ))
         return vars
 
