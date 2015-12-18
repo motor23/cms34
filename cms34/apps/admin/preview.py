@@ -50,6 +50,10 @@ class PreviewCfgOverload(object):
     def __init__(self, admin_cfg):
         self._admin = admin_cfg
 
+    @cached_property
+    def ROOT(self):
+        return self._admin.ROOT
+
     PREVIEW = True
     PREFIX = '/preview'
     TMP_DIR = from_admin_cfg('TMP_DIR')
