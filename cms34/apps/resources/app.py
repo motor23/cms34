@@ -52,10 +52,10 @@ class Application(BaseApplication):
         result = {}
         for lang in ['ru', 'en']:
             result[lang] = self.sections_maker(lang)
-        self.update_sections(result.values())
+        self.update_sections(result.values(), dispose_connections=True)
         return result
 
-    def update_sections(self, sections_list):
+    def update_sections(self, sections_list, dispose_connections=False):
         db = self.db_maker()
         result = False
         try:
@@ -64,6 +64,9 @@ class Application(BaseApplication):
                 result = sections.bind(db, cache).update() or result
         finally:
             db.close()
+            if dispose_connections:
+                engines = set(db._Session__binds.values())
+                map(lambda x: x.dispose(), engines)
         return result
 
     def create_environment(self, request=None, **kwargs):
