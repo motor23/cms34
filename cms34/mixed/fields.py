@@ -147,18 +147,18 @@ class XF_Simple(XF_Base):
 
     def _model_field(self, factory=None):
         raise NotImplementedError(
-            'cls=%s, name=%s' % (self.__class__, self.name))
+                'cls=%s, name=%s' % (self.__class__, self.name))
 
     def _list_field(self):
         return LF_String(self.name, label=self.label)
 
     def _filter_field(self, models, factory=None):
         raise NotImplementedError(
-            'cls=%s, name=%s' % (self.__class__, self.name))
+                'cls=%s, name=%s' % (self.__class__, self.name))
 
     def _item_field(self, models, factory=None):
         raise NotImplementedError(
-            'cls=%s, name=%s' % (self.__class__, self.name))
+                'cls=%s, name=%s' % (self.__class__, self.name))
 
     def model_register(self, factory=None, register=None):
         field = self._model_field(factory)
@@ -427,43 +427,43 @@ class XF_StreamSelect(XF_Simple):
     def _model_field(self, factory=None):
         if self.multiple:
             return MF_M2MRelation(
-                self.name,
-                ordered=self.ordered,
-                remote_cls_name=self.model,
+                    self.name,
+                    ordered=self.ordered,
+                    remote_cls_name=self.model,
             )
         else:
             return MF_M2ORelation(
-                self.name,
-                remote_cls_name=self.model,
+                    self.name,
+                    remote_cls_name=self.model,
             )
 
     def _item_field(self, models, factory=None):
         return IF_StreamSelect(
-            self.name,
-            label=self.label,
-            model=self.model,
-            stream_name=self.stream_name,
-            multiple=self.multiple,
-            allow_create=self.allow_create,
-            allow_select=self.allow_select,
-            allow_delete=self.allow_delete,
-            inshift=self.inshift,
-            condition=self.condition,
-            default_filters=self.default_filters,
-            ordered=self.ordered,
-            rel=self.rel,
-            required=self.required,
+                self.name,
+                label=self.label,
+                model=self.model,
+                stream_name=self.stream_name,
+                multiple=self.multiple,
+                allow_create=self.allow_create,
+                allow_select=self.allow_select,
+                allow_delete=self.allow_delete,
+                inshift=self.inshift,
+                condition=self.condition,
+                default_filters=self.default_filters,
+                ordered=self.ordered,
+                rel=self.rel,
+                required=self.required,
         )
 
     def _filter_field(self, models, factory=None):
         return FF_StreamSelect(
-            self.name,
-            label=self.label,
-            model=self.model,
-            stream_name=self.stream_name,
-            multiple=self.multiple,
-            condition=self.condition,
-            default_filters=self.default_filters,
+                self.name,
+                label=self.label,
+                model=self.model,
+                stream_name=self.stream_name,
+                multiple=self.multiple,
+                condition=self.condition,
+                default_filters=self.default_filters,
         )
 
     def _list_field(self):
@@ -506,6 +506,8 @@ class XF_Parent(XF_Simple):
     get_stream_name = prop_getter('stream_name', 'name')
     default_filters = {}
     rel = None
+    multiple = False
+    condition = None
     validators = [check_circular_dependency]
 
     def _model_field(self, factory=None):
@@ -513,13 +515,24 @@ class XF_Parent(XF_Simple):
 
     def _item_field(self, models, factory=None):
         return IF_StreamSelect(
-            self.name,
-            label=self.label,
-            model=self.get_model(factory),
-            stream_name=self.get_stream_name(factory),
-            default_filters=self.default_filters,
-            rel=self.rel,
-            validators=self.validators,
+                self.name,
+                label=self.label,
+                model=self.get_model(factory),
+                stream_name=self.get_stream_name(factory),
+                default_filters=self.default_filters,
+                rel=self.rel,
+                validators=self.validators,
+        )
+
+    def _filter_field(self, models, factory=None):
+        return FF_StreamSelect(
+                self.name,
+                label=self.label,
+                model=self.model,
+                stream_name=self.stream_name,
+                multiple=self.multiple,
+                condition=self.condition,
+                default_filters=self.default_filters,
         )
 
 
