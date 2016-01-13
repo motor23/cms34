@@ -56,3 +56,7 @@
     position:absolute;
     right:5px;
 }
+
+.preview-unpublished {
+    background-color: #FFEEEE !important;
+}
