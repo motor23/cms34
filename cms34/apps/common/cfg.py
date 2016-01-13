@@ -201,10 +201,11 @@ class Cfg(BaseCfg):
 
     def config_logging(self):
         lvl_names = logging._levelNames
+        level = lvl_names[self.LOG_LEVEL]
         logging.basicConfig(
-            level=lvl_names[self.LOG_LEVEL],
+            level=level,
             format=self.LOG_FORMAT)
-
+        logging.getLogger().setLevel(level)
         logging.getLogger('sqlalchemy') \
             .setLevel(lvl_names[self.SQLALCHEMY_LOG_LEVEL])
         logging.getLogger('sqlalchemy.engine') \
