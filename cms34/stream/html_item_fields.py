@@ -147,7 +147,7 @@ def wrap_inlines(doc, tag='p', blocks=()):
 
 
 class IF_ExpHtml(IF_Html):
-    allowed_elements = ('a', 'p', 'li', 'ul', 'ol', 'i', 'b',
+    allowed_elements = ('a', 'p', 'li', 'ul', 'ol', 'i', 'b', 'u',
                         'blockquote', 'hr', 'h1', 'h2', 'h3', 'h4', 'br',
                         'table', 'tr', 'td', 'iktomi_doclink', 'iktomi_media',
                         'iktomi_files', 'table', 'td', 'tr')
