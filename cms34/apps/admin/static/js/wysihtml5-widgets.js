@@ -409,7 +409,6 @@ var PopupCommand = Object({
         Object.create(FullscreenPlugin), {}
     );
 
-  console.log('commands', wysihtml5.commands);
 })(wysihtml5);
 
 (function(wysihtml5) {
