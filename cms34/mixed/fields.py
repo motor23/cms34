@@ -204,6 +204,7 @@ class XF_String(XF_Simple):
     regex = None
     error_regex = None
     sortable = True
+    validators = []
 
     def _model_field(self, factory=None):
         return MF_String(self.name,
@@ -222,10 +223,26 @@ class XF_String(XF_Simple):
                          required=self.required,
                          permissions=self.permissions,
                          regex=self.regex,
-                         error_regex=self.error_regex)
+                         error_regex=self.error_regex,
+                         validators=self.validators)
 
     def _list_field(self):
         return LF_String(self.name, label=self.label)
+
+
+def slug_uniqueness(converter, value):
+    """
+    Slug should be unique on current section tree level.
+    """
+    current_item = converter.field.form.item
+    env = converter.field.form.env
+    slug_exists = env.db.query(env.models.Section) \
+        .filter_by(parent_id=current_item.parent_id, slug=value).count()
+
+    if slug_exists:
+        raise ValidationError(u'Раздел с таким слагом уже существует.')
+
+    return value
 
 
 class XF_Slug(XF_String):
@@ -238,6 +255,7 @@ class XF_Slug(XF_String):
                   u'а также символов `_` или `-`. ' \
                   u'Первый символ должен быть буквой.'
     sortable = True
+    validators = [slug_uniqueness]
 
 
 class XF_Text(XF_String):

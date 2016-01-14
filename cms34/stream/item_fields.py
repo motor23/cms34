@@ -83,11 +83,13 @@ class IF_String(IF_Simple):
     max_length = 250
     regex = None
     error_regex = None
+    validators = []
 
     def create_conv(self, models, factory=None):
         if self.error_regex is None:
             self.error_regex = convs.Char.error_regex
         return convs.Char(convs.length(self.min_length, self.max_length),
+                          *self.validators,
                           required=self.required,
                           regex=self.regex,
                           error_regex=self.error_regex)
