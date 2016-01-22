@@ -48,6 +48,9 @@ class BindedSections(object):
 
     def get_version_from_db(self):
         model = self.sections.model
+        engine = self.db.get_bind(mapper=model)
+        if not engine.has_table(model.__tablename__):
+            return None
         cnt = self.db.query(model.id).count()
         updated_dt = self.db.query(func.max(model.updated_dt)).first()
         return (updated_dt, cnt)
