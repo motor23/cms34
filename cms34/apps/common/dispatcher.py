@@ -21,16 +21,41 @@ class Cfg(CfgBase):
     def DEFAULT_CUSTOM_CFG(self):
         return path.join(self.CFG_DIR, 'dispatcher.py')
 
+    LOG_LEVEL = 'INFO'
+    LOG_FORMAT = '%(asctime)s: %(levelname)-5s: %(name)-15s: %(message)s'
+    SQLALCHEMY_LOG_LEVEL = 'WARNING'
+    SQLALCHEMY_ENGINE_LOG_LEVEL = 'WARNING'
+    SQLALCHEMY_POOL_LOG_LEVEL = 'WARNING'
+
+    def config_logging(self):
+        lvl_names = logging._levelNames
+        level = lvl_names[self.LOG_LEVEL]
+        logging.basicConfig(
+            level=level,
+            format=self.LOG_FORMAT)
+        logging.getLogger().setLevel(level)
+        logging.getLogger('sqlalchemy') \
+            .setLevel(lvl_names[self.SQLALCHEMY_LOG_LEVEL])
+        logging.getLogger('sqlalchemy.engine') \
+            .setLevel(lvl_names[self.SQLALCHEMY_ENGINE_LOG_LEVEL])
+        logging.getLogger('sqlalchemy.pool') \
+            .setLevel(lvl_names[self.SQLALCHEMY_POOL_LOG_LEVEL])
+
 
 class DispatcherApp(object):
     apps = []
 
     def __init__(self, App, cfg=None):
         self.cfg = cfg or self.cfg_class()
+        self.cfg.config_logging()
         for reg, cfg_path in self.cfg.DOMAINS:
             compiled_reg = re.compile(reg)
-            app = App.custom(cfg_path, ROOT=cfg.ROOT, APP_ID=reg)
-            self.apps.append((compiled_reg, app))
+            try:
+                app = App.custom(cfg_path, ROOT=cfg.ROOT, APP_ID=reg)
+                self.apps.append((compiled_reg, app))
+            except Exception as e:
+                logger.info('Initialization error cfg=%s' % cfg_path)
+                logger.exception(e)
 
     @classmethod
     def custom(cls, App, custom_cfg_path='', **kwargs):
