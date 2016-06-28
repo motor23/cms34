@@ -11,6 +11,7 @@ from .fields import xf_members
 from ..sections.fields import (
     xb_section_object
 )
+from common.blocks import xb_section_files_blocks, xb_section_links_blocks
 
 
 class XB_Content(XB_Content):
@@ -45,6 +46,8 @@ class SFY_Orgs(StreamFactory):
         xb_section_object,
         xb_content,
         xb_members,
+        xb_section_files_blocks,
+        xb_section_links_blocks,
     ]
     list_fields = sort_fields = filter_fields = item_fields = fields
 

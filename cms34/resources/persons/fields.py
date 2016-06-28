@@ -47,6 +47,7 @@ class XF_Persons(XF_PersonSelect):
     name = 'persons'
     label = u'Персоны'
     multiple = True
+    ordered = True
 
 
 xf_first_name = XF_FirstName()

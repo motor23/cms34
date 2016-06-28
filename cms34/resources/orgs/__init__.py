@@ -9,7 +9,7 @@ class R_Org(ResourceBase):
     name = 'org'
     title = u'Организация'
 
-    view_cls = front.V_Org
+    view_cls = V_Org
     section_model_factory = MFY_Org
     section_stream_item_fields = SFY_Orgs.fields
     stream_factories = [SFY_Orgs]

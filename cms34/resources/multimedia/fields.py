@@ -38,6 +38,8 @@ class XF_PhotosSelect(XF_StreamSelect):
     stream_name = 'multimedia'
     multiple = True
     default_filters = {'type': 'photo'}
+    ordered = True
+    allow_create = True
 
 
 class XF_VideoSelect(XF_StreamSelect):
