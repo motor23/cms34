@@ -18,6 +18,7 @@ __all__ = (
 class IF_Html(IF_Simple):
     name = 'html'
     label = u'Текст'
+    split_paragraphs_by_br = False
     allowed_elements = ('a', 'p', 'li', 'ul', 'ol', 'i', 'b',
                         'blockquote', 'hr', 'h1', 'h2', 'h3', 'br',
                         'table', 'tr', 'td')
@@ -34,6 +35,7 @@ class IF_Html(IF_Simple):
             allowed_attributes=self.allowed_attributes,
             button_blocks=self.button_blocks,
             stylesheets=self.stylesheets,
+            split_paragraphs_by_br=self.split_paragraphs_by_br,
             required=self.required)
 
     def create_widget(self, models, factory=None):
@@ -64,7 +66,11 @@ class ExpandableHtmlConv(convs.Html):
 _transcript_class_match = re.compile(
     r'^(person|theme|index|assignment)_(\d+)$').match
 
-text_align_classes = ['text-align-right', 'text-align-center']
+text_align_classes = [
+    'text-align-right',
+    'text-align-center',
+    'text-align-full',
+]
 
 _p_cls_test = lambda x: x == 'transcript-p-hidden' or \
                         _transcript_class_match(x) or \
@@ -158,7 +164,7 @@ class IF_ExpHtml(IF_Html):
                            p=_p_cls_test,
                            hr=('block-links', 'block-media', 'block-files'))
     button_blocks = [
-        ('justify', ['justifyCenter', 'justifyRight']),
+        ('justify', ['justifyCenter', 'justifyRight', 'justifyFull']),
         ('inline', ['bold', 'italic', 'underline']),
         ('block', ['headings', 'sup', 'sub', 'blockquote']),
         ('lists', ['insertunorderedlist', 'insertorderedlist',
@@ -179,4 +185,5 @@ class IF_ExpHtml(IF_Html):
             allowed_classes=self.allowed_classes,
             button_blocks=self.button_blocks,
             stylesheets=self.stylesheets,
+            split_paragraphs_by_br=self.split_paragraphs_by_br,
             required=self.required)

@@ -14,6 +14,7 @@ textarea.wysihtml5{
 .wysihtml5-toolbar a.btn[data-wysihtml5-command="justifyLeft"] { background-position: -375px; }
 .wysihtml5-toolbar a.btn[data-wysihtml5-command="justifyCenter"] { background-position: -400px; }
 .wysihtml5-toolbar a.btn[data-wysihtml5-command="justifyRight"] { background-position: -425px; }
+.wysihtml5-toolbar a.btn[data-wysihtml5-command="justifyFull"] { background-position: -450px; }
 
 
 .wysihtml5-widget {

@@ -286,3 +286,6 @@ a[id]:before {
 .text-align-right{
     text-align: right;
 }
+.text-align-full{
+    text-align: justify;
+}
