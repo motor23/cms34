@@ -26,6 +26,8 @@ class Environment(EnvironmentBase):
     def url_for_obj(storage, obj, default=None):
         if isinstance(obj, storage.models.Menu):
             return storage.menu.url_for_item(obj)
+        elif isinstance(obj, storage.models.Block):
+            return storage.url_for('index')
         url = storage.sections.url_for_obj(storage.lang.root, obj)
         return url and url or default
 
