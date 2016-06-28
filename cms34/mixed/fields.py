@@ -101,6 +101,7 @@ __all__ = (
 class XF_Base(object):
     name = None
     label = None
+    hint = None
     permissions = "rw"
 
     def __init__(self, name=None, **kwargs):
@@ -147,18 +148,18 @@ class XF_Simple(XF_Base):
 
     def _model_field(self, factory=None):
         raise NotImplementedError(
-                'cls=%s, name=%s' % (self.__class__, self.name))
+            'cls=%s, name=%s' % (self.__class__, self.name))
 
     def _list_field(self):
         return LF_String(self.name, label=self.label)
 
     def _filter_field(self, models, factory=None):
         raise NotImplementedError(
-                'cls=%s, name=%s' % (self.__class__, self.name))
+            'cls=%s, name=%s' % (self.__class__, self.name))
 
     def _item_field(self, models, factory=None):
         raise NotImplementedError(
-                'cls=%s, name=%s' % (self.__class__, self.name))
+            'cls=%s, name=%s' % (self.__class__, self.name))
 
     def model_register(self, factory=None, register=None):
         field = self._model_field(factory)
@@ -217,6 +218,7 @@ class XF_String(XF_Simple):
     def _item_field(self, models, factory=None):
         return IF_String(self.name,
                          label=self.label,
+                         hint=self.hint,
                          max_length=self.max_length,
                          min_length=self.min_length,
                          initial=self.initial,
@@ -237,7 +239,9 @@ def slug_uniqueness(converter, value):
     current_item = converter.field.form.item
     env = converter.field.form.env
     slug_exists = env.db.query(env.models.Section) \
-        .filter_by(parent_id=current_item.parent_id, slug=value).count()
+        .filter_by(parent_id=current_item.parent_id, slug=value) \
+        .filter(env.models.Section.id != current_item.id,
+                env.models.Section.state != env.models.Section.DELETED).count()
 
     if slug_exists:
         raise ValidationError(u'Раздел с таким слагом уже существует.')
@@ -269,6 +273,7 @@ class XF_Text(XF_String):
     def _item_field(self, models, factory=None):
         return IF_Text(self.name,
                        label=self.label,
+                       hint=self.hint,
                        max_length=self.max_length,
                        min_length=self.min_length,
                        initial=self.initial,
@@ -445,43 +450,43 @@ class XF_StreamSelect(XF_Simple):
     def _model_field(self, factory=None):
         if self.multiple:
             return MF_M2MRelation(
-                    self.name,
-                    ordered=self.ordered,
-                    remote_cls_name=self.model,
+                self.name,
+                ordered=self.ordered,
+                remote_cls_name=self.model,
             )
         else:
             return MF_M2ORelation(
-                    self.name,
-                    remote_cls_name=self.model,
+                self.name,
+                remote_cls_name=self.model,
             )
 
     def _item_field(self, models, factory=None):
         return IF_StreamSelect(
-                self.name,
-                label=self.label,
-                model=self.model,
-                stream_name=self.stream_name,
-                multiple=self.multiple,
-                allow_create=self.allow_create,
-                allow_select=self.allow_select,
-                allow_delete=self.allow_delete,
-                inshift=self.inshift,
-                condition=self.condition,
-                default_filters=self.default_filters,
-                ordered=self.ordered,
-                rel=self.rel,
-                required=self.required,
+            self.name,
+            label=self.label,
+            model=self.model,
+            stream_name=self.stream_name,
+            multiple=self.multiple,
+            allow_create=self.allow_create,
+            allow_select=self.allow_select,
+            allow_delete=self.allow_delete,
+            inshift=self.inshift,
+            condition=self.condition,
+            default_filters=self.default_filters,
+            ordered=self.ordered,
+            rel=self.rel,
+            required=self.required,
         )
 
     def _filter_field(self, models, factory=None):
         return FF_StreamSelect(
-                self.name,
-                label=self.label,
-                model=self.model,
-                stream_name=self.stream_name,
-                multiple=self.multiple,
-                condition=self.condition,
-                default_filters=self.default_filters,
+            self.name,
+            label=self.label,
+            model=self.model,
+            stream_name=self.stream_name,
+            multiple=self.multiple,
+            condition=self.condition,
+            default_filters=self.default_filters,
         )
 
     def _list_field(self):
@@ -533,24 +538,24 @@ class XF_Parent(XF_Simple):
 
     def _item_field(self, models, factory=None):
         return IF_StreamSelect(
-                self.name,
-                label=self.label,
-                model=self.get_model(factory),
-                stream_name=self.get_stream_name(factory),
-                default_filters=self.default_filters,
-                rel=self.rel,
-                validators=self.validators,
+            self.name,
+            label=self.label,
+            model=self.get_model(factory),
+            stream_name=self.get_stream_name(factory),
+            default_filters=self.default_filters,
+            rel=self.rel,
+            validators=self.validators,
         )
 
     def _filter_field(self, models, factory=None):
         return FF_StreamSelect(
-                self.name,
-                label=self.label,
-                model=self.model,
-                stream_name=self.stream_name,
-                multiple=self.multiple,
-                condition=self.condition,
-                default_filters=self.default_filters,
+            self.name,
+            label=self.label,
+            model=self.model,
+            stream_name=self.stream_name,
+            multiple=self.multiple,
+            condition=self.condition,
+            default_filters=self.default_filters,
         )
 
 

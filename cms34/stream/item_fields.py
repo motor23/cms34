@@ -37,6 +37,7 @@ PermissionsGetter = str  # XXX
 class IF_Base(object):
     label = None
     name = None
+    hint = None
     permissions = "rw"
     permissions_getter = PermissionsGetter
 
@@ -68,6 +69,7 @@ class IF_Simple(IF_Base):
             widget=self.create_widget(models, factory),
             permissions=self.permissions_getter(self.permissions),
             label=self.label,
+            hint=self.hint,
             **kwargs
         )
 
