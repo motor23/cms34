@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
+from webob.exc import HTTPBadRequest
 from iktomi.web import match
 from iktomi.utils import cached_property
-from cms34.front.view import view_handler
+from cms34.front.view import view_handler, iframe_json
 from cms34.resources import ResourceView
 from cms34.front.plugins import VP_Response, VP_Query
 from cms34.resources.forms.front import ConstructedForm
@@ -82,7 +83,7 @@ class V_LettersSection(ResourceView):
         return [
             match('/', name='rules') | cache(False) | cls.h_rules,
             GuardedMatch('/form/', name='form', methods=('GET', 'POST')) |
-            cache(False) | no_preview | cls.h_form,
+            cache(False) | cls.h_form,
             sections.h_section(section),
         ]
 
@@ -106,11 +107,15 @@ class V_LettersSection(ResourceView):
     def h_form(self, env, data):
         letter_model = self._get_model()
         form = self._get_form()
+        is_iframe = 'iframe' in env.request.POST
 
         if env.request.method == 'POST':
             response_data = {'valid': None, 'errors': None, 'message': None}
 
             if form.accept(env.request.POST):
+                preview = getattr(env.app.cfg, 'PREVIEW', None)
+                if preview:
+                    raise HTTPBadRequest("Form submit is forbidden in preview")
                 flood_msg = self._check_flood(env, self.name)
                 if flood_msg:
                     response_data['message'] = flood_msg
@@ -129,7 +134,9 @@ class V_LettersSection(ResourceView):
 
             response_data['valid'] = form.is_valid
             response_data['errors'] = form.errors
-            return env.json(response_data)
+
+            to_json = iframe_json if is_iframe else env.json
+            return to_json(response_data)
         else:
             return self.response.template('form', dict(
                 letter=self.section,

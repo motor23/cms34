@@ -1,3 +1,5 @@
+import json
+from webob import Response
 from collections import OrderedDict
 from iktomi.web import WebHandler, cases as cases
 
@@ -105,4 +107,9 @@ class ViewHandler(WebHandler):
 def view_handler(method):
     return ViewHandler(method)
 
+
+def iframe_json(dict_):
+    data = json.dumps(dict_)
+    resp = '<html><head><script>data = %s;</script></head><body></body></html>' % data
+    return Response(resp, content_type="text/html")
 
