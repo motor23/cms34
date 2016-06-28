@@ -9,8 +9,15 @@
 
 from sqlalchemy.ext.serializer import dumps, loads
 
-class CachedQuery(object):
 
+class NoSuchAttribute(object):
+    """
+    This should be used as safe default value for getattr.
+    """
+    pass
+
+
+class CachedQuery(object):
     def __init__(self, items):
         self.items = items
 
@@ -18,7 +25,7 @@ class CachedQuery(object):
         result = []
         for item in self.items:
             for key, value in kwargs.items():
-                if getattr(item, key)!=value:
+                if getattr(item, key, NoSuchAttribute) != value:
                     break
             else:
                 result.append(item)
@@ -39,7 +46,7 @@ class CachedQuery(object):
     def order_by(self, field, direction='asc'):
         result = self.items
         result.sort(lambda x, y: cmp(getattr(x, field), getattr(y, field)))
-        if direction=='desc':
+        if direction == 'desc':
             result.reverse()
         return self.__class__(result)
 
@@ -48,7 +55,6 @@ class CachedQuery(object):
 
 
 class CachedDb(object):
-
     def __init__(self, cache, cache_enabled=True, cache_prefix='cached-db-',
                  cache_timeout=60, query_cls=CachedQuery, bind_to_session=True):
         self.cache = cache
@@ -92,4 +98,3 @@ class CachedDb(object):
 
     def close(self):
         self.queries = {}
-
