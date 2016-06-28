@@ -7,7 +7,8 @@ class H_App(web.WebHandler):
 
     def _locations(self):
         #XXX
-        self.app.update_sections(self.app.sections.values())
+        self.app.update_sections(self.app.sections.values(),
+                                 dispose_connections=True)
         self.app.handler = self.app.get_handler()
         return self.app.handler._locations()
 
