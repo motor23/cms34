@@ -45,12 +45,12 @@ class BaseApplication(object):
         cfg_cls = cls.cfg_class()
         cfg = cfg_cls(**kwargs)
         # Apply default local config (if any) to app, then apply custom config.
-        cfg.update_from_py(cfg.DEFAULT_CUSTOM_CFG)
+        cfg.update_from_py(cfg.DEFAULT_CUSTOM_CFG, silent=False)
         # Kwargs has more priority then default cfg values,
         # so we need to update then once more.
         # But `update_cfg` do not correctly update properties, be careful.
         cfg.update_cfg(kwargs)
-        cfg.update_from_py(custom_cfg_path)
+        cfg.update_from_py(custom_cfg_path, silent=False)
         return cls(cfg)
 
     @classmethod
