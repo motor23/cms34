@@ -13,6 +13,10 @@
     <p class="count_result">Найдено результатов: {{ paginator.count }}</p>
 {% endif %}
 <ul class="search_filter">
+    {% set order_field = form.get_field('order') %}
+    {% if order_field.conv.options()|list|length %}
+        {{ order_field.widget.render() }}
+    {% endif %}
 
     {% set filter_field = form.get_field('filter') %}
     {% if filter_field.conv.options()|list|length %}

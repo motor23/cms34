@@ -49,6 +49,7 @@ class V_Search(ResourceView):
 
     index_params = {
         'q': unicode,
+        'order': unicode,
         'filter': int,
         'page': int,
     }

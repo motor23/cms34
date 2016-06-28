@@ -1,7 +1,7 @@
 <ul>
     {% for option in options %}
         <li>
-            {% set url = context.current_url.qs_set(filter=option.value) %}
+            {% set url = context.current_url.qs_set(**{widget.input_name: option.value}) %}
             <a href="{{ url }}"
                {%- if option.selected %} class="selected" {% endif %}>
                 {{- option.title|escape -}}
