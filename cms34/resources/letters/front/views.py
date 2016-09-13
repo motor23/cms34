@@ -90,7 +90,7 @@ class V_LettersSection(ResourceView):
     @view_handler
     def h_rules(self, env, data):
         rules = getattr(self.section, 'rules', None)
-        if rules and rules.markup:
+        if rules:
             return self.response.template('rules', dict(letter=self.section))
         return self.response.redirect_to(self.root.form, qs=None)
 
@@ -102,6 +102,9 @@ class V_LettersSection(ResourceView):
                                         allowed_at.minute,
                                         env.lang.date(allowed_at))
             return message
+
+    def _format_success_msg(self, letter_id):
+        return self.SUCCESS_TPL.format(id=letter_id)
 
     @view_handler
     def h_form(self, env, data):
@@ -129,8 +132,7 @@ class V_LettersSection(ResourceView):
                 env.db.commit()
                 letter_id = '{}_{}'.format(self.env.cfg.APP_ID, letter.id)
                 response_data['success'] = True
-                response_data['message'] = self.SUCCESS_TPL.format(
-                    id=letter_id)
+                response_data['message'] = self._format_success_msg(letter_id)
 
             response_data['valid'] = form.is_valid
             response_data['errors'] = form.errors

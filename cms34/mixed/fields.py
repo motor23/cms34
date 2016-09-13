@@ -57,6 +57,7 @@ __all__ = (
     'XF_Slug',
     'XF_Text',
     'XF_Title',
+    'XF_OptionalTitle',
     'XF_Lead',
     'XF_Int',
     'XF_Order',
@@ -732,6 +733,7 @@ class XF_ExpHtml(XF_Html):
                           allowed_attributes=self.allowed_attributes,
                           button_blocks=self.button_blocks,
                           stylesheets=self.stylesheets,
+                          hint=self.hint,
                           )
 
 
