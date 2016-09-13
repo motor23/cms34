@@ -237,9 +237,10 @@ def slug_uniqueness(converter, value):
     Slug should be unique on current section tree level.
     """
     current_item = converter.field.form.item
+    form_parent_id = converter.field.form.raw_data.get('parent')
     env = converter.field.form.env
     slug_exists = env.db.query(env.models.Section) \
-        .filter_by(parent_id=current_item.parent_id, slug=value) \
+        .filter_by(parent_id=form_parent_id, slug=value) \
         .filter(env.models.Section.id != current_item.id,
                 env.models.Section.state != env.models.Section.DELETED).count()
 
