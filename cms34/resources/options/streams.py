@@ -17,7 +17,7 @@ from cms34.mixed import (
 
 class XB_Main(XF_Block):
     name = 'media_block'
-    label = u'Медия'
+    label = u'Общие настройки'
     sort_initial_field = 'order'
     list_fields = [
         xf_title,

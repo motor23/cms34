@@ -2,7 +2,8 @@
 import json
 from sqlalchemy import PickleType, Text, Column
 from cms34.model.fields import MF_Int, MF_Base, MF_DateTime
-from cms34.mixed.fields import XF_Body, XF_Simple
+from cms34.mixed.fields import XF_Simple
+from cms34.mixed.fields import XF_Html
 
 
 class TextPickleType(PickleType):
@@ -28,7 +29,7 @@ class MF_LetterJson(MF_Json):
     name = 'letter_json'
 
 
-class XF_Rules(XF_Body):
+class XF_Rules(XF_Html):
     name = 'rules'
     label = u'Правила отправки обращений'
 

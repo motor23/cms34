@@ -61,7 +61,8 @@ class AppCli(Cli):
         }
 
     def cli(self, app):
-        return BaseApp(app, shell_namespace=self.shell_namespace(app))
+        return BaseApp(app, shell_namespace=self.shell_namespace(app),
+                       extra_files=(app.cfg.DEFAULT_CUSTOM_CFG,))
 
 
 class FcgiCli(Cli):
