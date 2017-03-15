@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 import os
+import pwd
 import sys
 import logging.config
 from cms34.utils import cached_property
@@ -178,9 +179,9 @@ class Cfg(BaseCfg):
         return dict(
             fastcgi_params=self.FASTCGI_PARAMS,
             umask=0,
-            bind=path.join(self.RUN_DIR, 'app.sock'),
-            pidfile=path.join(self.RUN_DIR, 'app.pid'),
-            logfile=path.join(self.LOG_DIR, 'app.log'),
+            bind=os.path.join(self.RUN_DIR, 'app.sock'),
+            pidfile=os.path.join(self.RUN_DIR, 'app.pid'),
+            logfile=os.path.join(self.LOG_DIR, 'app.log'),
         )
 
     def config_uid(self):
