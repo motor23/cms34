@@ -22,7 +22,7 @@ class V_Theme(ResourceView):
 
     @view_handler
     def h_index(self, env, data):
-        return self.response.template('index', dict())
+        return self.response.template('index', dict(theme=self.section))
 
 
 class V_ThemesList(ResourceView):

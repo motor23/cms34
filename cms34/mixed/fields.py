@@ -143,6 +143,7 @@ class XF_Simple(XF_Base):
     initial = None
     required = False
     sortable = False
+    nullable = True
 
     def __init__(self, name=None, **kwargs):
         XF_Base.__init__(self, name, **kwargs)
@@ -210,6 +211,7 @@ class XF_String(XF_Simple):
 
     def _model_field(self, factory=None):
         return MF_String(self.name,
+                         nullable=self.nullable,
                          length=self.max_length,
                          default=self.initial)
 
@@ -238,7 +240,7 @@ def slug_uniqueness(converter, value):
     Slug should be unique on current section tree level.
     """
     current_item = converter.field.form.item
-    form_parent_id = converter.field.form.raw_data.get('parent')
+    form_parent_id = converter.field.form.raw_data.get('parent') or None
     env = converter.field.form.env
     slug_exists = env.db.query(env.models.Section) \
         .filter_by(parent_id=form_parent_id, slug=value) \
@@ -255,6 +257,7 @@ class XF_Slug(XF_String):
     name = 'slug'
     label = u'Слаг'
     required = True
+    nullable = False
     min_length = 2
     regex = r'^[A-Za-z][A-Za-z0-9_-]+$'
     error_regex = u'Слаг может состоять из латинских букв и цифр,' \

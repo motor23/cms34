@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms34.stream import StreamFactory
-from cms34.resources.sections.fields import xb_section_object
+from cms34.resources.sections.blocks import xb_section_object
 from cms34.resources.forms.fields import xb_form_blocks
 from .blocks import xb_letters_settings
 

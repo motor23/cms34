@@ -18,8 +18,8 @@ from cms34.mixed import (
 )
 from .fields import (
     xf_section_tree_title,
-    xb_section_object,
 )
+from cms34.resources.sections.blocks import xb_section_object
 
 
 class SFY_Sections(StreamFactory):

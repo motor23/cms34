@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms34.stream import StreamFactory
-from cms34.resources.sections.fields import xb_section_object
-
+from .blocks import xb_search_section_object
 
 class SFY_SearchSection(StreamFactory):
     name = 'search'
@@ -17,5 +16,5 @@ class SFY_SearchSection(StreamFactory):
     }
 
     fields = sort_fields = filter_fields = item_fields = [
-        xb_section_object,
+        xb_search_section_object,
     ]

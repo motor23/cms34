@@ -425,47 +425,116 @@ var PopupCommand = Object({
   };
 })(wysihtml5);
 
-(function(wysihtml5) {
-  var CLASS_NAME  = "text-align-center",
-      REG_EXP     = /text-align-[0-9a-z]+/g;
 
-  wysihtml5.commands.justifyCenter = {
-    exec: function(composer, command) {
-      return wysihtml5.commands.formatBlock.exec(composer, "formatBlock", null, CLASS_NAME, REG_EXP);
-    },
+(function (wysihtml5) {
 
-    state: function(composer, command) {
-      return wysihtml5.commands.formatBlock.state(composer, "formatBlock", null, CLASS_NAME, REG_EXP);
+    function _hasClass(node, _className) {
+        if (node && node.className) {
+            var classList = node.className.split(' ');
+            for (var cls of classList) {
+                if (cls === _className) {
+                    return true
+                }
+            }
+        }
+        return false;
     }
-  };
-})(wysihtml5);
 
-(function(wysihtml5) {
-  var CLASS_NAME  = "text-align-right",
-      REG_EXP     = /text-align-[0-9a-z]+/g;
-
-  wysihtml5.commands.justifyRight = {
-    exec: function(composer, command) {
-      return wysihtml5.commands.formatBlock.exec(composer, "formatBlock", null, CLASS_NAME, REG_EXP);
-    },
-
-    state: function(composer, command) {
-      return wysihtml5.commands.formatBlock.state(composer, "formatBlock", null, CLASS_NAME, REG_EXP);
+    function _addClass(node, newClass) {
+        if (node) {
+            if (node.className) {
+                if (!_hasClass(node, newClass)) {
+                    node.className += ' ' + newClass;
+                }
+            }
+            else {
+                node.className = newClass;
+            }
+        }
+        return node
     }
-  };
-})(wysihtml5);
 
-(function(wysihtml5) {
-  var CLASS_NAME  = "text-align-full",
-      REG_EXP     = /text-align-[0-9a-z]+/g;
-
-  wysihtml5.commands.justifyFull = {
-    exec: function(composer, command) {
-      return wysihtml5.commands.formatBlock.exec(composer, "formatBlock", null, CLASS_NAME, REG_EXP);
-    },
-
-    state: function(composer, command) {
-      return wysihtml5.commands.formatBlock.state(composer, "formatBlock", null, CLASS_NAME, REG_EXP);
+    function _removeClass(node, _className) {
+        if (_hasClass(node, _className)) {
+            var classList = node.className.split(' ');
+            var newClassList = classList.filter(cls => cls != _className);
+            node.className = newClassList.join(' ');
+        }
+        return node
     }
-  };
+
+    function _getSelectedParagraphs(composer) {
+        var range = composer.selection.getRange();
+        var nodes = range.getNodes(wysihtml5.ELEMENT_NODE, function (node) {
+            return node.nodeName === "P";
+        });
+        return nodes;
+    }
+
+    function isIterable(obj) {
+        // checks for null and undefined
+        if (obj == null) {
+            return false;
+        }
+        return typeof obj[Symbol.iterator] === 'function';
+    }
+
+    function justifyExecFunc(composer, command) {
+        var activeNodes = this.state(composer, command);
+        var self = this;
+        if (activeNodes) {
+            if (isIterable(activeNodes)) {
+                composer.selection.executeAndRestoreSimple(function () {
+                    for (var node of activeNodes) {
+                        _removeClass(node, self.clsName);
+                    }
+                });
+            } else {
+                return wysihtml5.commands.formatBlock.exec(composer, "formatBlock", null, self.clsName, self.regExp);
+            }
+        } else {
+            composer.selection.executeAndRestoreSimple(function () {
+                var nodes = _getSelectedParagraphs(composer);
+                if (nodes.length > 0) {
+                    for (var node of nodes) {
+                        _addClass(node, self.clsName);
+                    }
+                } else {
+                    return wysihtml5.commands.formatBlock.exec(composer, "formatBlock", null, self.clsName, self.regExp);
+                }
+            });
+        }
+    }
+
+    function justifyStateFunc(composer, command) {
+        var nodes = _getSelectedParagraphs(composer);
+        var allNodes = !!nodes.length && nodes.every(x => _hasClass(x, this.clsName));
+        if (allNodes) {
+            return nodes;
+        } else {
+            return wysihtml5.commands.formatBlock.state(composer, "formatBlock", null, this.clsName, this.regExp);
+        }
+    }
+
+    wysihtml5.commands.justifyFull = {
+        clsName: "text-align-full",
+        regExp: /text-align-[0-9a-z]+/g,
+        exec: justifyExecFunc,
+        state: justifyStateFunc,
+    };
+
+    wysihtml5.commands.justifyCenter = {
+        clsName: "text-align-center",
+        regExp: /text-align-[0-9a-z]+/g,
+        exec: justifyExecFunc,
+        state: justifyStateFunc,
+    };
+
+    wysihtml5.commands.justifyRight = {
+        clsName: "text-align-right",
+        regExp: /text-align-[0-9a-z]+/g,
+        exec: justifyExecFunc,
+        state: justifyStateFunc,
+    };
+
 })(wysihtml5);
