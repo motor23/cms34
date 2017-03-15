@@ -657,6 +657,7 @@ class XF_Img(XF_Simple):
                       show_thumbnail=self.show_thumbnail,
                       crop=self.crop,
                       show_size=self.show_size,
+                      required=self.required,
                       )
 
 
