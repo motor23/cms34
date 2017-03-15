@@ -93,6 +93,22 @@ class FcgiCli(Cli):
 class DbCli(Cli):
     name = 'db'
 
+    def create_app(self, cls, level=None, **kwargs):
+        """
+        We do not want to initialize full application here, only base app
+        properties needed. Full app initializes sections from DB, so we will
+        fail because of inconsistent model-schema state.
+        """
+        cls.properties = [
+            'models',
+            'admin_file_manager',
+            'front_file_manager',
+            'shared_file_manager',
+            'db_maker',
+            'env_class',
+        ]
+        return super(DbCli, self).create_app(cls, level, **kwargs)
+
     def command_create_tables(self, meta_name=None, verbose=False,
                               level=None, cfg=''):
         app = self.create_app(self.App, level=level, custom_cfg_path=cfg)
@@ -113,10 +129,6 @@ class DbCli(Cli):
     def command_schema(self, name=None, level=None, cfg=''):
         app = self.create_app(self.App, level=level, custom_cfg_path=cfg)
         return self.cli(app).command_schema(name)
-
-    def command_gen(self, *names):  # XXX
-        app = self.create_app()
-        return self.cli(app).command_gen()
 
     def cli(self, app):
         import models.initial
