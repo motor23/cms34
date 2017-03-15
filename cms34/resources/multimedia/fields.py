@@ -114,7 +114,7 @@ class XF_Poster4_3(XF_Img):
     image_sizes = (640, 480)
     resize = ResizeCrop()
     fill_from = 'poster_orig'
-    required = True
+    required = False
     show_thumbnail = True
     show_size = True
     crop = True
@@ -126,7 +126,7 @@ class XF_Poster16_9(XF_Img):
     image_sizes = (640, 360)
     resize = ResizeCrop()
     fill_from = 'poster_orig'
-    required = True
+    required = False
     show_thumbnail = True
     show_size = True
     crop = True
