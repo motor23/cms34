@@ -15,7 +15,6 @@ class MFY_Theme(ModelFactory):
 
     fields = [
         xf_id,
-        xf_title,
         xf_lead,
         xf_body,
     ]
