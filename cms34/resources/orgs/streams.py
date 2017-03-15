@@ -8,9 +8,7 @@ from cms34.mixed import (
     xf_body,
 )
 from .fields import xf_members
-from ..sections.fields import (
-    xb_section_object
-)
+from cms34.resources.sections.blocks import xb_section_object
 from common.blocks import xb_section_files_blocks, xb_section_links_blocks
 
 

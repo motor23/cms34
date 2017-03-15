@@ -15,9 +15,7 @@ from .fields import (
     xf_patronymic,
     xf_post,
 )
-from ..sections.fields import (
-    xb_section_object
-)
+from cms34.resources.sections.blocks import xb_section_object
 
 
 class XB_Main(XF_Block):

@@ -12,7 +12,7 @@ from cms34.mixed import (
     xf_body,
     xb_object,
 )
-from ..sections.fields import xb_section
+from cms34.resources.sections.blocks import xb_section
 
 
 class XB_Content(XB_Content):

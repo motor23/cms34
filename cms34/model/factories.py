@@ -8,12 +8,15 @@ from sqlalchemy import ForeignKeyConstraint
 from ..utils import prop_getter
 from .fields import MF_Enum
 
+
 def decorator_to_registry(dec, **kwargs):
     def register(name, constructor, bases):
         def func(models):
             locals().update(constructor(models))
+
         func.func_name = name
         dec(*bases, **kwargs)(func)
+
     return register
 
 
@@ -35,11 +38,11 @@ class HybridFactoryMethod(object):
             raise NotImplementedError()
         return self.factory_method.__get__(instance, owner)
 
+
 hybrid_factory_method = HybridFactoryMethod()
 
 
 class ModelFactory(object):
-
     fields = []
     register = None
     title = None
@@ -48,15 +51,16 @@ class ModelFactory(object):
     plugins = []
     id_field_name = 'id'
 
-    def __init__(self, register=None,
-                       bases=None,
-                       rel_cls_bases=None,
-                       plugins=None,
-                       common_plugins=[],
-                       main_factory=None):
+    def __init__(self,
+                 register=None,
+                 bases=None,
+                 rel_cls_bases=None,
+                 plugins=None,
+                 common_plugins=[],
+                 main_factory=None):
         self.register = register or self.register
         assert self.register, \
-               u'You must specify register param, cls=%s' % self.__class__
+            u'You must specify register param, cls=%s' % self.__class__
         self.bases = bases or self.bases
         self.rel_cls_bases = rel_cls_bases or self.rel_cls_bases
         plugins = plugins or self.plugins
@@ -76,8 +80,10 @@ class ModelFactory(object):
             'models': models,
             '__title__': self.title,
         })
+
         for field in self.fields:
             field.model_field(model_dict, models, self)
+
         for prop_name in dir(self.__class__):
             prop = getattr(self.__class__, prop_name)
             if isinstance(prop, HybridFactoryMethod) and prop.model_method:
@@ -86,17 +92,16 @@ class ModelFactory(object):
             plugin.get_model_dict(model_dict, models)
         return model_dict
 
-    @cached_class_property #XXX
+    @cached_class_property  # XXX
     def model(cls):
         return cls.__name__
 
-    @cached_class_property #XXX
+    @cached_class_property  # XXX
     def name(cls):
         return cls.model
 
 
 class ModelFactoryPlugin(object):
-
     def __init__(self, factory=None, **kwargs):
         self.factory = factory
         self.kwargs = kwargs
@@ -105,24 +110,25 @@ class ModelFactoryPlugin(object):
     def __call__(self, factory):
         return self.__class__(factory, **self.kwargs)
 
-    def get_model_dict(self, model_dict, models): pass
-    def register(self): pass
+    def get_model_dict(self, model_dict, models):
+        pass
+
+    def register(self):
+        pass
 
 
 class MFP_I18n(ModelFactoryPlugin):
-
     def get_model_dict(self, model_dict, models):
         if models.lang != models.main_lang:
             model_dict.setdefault('__table_args__', ())
             remote = '%sRu.%s' % (self.factory.name,
                                   self.factory.id_field_name)
-            model_dict['__table_args__']+= \
-                     (ForeignKeyConstraint([self.factory.id_field_name],
-                      [remote]),)
+            model_dict['__table_args__'] += \
+                (ForeignKeyConstraint([self.factory.id_field_name],
+                                      [remote]),)
 
 
 class MFP_Types(ModelFactoryPlugin):
-
     class MFP_Type(ModelFactoryPlugin):
 
         parent_factory = None
@@ -139,9 +145,9 @@ class MFP_Types(ModelFactoryPlugin):
             remote_model = getattr(models, parent_factory.name)
             remote_id = getattr(remote_model,
                                 parent_factory.id_field_name)
-            model_dict['__table_args__']+= \
-                     (ForeignKeyConstraint([self.factory.id_field_name],
-                                           [remote_id]),)
+            model_dict['__table_args__'] += \
+                (ForeignKeyConstraint([self.factory.id_field_name],
+                                      [remote_id]),)
 
     type_field_name = 'type'
 
@@ -149,10 +155,11 @@ class MFP_Types(ModelFactoryPlugin):
         ModelFactoryPlugin.__init__(self, factory)
         self.types = getattr(self.factory, 'types', None)
         assert self.types is not None, \
-               u'You must specify types param, factory=%s' % factory
+            u'You must specify types param, factory=%s' % factory
 
     def get_model_dict(self, model_dict, models):
-        self.type_field(self.types).model_field(model_dict, models, self.factory)
+        self.type_field(self.types).model_field(model_dict, models,
+                                                self.factory)
         mapper_args = model_dict.setdefault('__mapper_args__', {})
         mapper_args['polymorphic_on'] = self.type_field_name
 
@@ -160,14 +167,15 @@ class MFP_Types(ModelFactoryPlugin):
             identity = initial.get(self.type_field_name)
             if identity:
                 for type_identity, type in self.factory.types:
-                    if type_identity==identity:
+                    if type_identity == identity:
                         cls = getattr(models, type.name)
                         break;
                 else:
                     raise Exception('Model="%s": Unknown type %s' % \
-                                       (cls, initial[self.type_field_name]))
+                                    (cls, initial[self.type_field_name]))
             return super(getattr(models, self.factory.name), cls).__new__(cls)
-        model_dict['__new__']=__new__
+
+        model_dict['__new__'] = __new__
 
     def type_field(self, types):
         return MF_Enum(self.type_field_name,
@@ -219,4 +227,3 @@ class MFP_AddFields(ModelFactoryPlugin):
         fields = self.get_fields()
         for field in fields:
             field.model_field(model_dict, models, self.factory)
-

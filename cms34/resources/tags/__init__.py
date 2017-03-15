@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 from .. import ResourceBase
-from ..sections.fields import xb_section_object
+from cms34.resources.sections.blocks import xb_section_object
 from .front import V_RegionSection
 from .models import MFY_Tag, MFY_Region, MFY_RegionSection
 from .streams import SFY_Tags, SFY_Regions

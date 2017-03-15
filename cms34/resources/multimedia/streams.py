@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from cms34.resources.sections.fields import xb_section_object
+from cms34.resources.sections.blocks import xb_section_object
 from ...stream import (
     StreamFactory,
     TypedItemFormFactory,
