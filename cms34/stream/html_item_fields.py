@@ -22,7 +22,7 @@ class IF_Html(IF_Simple):
     allowed_elements = ('a', 'p', 'li', 'ul', 'ol', 'i', 'b',
                         'blockquote', 'hr', 'h1', 'h2', 'h3', 'br',
                         'table', 'tr', 'td')
-    allowed_protocols = ('http', 'https', 'ftp')
+    allowed_protocols = ('http', 'https', 'ftp', 'mailto')
     allowed_attributes = ('href', 'src', 'alt', 'colspan',
                           'title', 'class', 'rel')
     button_blocks = widgets.WysiHtml5.button_blocks
@@ -159,7 +159,7 @@ class IF_ExpHtml(IF_Html):
                         'iktomi_files', 'table', 'td', 'tr')
     allowed_attributes = ('data-align', 'item_id', 'id',
                           'class', 'href', 'colspan')
-    allowed_protocols = ('model', 'http')
+    allowed_protocols = ('model', 'http', 'mailto')
     allowed_classes = dict(convs.Html.allowed_classes,
                            p=_p_cls_test,
                            hr=('block-links', 'block-media', 'block-files'))
