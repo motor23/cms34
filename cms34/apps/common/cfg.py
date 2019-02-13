@@ -139,6 +139,9 @@ class Cfg(BaseCfg):
     EMAIL_ERRORS_TO = []
     EMAIL_LETTERS_TO = []
 
+    HTTP_SERVER_HOST = '127.0.0.1'
+    HTTP_SERVER_PORT = 8000
+
     UID = 'someuid'
 
     LOG_LEVEL = 'INFO'
