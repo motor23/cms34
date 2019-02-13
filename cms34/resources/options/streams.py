@@ -17,25 +17,21 @@ from cms34.mixed import (
 
 class XB_Main(XF_Block):
     name = 'media_block'
-    label = u'Общие настройки'
+    label = u''
     sort_initial_field = 'order'
     list_fields = [
-        xf_title,
-        xf_order,
+        xf_type,
     ]
     filter_fields = [
         xf_type,
-        xf_title,
     ]
     item_fields = [
         xf_type,
-        xf_title,
-        xf_order,
     ]
     sort_fields = [
-       xf_title,
-       xf_order,
+        xb_object,
     ]
+
 
 xb_main = XB_Main()
 
@@ -49,17 +45,14 @@ class SFY_Options(StreamFactory):
     plugins = [SFP_ImageUpload]
 
     permissions = {
-        'wheel':'rwxdcp',
-        'editor':'rwxdcp',
+        'wheel': 'rwxdcp',
+        'editor': 'rwxdcp',
     }
 
     item_form_factory = TypedItemFormFactory
 
     common_fields = [
-        xb_object,
         xb_main,
     ]
     sort_fields = filter_fields = list_fields = common_fields
     item_fields = {}
-
-

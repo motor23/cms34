@@ -1,7 +1,11 @@
 import sys
 from subprocess import Popen
 import os.path
-
+import fnmatch
+from multiprocessing import Process
+from iktomi.cli.app import wait_for_code_change
+from iktomi.cli.app import flush_fds
+from iktomi.cli.app import MAXFD
 from iktomi.cli.base import Cli as BaseCli
 from iktomi.cli.app import App as BaseApp
 from iktomi.cli.fcgi import Flup as BaseFcgi
@@ -15,7 +19,7 @@ class AppCliDict(object):
         self.cli_classes = cli_classes
 
     def __get__(self, app, app_cls):
-        return dict([(cli_cls.name, cli_cls(app_cls)) \
+        return dict([(cli_cls.name, cli_cls(app_cls))
                      for cli_cls in self.cli_classes])
 
 
@@ -41,9 +45,49 @@ class Cli(BaseCli):
 class AppCli(Cli):
     name = 'app'
 
-    def command_serve(self, host='', port='8000', level=None, cfg=''):
-        app = self.create_app(self.App, level=level, custom_cfg_path=cfg)
-        return self.cli(app).command_serve(host, port)
+    def  command_serve(self, host='', port='8000', level=None, cfg=''):
+
+        def http_process(host, port, stdin):
+            sys.stdin = stdin
+            from wsgiref.simple_server import make_server
+            app = self.create_app(self.App, level=level, custom_cfg_path=cfg)
+            host = host or app.cfg.HTTP_SERVER_HOST
+            port = port and int(port) or app.cfg.HTTP_SERVER_PORT
+            print('Staring HTTP server {}:{}...'.format(host, port))
+            server = make_server(host, port, app)
+            server.serve_forever()
+
+        stdin = os.fdopen(os.dup(sys.stdin.fileno()))
+        p1 = Process(target=http_process, args=(host, port, stdin))
+        p1.start()
+
+        cfg = self.create_cfg()
+
+        extra_files = []
+        for root, dirnames, filenames in os.walk(cfg.ROOT):
+            for filename in fnmatch.filter(filenames, '*.py'):
+                extra_files.append(os.path.join(root, filename))
+
+        try:
+            wait_for_code_change(extra_files=extra_files)
+            p1.terminate()
+            p1.join()
+            flush_fds()
+
+            pid = os.fork()
+            if pid:
+                os.closerange(3, MAXFD)
+                os.waitpid(pid, 0)
+                os.execvp(sys.executable, [sys.executable] + sys.argv)
+            else:
+                sys.exit()
+
+        except KeyboardInterrupt:
+            print('Terminating HTTP server...')
+            p1.terminate()
+
+        sys.exit()
+
 
     def command_dispatch(self, host='', port='8000', level=None, cfg=''):
         app = self.create_app(self.App.Dispatcher,
@@ -61,8 +105,11 @@ class AppCli(Cli):
         }
 
     def cli(self, app):
-        return BaseApp(app, shell_namespace=self.shell_namespace(app),
-                       extra_files=(app.cfg.DEFAULT_CUSTOM_CFG,))
+        return BaseApp(
+            app,
+            shell_namespace=self.shell_namespace(app),
+            extra_files=(app.cfg.DEFAULT_CUSTOM_CFG,)
+        )
 
 
 class FcgiCli(Cli):
