@@ -44,15 +44,16 @@ class Cli(BaseCli):
 
 class AppCli(Cli):
     name = 'app'
+    DEFAULT_PORT = '8000'
 
-    def  command_serve(self, host='', port='8000', level=None, cfg=''):
-
+    def  command_serve(self, host='', port=None, level=None, cfg=''):
         def http_process(host, port, stdin):
             sys.stdin = stdin
             from wsgiref.simple_server import make_server
             app = self.create_app(self.App, level=level, custom_cfg_path=cfg)
             host = host or app.cfg.HTTP_SERVER_HOST
-            port = port and int(port) or app.cfg.HTTP_SERVER_PORT
+            if port is None:
+                port = getattr(app.cfg, 'HTTP_SERVER_PORT', self.DEFAULT_PORT)
             print('Staring HTTP server {}:{}...'.format(host, port))
             server = make_server(host, port, app)
             server.serve_forever()
